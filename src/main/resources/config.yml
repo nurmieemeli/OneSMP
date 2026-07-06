@@ -1,0 +1,73 @@
+# CanvasSuite configuration
+
+storage:
+  # Storage type: MYSQL or SQLITE. If MYSQL is selected but the connection
+  # cannot be established on startup, CanvasSuite automatically falls back
+  # to the local SQLite file below.
+  type: SQLITE
+  mysql:
+    host: localhost
+    port: 3306
+    database: canvassuite
+    username: canvassuite
+    password: ""
+    useSSL: false
+    pool-size: 10
+  sqlite:
+    file: data.db
+
+economy:
+  currency-symbol: "$"
+  currency-name-singular: dollar
+  currency-name-plural: dollars
+  starting-balance: 100.00
+  max-balance: 1000000000.00
+
+shop:
+  # Multiplier applied to every configured sell price, e.g. 0.75 = sell for 75% of list price.
+  sell-price-multiplier: 1.0
+
+teleport:
+  tpa-request-timeout-seconds: 60
+  teleport-warmup-seconds: 3
+  cancel-warmup-on-move: true
+  home-limit-permission-prefix: "canvassuite.home.limit."
+  default-home-limit: 3
+
+rtp:
+  min-radius: 500
+  max-radius: 5000
+  cooldown-seconds: 300
+  cost: 0.0
+  max-attempts: 30
+  disallowed-worlds: []
+  # Biome keys (namespaced) players should never be randomly teleported into.
+  avoid-biomes:
+    - "minecraft:ocean"
+    - "minecraft:deep_ocean"
+    - "minecraft:frozen_ocean"
+    - "minecraft:river"
+    - "minecraft:void"
+
+guild:
+  max-name-length: 16
+  min-name-length: 3
+  max-tag-length: 5
+  default-member-limit: 10
+  creation-cost: 500.0
+  allow-guild-bank: true
+
+chat:
+  # Formats are evaluated top-to-bottom; the first entry whose permission
+  # the sender holds (or that has no permission set) is used.
+  formats:
+    - permission: canvassuite.chat.admin
+      format: "<red><bold>ADMIN</bold></red> <gray>[<guild_tag>]</gray> <white><player_name></white><dark_gray>:</dark_gray> <message>"
+    - permission: ""
+      format: "<gray>[<guild_tag>]</gray> <white><player_name></white><dark_gray>:</dark_gray> <gray><message>"
+  guild-chat-format: "<dark_aqua>[G]</dark_aqua> <gray>[<guild_tag>]</gray> <white><player_name></white><dark_gray>:</dark_gray> <aqua><message>"
+  default-guild-tag: "-"
+
+protection:
+  disable-stronghold-generation: true
+  disable-nether-portal-creation: true
