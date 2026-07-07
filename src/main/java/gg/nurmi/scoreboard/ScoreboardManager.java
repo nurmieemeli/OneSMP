@@ -75,7 +75,7 @@ public final class ScoreboardManager {
         // even for an already-existing (per-player) Scoreboard instance.
         plugin.scheduler().runGlobal(() -> {
             Objective objective = board.getObjective(OBJECTIVE_NAME);
-            if (objective != null) {
+            if (objective != null && !title.equals(objective.displayName())) {
                 objective.displayName(title);
             }
             applyLines(board, objective, lines);
@@ -88,28 +88,47 @@ public final class ScoreboardManager {
         }
     }
 
-    /** Must already be running on the global tick thread - mutates the Scoreboard's teams/scores directly. */
+    /**
+     * Must already be running on the global tick thread - mutates the Scoreboard's teams/scores
+     * directly. Diffs against whatever's already registered instead of unregistering and
+     * recreating every "csln_" team on every call - unregistering a team briefly removes its line
+     * from the sidebar before the replacement appears, which is what caused the visible blinking.
+     * An existing team's prefix is only touched when its text actually changed.
+     */
     private void applyLines(Scoreboard board, Objective objective, List<Component> lines) {
-        for (Team team : List.copyOf(board.getTeams())) {
-            if (team.getName().startsWith("csln_")) {
-                for (String entry : team.getEntries()) {
-                    board.resetScores(entry);
-                }
-                team.unregister();
-            }
-        }
-
         if (objective == null) {
             return;
         }
 
-        int total = lines.size();
-        for (int i = 0; i < total; i++) {
+        int newTotal = lines.size();
+        int oldTotal = 0;
+        while (board.getTeam("csln_" + oldTotal) != null) {
+            oldTotal++;
+        }
+
+        // Only the excess teams beyond the new line count are torn down.
+        for (int i = newTotal; i < oldTotal; i++) {
+            Team team = board.getTeam("csln_" + i);
+            for (String entry : team.getEntries()) {
+                board.resetScores(entry);
+            }
+            team.unregister();
+        }
+
+        for (int i = 0; i < newTotal; i++) {
             String entry = entryFor(i);
-            Team team = board.registerNewTeam("csln_" + i);
-            team.addEntry(entry);
-            team.prefix(lines.get(i));
-            objective.getScore(entry).setScore(total - i);
+            Team team = board.getTeam("csln_" + i);
+            if (team == null) {
+                team = board.registerNewTeam("csln_" + i);
+                team.addEntry(entry);
+            }
+            if (!lines.get(i).equals(team.prefix())) {
+                team.prefix(lines.get(i));
+            }
+            // Score only depends on position, so it only needs touching when the line count changed.
+            if (newTotal != oldTotal) {
+                objective.getScore(entry).setScore(newTotal - i);
+            }
         }
     }
 
