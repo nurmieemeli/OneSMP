@@ -1,0 +1,66 @@
+package gg.nurmi.spawn;
+
+import org.bukkit.GameMode;
+import org.bukkit.Tag;
+import org.bukkit.block.Block;
+import org.bukkit.entity.Player;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.Listener;
+import org.bukkit.event.block.Action;
+import org.bukkit.event.entity.EntityChangeBlockEvent;
+import org.bukkit.event.entity.EntityDamageEvent;
+import org.bukkit.event.entity.FoodLevelChangeEvent;
+import org.bukkit.event.player.PlayerInteractEvent;
+
+/**
+ * In the void spawn world, non-creative players can't interact with blocks (except opening/closing
+ * doors), trample farmland, take damage, or lose food — it's a lobby, not somewhere to survive in.
+ * Creative-mode players bypass every rule here.
+ */
+public final class VoidWorldListener implements Listener {
+
+    private final SpawnWorldManager spawnWorldManager;
+
+    public VoidWorldListener(SpawnWorldManager spawnWorldManager) {
+        this.spawnWorldManager = spawnWorldManager;
+    }
+
+    private boolean restricted(Player player) {
+        return spawnWorldManager.isVoidWorld(player.getWorld()) && player.getGameMode() != GameMode.CREATIVE;
+    }
+
+    @EventHandler(ignoreCancelled = true)
+    public void onInteract(PlayerInteractEvent event) {
+        if (event.getAction() != Action.RIGHT_CLICK_BLOCK) {
+            return;
+        }
+        Block block = event.getClickedBlock();
+        if (block == null || !restricted(event.getPlayer())) {
+            return;
+        }
+        if (!Tag.DOORS.isTagged(block.getType())) {
+            event.setCancelled(true);
+        }
+    }
+
+    @EventHandler
+    public void onEntityChangeBlock(EntityChangeBlockEvent event) {
+        if (event.getEntity() instanceof Player player && restricted(player)) {
+            event.setCancelled(true);
+        }
+    }
+
+    @EventHandler
+    public void onEntityDamage(EntityDamageEvent event) {
+        if (event.getEntity() instanceof Player player && restricted(player)) {
+            event.setCancelled(true);
+        }
+    }
+
+    @EventHandler
+    public void onFoodLevelChange(FoodLevelChangeEvent event) {
+        if (event.getEntity() instanceof Player player && restricted(player)) {
+            event.setCancelled(true);
+        }
+    }
+}

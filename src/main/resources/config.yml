@@ -60,14 +60,84 @@ guild:
 chat:
   # Formats are evaluated top-to-bottom; the first entry whose permission
   # the sender holds (or that has no permission set) is used.
+  # <guild_segment> renders to nothing for players with no guild - don't bake brackets around
+  # <guild_tag> directly in these formats, use guild-segment-format below instead.
+  # <luckperms_prefix>/<luckperms_suffix> require the MiniPlaceholders-LuckPerms expansion plugin
+  # to be installed alongside MiniPlaceholders - remove them here if that expansion isn't installed,
+  # otherwise MiniMessage will fail to parse the unknown tag on every chat message.
   formats:
     - permission: canvassuite.chat.admin
-      format: "<red><bold>ADMIN</bold></red> <gray>[<guild_tag>]</gray> <white><player_name></white><dark_gray>:</dark_gray> <message>"
+      format: "<red><bold>ADMIN</bold></red> <guild_segment><luckperms_prefix><white><player_name></white><dark_gray>:</dark_gray> <message>"
     - permission: ""
-      format: "<gray>[<guild_tag>]</gray> <white><player_name></white><dark_gray>:</dark_gray> <gray><message>"
+      format: "<guild_segment><luckperms_prefix><white><player_name></white><dark_gray>:</dark_gray> <gray><message>"
   guild-chat-format: "<dark_aqua>[G]</dark_aqua> <gray>[<guild_tag>]</gray> <white><player_name></white><dark_gray>:</dark_gray> <aqua><message>"
-  default-guild-tag: "-"
+  # Used to build <guild_segment> only when the player is in a guild; include the trailing space
+  # yourself so the no-guild case can omit both the brackets and the space cleanly.
+  guild-segment-format: "<gray>[<guild_tag>]</gray> "
 
 protection:
   disable-stronghold-generation: true
   disable-nether-portal-creation: true
+
+spawn:
+  # Created automatically on first enable if it doesn't already exist.
+  world-name: "canvassuite_void"
+  # Block used for the small starter platform placed under the default coordinates below, so
+  # /spawn and first-join teleports have solid ground before any admin has run /setspawn.
+  platform-material: "STONE"
+  # Populated by /setspawn; these defaults are only used before any admin has run it.
+  world: "canvassuite_void"
+  x: 1.5
+  y: 65.0
+  z: 1.5
+  yaw: 0.0
+  pitch: 0.0
+  # Below this Y in the void world, non-creative players are rescued back to spawn instead of
+  # taking void damage.
+  void-rescue-y: -32
+
+# Overhead nametag prefixes, sent via PacketEvents team packets only (no real scoreboard team is
+# ever registered). Requires the PacketEvents plugin to be installed - silently disabled otherwise.
+nametag:
+  enabled: true
+  # There's no LuckPerms hook available (prefixes come from the MiniPlaceholders-LuckPerms
+  # expansion, not the LuckPerms API directly), so prefix changes are only picked up this often.
+  refresh-interval-seconds: 30
+
+tablist:
+  enabled: true
+  # Fills unused tablist slots with blank filler entries so it stays visually full-size instead of
+  # shrinking to fit the online player count. Requires the PacketEvents plugin to be installed;
+  # header/footer below still work without it.
+  reserved-slots-enabled: true
+  # Vanilla's tablist is a fixed 4-column grid; this is the row count (1-20, 20 = the full 80-slot grid).
+  rows: 20
+  refresh-interval-seconds: 5
+
+msg:
+  # Minimum seconds between messages sent by the same player; 0 disables the cooldown entirely.
+  cooldown-seconds: 0
+
+world-creation:
+  # Seeded into a fresh /world create session before the admin starts toggling anything in the GUI.
+  defaults:
+    environment: NORMAL
+    type: NORMAL
+    generator: VANILLA        # VANILLA or VOID
+    generate-structures: true
+    hardcore: false
+    keep-spawn-in-memory: true
+    difficulty: NORMAL
+    pvp: true
+
+scoreboard:
+  enabled: true
+  refresh-interval-seconds: 5
+  title: "<gradient:#38bdf8:#818cf8><bold>CanvasMC</bold></gradient>"
+  # Evaluated top-to-bottom (index 0 is the top line), rendered relationally per viewer.
+  lines:
+    - "<gray>---------------"
+    - "<white>Player: <player_name>"
+    - "<white><luckperms_prefix>"
+    - "<gray>---------------"
+    - "<white>play.example.com"

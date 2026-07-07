@@ -18,7 +18,7 @@ import java.util.Map;
 
 /**
  * Renders every chat message through MiniMessage + MiniPlaceholders. Untrusted player-typed text
- * is inserted as a plain Component (never re-parsed as MiniMessage) unless the sender holds
+ * is inserted as a plain Component (never reparsed as MiniMessage) unless the sender holds
  * canvassuite.chat.format, so players can't inject <click>/<hover>/color tags into chat.
  */
 public final class ChatFormatListener implements Listener {
@@ -44,12 +44,20 @@ public final class ChatFormatListener implements Listener {
         // AsyncChatEvent runs off the region thread specifically so plugins can do blocking work
         // like this DB lookup; safe here in a way it would not be on a region/entity thread.
         Guild guild = plugin.guilds().getGuildByMember(sender.getUniqueId()).join().orElse(null);
-        String guildTag = guild != null ? guild.tag() : plugin.getConfig().getString("chat.default-guild-tag", "-");
+        Component guildSegment = buildGuildSegment(sender, guild);
 
         event.renderer((source, sourceDisplayName, message, viewer) ->
                 plugin.messages().renderRelationalRaw(source, viewer, format,
                         Placeholder.component("message", messageComponent),
-                        Placeholder.unparsed("guild_tag", guildTag)));
+                        Placeholder.component("guild_segment", guildSegment)));
+    }
+
+    private Component buildGuildSegment(Player sender, Guild guild) {
+        if (guild == null) {
+            return Component.empty();
+        }
+        String segmentFormat = plugin.getConfig().getString("chat.guild-segment-format", "<gray>[<guild_tag>]</gray> ");
+        return plugin.messages().parse(segmentFormat, sender, Placeholder.unparsed("guild_tag", guild.tag()));
     }
 
     private void handleGuildChat(AsyncChatEvent event, Player sender) {

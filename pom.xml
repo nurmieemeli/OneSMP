@@ -31,6 +31,10 @@
             <id>jitpack.io</id>
             <url>https://jitpack.io</url>
         </repository>
+        <repository>
+            <id>codemc-repo</id>
+            <url>https://repo.codemc.io/repository/maven-public/</url>
+        </repository>
     </repositories>
 
     <dependencies>
@@ -62,6 +66,15 @@
                     <artifactId>bukkit</artifactId>
                 </exclusion>
             </exclusions>
+        </dependency>
+
+        <!-- Packet-level features (nametags, moderator vanish, reserved-slot tablist). Installed as
+             its own standalone plugin on the server; we only compile against its API. -->
+        <dependency>
+            <groupId>com.github.retrooper</groupId>
+            <artifactId>packetevents-spigot</artifactId>
+            <version>2.13.0</version>
+            <scope>provided</scope>
         </dependency>
 
         <!-- Storage: shaded + relocated, not provided by the server -->

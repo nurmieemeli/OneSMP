@@ -154,6 +154,14 @@ public final class Database {
                     PRIMARY KEY (guild_id, uuid)
                 )
                 """);
+
+            statement.executeUpdate("""
+                CREATE TABLE IF NOT EXISTS ignored_players (
+                    owner VARCHAR(36) NOT NULL,
+                    ignored VARCHAR(36) NOT NULL,
+                    PRIMARY KEY (owner, ignored)
+                )
+                """);
         } catch (SQLException ex) {
             throw new RuntimeException("Failed to run CanvasSuite schema migration", ex);
         }

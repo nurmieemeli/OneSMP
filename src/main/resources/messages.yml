@@ -105,6 +105,48 @@ guild:
 protection:
   portal-blocked: "<prefix><red>Nether portal creation is disabled on this server."
 
+spawn:
+  set: "<prefix><green>Spawn point set to your current location."
+  teleported: "<prefix><green>Teleported to spawn."
+
+nametag:
+  # Rendered per-player (not per-viewer - team packets aren't relational, one team assignment is
+  # broadcast identically to every viewer), used as the overhead nametag prefix.
+  format: "<luckperms_prefix>"
+
+moderation:
+  spectate-started: "<prefix><green>Now spectating <white><target></white>."
+  spectate-stopped: "<prefix><green>Stopped spectating."
+  packetevents-required: "<prefix><red>This feature requires the PacketEvents plugin to be installed on the server."
+
+tablist:
+  header: "<gradient:#38bdf8:#818cf8><bold>CanvasMC</bold></gradient>"
+  footer: "<gray>play.example.com"
+
+msg:
+  sent: "<prefix><gray>To <white><target></white>: <message>"
+  received: "<prefix><gray>From <white><sender></white>: <message>"
+  socialspy: "<prefix><dark_gray>[Spy] <sender> → <target>: <message>"
+  self: "<prefix><red>You can't message yourself."
+  blocked: "<prefix><red>Your message could not be delivered."
+  cooldown: "<prefix><red>Please wait <white><seconds>s</white> before sending another message."
+  no-reply-target: "<prefix><red>You have no one to reply to."
+  reply-target-offline: "<prefix><red>That player is no longer online."
+  ignore-self: "<prefix><red>You can't ignore yourself."
+  ignore-enabled: "<prefix><green>You are now ignoring <white><target></white>."
+  ignore-disabled: "<prefix><green>You are no longer ignoring <white><target></white>."
+  socialspy-enabled: "<prefix><green>Social spy enabled."
+  socialspy-disabled: "<prefix><gray>Social spy disabled."
+
+world:
+  created: "<prefix><green>World <white><name></white> created."
+  create-failed: "<prefix><red>Failed to create world <white><name></white>."
+  deleted: "<prefix><green>World <white><name></white> unloaded and no longer tracked."
+  wiped: "<prefix><green>World <white><name></white> unloaded and its files were permanently deleted."
+  not-found: "<prefix><red>No managed world named <white><name></white> exists."
+  name-taken: "<prefix><red>A world named <white><name></white> already exists."
+  invalid-name: "<prefix><red>World names must be 3-32 characters (letters, numbers, - and _ only)."
+
 gui:
   close: "<gray>Close"
   back: "<gray>« Back"

@@ -1,0 +1,34 @@
+package gg.nurmi.spawn;
+
+import gg.nurmi.CanvasSuitePlugin;
+import org.bukkit.command.Command;
+import org.bukkit.command.CommandExecutor;
+import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
+
+public final class SetSpawnCommand implements CommandExecutor {
+
+    private final CanvasSuitePlugin plugin;
+    private final SpawnWorldManager spawnWorldManager;
+
+    public SetSpawnCommand(CanvasSuitePlugin plugin, SpawnWorldManager spawnWorldManager) {
+        this.plugin = plugin;
+        this.spawnWorldManager = spawnWorldManager;
+    }
+
+    @Override
+    public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
+        if (!(sender instanceof Player player)) {
+            plugin.messages().send(sender, "general.player-only");
+            return true;
+        }
+        if (!player.hasPermission("canvassuite.spawn.admin")) {
+            plugin.messages().send(sender, "general.no-permission");
+            return true;
+        }
+
+        spawnWorldManager.setSpawn(player.getLocation());
+        plugin.messages().send(player, "spawn.set");
+        return true;
+    }
+}
