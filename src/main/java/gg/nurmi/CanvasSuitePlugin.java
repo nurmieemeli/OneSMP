@@ -36,6 +36,7 @@ import gg.nurmi.scheduler.SchedulerUtil;
 import gg.nurmi.shop.ShopCommand;
 import gg.nurmi.shop.ShopManager;
 import gg.nurmi.spawn.FirstJoinListener;
+import gg.nurmi.spawn.PlayerRespawnListener;
 import gg.nurmi.spawn.SetSpawnCommand;
 import gg.nurmi.spawn.SpawnCommand;
 import gg.nurmi.spawn.SpawnWorldManager;
@@ -191,6 +192,7 @@ public final class CanvasSuitePlugin extends JavaPlugin {
         getServer().getPluginManager().registerEvents(new FirstJoinListener(this, spawnWorldManager), this);
         getServer().getPluginManager().registerEvents(new VoidWorldListener(spawnWorldManager), this);
         getServer().getPluginManager().registerEvents(new VoidFallRescueListener(spawnWorldManager), this);
+        getServer().getPluginManager().registerEvents(new PlayerRespawnListener(spawnWorldManager), this);
     }
 
     private void registerProtection() {

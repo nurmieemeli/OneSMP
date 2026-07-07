@@ -1,9 +1,8 @@
-name: ${project.name}
+name: CanvasSuite
 version: ${project.version}
 main: gg.nurmi.CanvasSuitePlugin
-api-version: "1.21"
+api-version: 1.21
 folia-supported: true
-author: CanvasSuite
 description: ${project.description}
 
 depend: [MiniPlaceholders]
@@ -106,7 +105,6 @@ permissions:
       canvassuite.warp.admin: true
       canvassuite.guild.admin: true
       canvassuite.rtp.admin: true
-      canvassuite.chat.admin: true
       canvassuite.spawn.admin: true
       canvassuite.world.admin: true
       canvassuite.msg.socialspy: true
@@ -123,7 +121,6 @@ permissions:
   canvassuite.guild.use: { default: true }
   canvassuite.guild.admin: { default: op }
   canvassuite.chat.format: { default: false }
-  canvassuite.chat.admin: { default: op }
   canvassuite.spawn.use: { default: true }
   canvassuite.spawn.admin: { default: op }
   canvassuite.moderation.spectate: { default: op }

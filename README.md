@@ -55,8 +55,8 @@ All player-facing text is rendered with [Adventure MiniMessage](https://docs.adv
 
 ### 💬 Chat Formatting
 - Every chat message is rendered through MiniMessage with full MiniPlaceholders support (e.g. `<player_name>`, plus relational placeholders between sender and each viewer).
-- **Permission-tiered formats**: define any number of formats in `config.yml`, evaluated top-to-bottom — first format whose permission the sender holds wins. Ship different looks for admins, donors, and defaults.
-- `<guild_tag>` placeholder built in.
+- One format for everyone, configurable in `config.yml`.
+- `<guild_segment>` placeholder built in — renders to nothing for players with no guild.
 - **Injection-safe**: player-typed message content is inserted as plain text, so players can't smuggle `<click>`, `<hover>`, or color tags into chat — unless they hold `canvassuite.chat.format`, which unlocks MiniMessage styling in their messages.
 
 ### 🌍 World Protection
@@ -97,25 +97,20 @@ All player-facing text is rendered with [Adventure MiniMessage](https://docs.adv
 | `canvassuite.rtp.use` / `.admin` | true / op | RTP / cooldown bypass |
 | `canvassuite.guild.use` / `.admin` | true / op | Guilds |
 | `canvassuite.chat.format` | false | Allows MiniMessage styling in chat messages |
-| `canvassuite.chat.admin` | op | Uses the admin chat format tier |
 
 ## Configuration
 
 Three files are created in `plugins/CanvasSuite/` on first start:
 
-- **`config.yml`** — storage backend (MySQL credentials with automatic SQLite fallback), economy settings, teleport warmup/TPA timeouts, home limits, RTP radius/cooldown/cost/biome blacklist, guild rules and costs, chat format tiers, and protection toggles.
+- **`config.yml`** — storage backend (MySQL credentials with automatic SQLite fallback), economy settings, teleport warmup/TPA timeouts, home limits, RTP radius/cooldown/cost/biome blacklist, guild rules and costs, chat format, and protection toggles.
 - **`messages.yml`** — every message the plugin sends, in MiniMessage. Change colors, add gradients, hover/click events, or MiniPlaceholders tags freely. The shared `<prefix>` is defined once at the top.
 - **`shop.yml`** — shop categories and per-item `buy-price` / `sell-price` values.
 
-Example chat format tier from `config.yml`:
+Example chat format from `config.yml`:
 
 ```yaml
 chat:
-  formats:
-    - permission: canvassuite.chat.admin
-      format: "<red><bold>ADMIN</bold></red> <gray>[<guild_tag>]</gray> <white><player_name></white><dark_gray>:</dark_gray> <message>"
-    - permission: ""   # fallback for everyone else
-      format: "<gray>[<guild_tag>]</gray> <white><player_name></white><dark_gray>:</dark_gray> <gray><message>"
+  format: "<guild_segment><white><player_name></white><dark_gray>:</dark_gray> <gray><message>"
 ```
 
 Example shop entry from `shop.yml`:

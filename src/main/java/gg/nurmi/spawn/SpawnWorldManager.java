@@ -85,10 +85,6 @@ public final class SpawnWorldManager {
         return world != null && world.getName().equals(voidWorldName());
     }
 
-    public double voidRescueY() {
-        return plugin.getConfig().getDouble("spawn.void-rescue-y", -32);
-    }
-
     private String voidWorldName() {
         return plugin.getConfig().getString("spawn.world-name", "canvassuite_void");
     }

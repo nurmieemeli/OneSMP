@@ -13,9 +13,6 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 
-import java.util.List;
-import java.util.Map;
-
 /**
  * Renders every chat message through MiniMessage + MiniPlaceholders. Untrusted player-typed text
  * is inserted as a plain Component (never reparsed as MiniMessage) unless the sender holds
@@ -39,7 +36,7 @@ public final class ChatFormatListener implements Listener {
         }
 
         Component messageComponent = renderMessageContent(event, sender);
-        String format = resolveFormat(sender);
+        String format = resolveFormat();
 
         // AsyncChatEvent runs off the region thread specifically so plugins can do blocking work
         // like this DB lookup; safe here in a way it would not be on a region/entity thread.
@@ -95,18 +92,7 @@ public final class ChatFormatListener implements Listener {
                 : Component.text(plainMessage);
     }
 
-    private String resolveFormat(Player sender) {
-        List<?> formats = plugin.getConfig().getMapList("chat.formats");
-        for (Object entry : formats) {
-            if (!(entry instanceof Map<?, ?> map)) {
-                continue;
-            }
-            String permission = String.valueOf(map.get("permission"));
-            String format = String.valueOf(map.get("format"));
-            if (permission.isBlank() || sender.hasPermission(permission)) {
-                return format;
-            }
-        }
-        return "<white><player_name></white><dark_gray>:</dark_gray> <gray><message>";
+    private String resolveFormat() {
+        return plugin.getConfig().getString("chat.format", "<white><player_name></white><dark_gray>:</dark_gray> <gray><message>");
     }
 }
