@@ -21,16 +21,18 @@ import java.util.UUID;
 
 public final class GuildMembersGui extends AbstractGui {
 
-    private static final int PAGE_SIZE = 45;
     private static final int BACK_SLOT = 45;
-    private static final int CLOSE_SLOT = 49;
 
     public GuildMembersGui(CanvasSuitePlugin plugin, GuildManager guildManager, Guild guild, UUID viewerUuid) {
+        this(plugin, guildManager, guild, viewerUuid, 0);
+    }
+
+    public GuildMembersGui(CanvasSuitePlugin plugin, GuildManager guildManager, Guild guild, UUID viewerUuid, int page) {
         super(plugin.messages().parse("<white>Members of <guild_name>", Placeholder.unparsed("guild_name", guild.name())), 6);
 
         GuildRole viewerRole = guild.member(viewerUuid).map(GuildMember::role).orElse(GuildRole.MEMBER);
         Pagination<GuildMember> pagination = new Pagination<>(guild.members(), PAGE_SIZE);
-        List<GuildMember> members = pagination.page(0);
+        List<GuildMember> members = pagination.page(page);
 
         int slot = 0;
         for (GuildMember member : members) {
@@ -92,7 +94,7 @@ public final class GuildMembersGui extends AbstractGui {
             }
         });
 
-        ItemStack close = new ItemBuilder(Material.BARRIER).name(plugin.messages().parse("<red>Close")).build();
-        setButton(CLOSE_SLOT, close, event -> event.getWhoClicked().closeInventory());
+        addPaginationFooter(pagination, page, (player, targetPage) ->
+                new GuildMembersGui(plugin, guildManager, guild, viewerUuid, targetPage).open(player));
     }
 }

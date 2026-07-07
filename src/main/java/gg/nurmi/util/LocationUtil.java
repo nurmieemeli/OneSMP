@@ -1,5 +1,6 @@
 package gg.nurmi.util;
 
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
@@ -36,8 +37,12 @@ public final class LocationUtil {
                 && groundType != Material.WATER;
     }
 
-    public static String serialize(Location location) {
-        return location.getWorld().getName() + ";" + location.getX() + ";" + location.getY() + ";"
-                + location.getZ() + ";" + location.getYaw() + ";" + location.getPitch();
+    /** Shared by every stored location record (Home, Warp, ...); null if the world isn't currently loaded. */
+    public static Location resolve(String worldName, double x, double y, double z, float yaw, float pitch) {
+        World world = Bukkit.getWorld(worldName);
+        if (world == null) {
+            return null;
+        }
+        return new Location(world, x, y, z, yaw, pitch);
     }
 }

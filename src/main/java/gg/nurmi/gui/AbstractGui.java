@@ -1,8 +1,12 @@
 package gg.nurmi.gui;
 
+import gg.nurmi.util.ItemBuilder;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
+import org.bukkit.Material;
 import org.bukkit.entity.HumanEntity;
+import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.inventory.Inventory;
@@ -12,6 +16,7 @@ import org.jspecify.annotations.NonNull;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.function.BiConsumer;
 
 /**
  * Base class for every chest-menu GUI in the plugin. Every slot is either empty (click ignored,
@@ -24,6 +29,12 @@ import java.util.Map;
  * {@code player.getScheduler().run(plugin, t -> gui.open(player), null)} first.</p>
  */
 public abstract class AbstractGui implements InventoryHolder {
+
+    /** Item count per page for every paginated chest menu (shop items, homes, warps, guild members, world list). */
+    protected static final int PAGE_SIZE = 45;
+    private static final int PREV_SLOT = 48;
+    private static final int CLOSE_SLOT = 49;
+    private static final int NEXT_SLOT = 50;
 
     private final Inventory inventory;
     private final Map<Integer, GuiButton> buttons = new HashMap<>();
@@ -69,5 +80,32 @@ public abstract class AbstractGui implements InventoryHolder {
 
     public void open(HumanEntity viewer) {
         viewer.openInventory(inventory);
+    }
+
+    /**
+     * Wires the close/prev/next footer shared by every paginated chest menu (slots 48/49/50).
+     * {@code onNavigate} is handed the target page and must open this same GUI type there - each
+     * subclass knows its own constructor, so it's simplest for it to provide that directly.
+     */
+    protected void addPaginationFooter(Pagination<?> pagination, int page, BiConsumer<Player, Integer> onNavigate) {
+        ItemStack close = new ItemBuilder(Material.BARRIER).name(Component.text("Close", NamedTextColor.RED)).build();
+        setButton(CLOSE_SLOT, close, event -> event.getWhoClicked().closeInventory());
+
+        if (page > 0) {
+            ItemStack prev = new ItemBuilder(Material.PAPER).name(Component.text("« Previous Page", NamedTextColor.GRAY)).build();
+            setButton(PREV_SLOT, prev, event -> {
+                if (event.getWhoClicked() instanceof Player player) {
+                    onNavigate.accept(player, page - 1);
+                }
+            });
+        }
+        if (page < pagination.pageCount() - 1) {
+            ItemStack next = new ItemBuilder(Material.PAPER).name(Component.text("Next Page »", NamedTextColor.GRAY)).build();
+            setButton(NEXT_SLOT, next, event -> {
+                if (event.getWhoClicked() instanceof Player player) {
+                    onNavigate.accept(player, page + 1);
+                }
+            });
+        }
     }
 }

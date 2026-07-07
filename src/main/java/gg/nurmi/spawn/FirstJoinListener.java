@@ -1,7 +1,6 @@
 package gg.nurmi.spawn;
 
 import gg.nurmi.CanvasSuitePlugin;
-import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -23,7 +22,6 @@ public final class FirstJoinListener implements Listener {
         if (player.hasPlayedBefore()) {
             return;
         }
-        Location spawn = spawnWorldManager.getSpawn();
-        plugin.scheduler().runAtEntity(player, () -> player.teleportAsync(spawn), () -> {});
+        plugin.scheduler().runAtEntity(player, () -> spawnWorldManager.teleportToSpawn(player), () -> {});
     }
 }

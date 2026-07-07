@@ -1,7 +1,6 @@
 package gg.nurmi.spawn;
 
 import gg.nurmi.CanvasSuitePlugin;
-import org.bukkit.Location;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -28,8 +27,7 @@ public final class SpawnCommand implements CommandExecutor {
             return true;
         }
 
-        Location spawn = spawnWorldManager.getSpawn();
-        plugin.scheduler().runAtEntity(player, () -> player.teleportAsync(spawn).thenAccept(success -> {
+        plugin.scheduler().runAtEntity(player, () -> spawnWorldManager.teleportToSpawn(player).thenAccept(success -> {
             if (success) {
                 plugin.messages().send(player, "spawn.teleported");
             }

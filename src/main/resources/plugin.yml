@@ -10,7 +10,6 @@ softdepend: [Vault, PacketEvents]
 
 commands:
   balance:
-    aliases: [bal, money]
     description: Check your or another player's balance.
     usage: /balance [player]
   pay:
@@ -29,7 +28,6 @@ commands:
     description: Set a home at your current location.
     usage: /sethome [name]
   home:
-    aliases: [homes]
     description: Teleport to a home, or list your homes.
     usage: /home [name]
   delhome:
@@ -39,7 +37,6 @@ commands:
     description: Create a server warp at your current location.
     usage: /setwarp <name>
   warp:
-    aliases: [warps]
     description: Teleport to a warp, or list warps.
     usage: /warp [name]
   delwarp:
@@ -61,11 +58,9 @@ commands:
     description: Teleport to your previous location.
     usage: /back
   rtp:
-    aliases: [wild, randomtp]
     description: Randomly teleport within the world border.
     usage: /rtp [world]
   guild:
-    aliases: [g, clan]
     description: Manage your guild.
     usage: /guild <create|disband|invite|accept|kick|promote|demote|sethome|home|info|list|chat|leave|gui>
   setspawn:
@@ -78,15 +73,12 @@ commands:
     description: Toggle moderator spectate/vanish mode on a target player.
     usage: /spectate [player]
   world:
-    aliases: [worlds]
     description: Create and manage worlds.
     usage: /world <create|list|delete|tp> ...
   msg:
-    aliases: [tell, w, pm]
     description: Send a private message to another player.
     usage: /msg <player> <message>
   reply:
-    aliases: [r]
     description: Reply to the last player who messaged you.
     usage: /reply <message>
   ignore:

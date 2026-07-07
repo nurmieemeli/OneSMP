@@ -20,6 +20,9 @@ public final class TeleportExecutor {
     /** Must already be running on the player's own entity thread. */
     public void execute(Player player, Location destination, boolean recordBack) {
         if (destination == null) {
+            // Home/Warp#toLocation() returns null when the stored world isn't loaded - tell the
+            // player instead of silently doing nothing, which looked like the command was ignored.
+            plugin.messages().send(player, "teleport.destination-unavailable");
             return;
         }
         if (recordBack) {

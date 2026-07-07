@@ -56,8 +56,14 @@ public final class SchedulerUtil {
         entity.getScheduler().run(plugin, t -> task.run(), ifRetired);
     }
 
-    public void runAtEntityDelayed(Entity entity, Runnable task, Runnable ifRetired, long delayTicks) {
-        entity.getScheduler().runDelayed(plugin, t -> task.run(), ifRetired, Math.max(1, delayTicks));
+    /**
+     * Returns {@code true} if the task was actually scheduled. Folia returns {@code null} from the
+     * underlying call (invoking neither {@code task} nor {@code ifRetired}) when the entity is
+     * already retired at call time — callers that track pending state per-entity must check this
+     * and treat a {@code false} return as an immediate retirement themselves.
+     */
+    public boolean runAtEntityDelayed(Entity entity, Runnable task, Runnable ifRetired, long delayTicks) {
+        return entity.getScheduler().runDelayed(plugin, t -> task.run(), ifRetired, Math.max(1, delayTicks)) != null;
     }
 
     /** Off-region async work (DB calls, HTTP, safe-location search) that must never touch Bukkit world state directly. */

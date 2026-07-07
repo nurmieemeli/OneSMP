@@ -23,7 +23,11 @@ public final class SpectateManager {
 
     /** Must already be running on the moderator's own entity thread. */
     public void enter(Player moderator, Location targetLocation) {
-        active.add(moderator.getUniqueId());
+        if (!active.add(moderator.getUniqueId())) {
+            // Already spectating - a fast double /spectate can otherwise queue two of these before
+            // the first one's async hops resolve, re-hiding/re-teleporting redundantly.
+            return;
+        }
         moderator.setGameMode(GameMode.SPECTATOR);
         vanishController.hide(moderator);
         moderator.teleportAsync(targetLocation);

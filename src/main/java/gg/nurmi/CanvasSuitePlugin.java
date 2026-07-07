@@ -8,6 +8,7 @@ import gg.nurmi.economy.EconomyManager;
 import gg.nurmi.economy.PayCommand;
 import gg.nurmi.economy.VaultEconomyProvider;
 import gg.nurmi.chat.ChatFormatListener;
+import gg.nurmi.command.AliasManager;
 import gg.nurmi.guild.GuildChatToggle;
 import gg.nurmi.guild.GuildCommand;
 import gg.nurmi.guild.GuildManager;
@@ -122,6 +123,9 @@ public final class CanvasSuitePlugin extends JavaPlugin {
         registerTablist();
         registerScoreboard();
 
+        // Must run last - it needs every command above to already be registered via plugin.yml.
+        new AliasManager(this).applyAliases();
+
         getLogger().info("CanvasSuite enabled.");
     }
 
@@ -180,6 +184,9 @@ public final class CanvasSuitePlugin extends JavaPlugin {
         getServer().getPluginManager().registerEvents(new NametagListener(nametagManager), this);
         int periodSeconds = Math.max(5, getConfig().getInt("nametag.refresh-interval-seconds", 30));
         schedulerUtil.runGlobalRepeating(nametagManager::refreshAll, periodSeconds * 20L, periodSeconds * 20L);
+
+        int remountTicks = Math.max(20, getConfig().getInt("nametag.guild-tag.remount-interval-ticks", 100));
+        schedulerUtil.runGlobalRepeating(nametagManager::reassertMounts, remountTicks, remountTicks);
     }
 
     private void registerSpawn() {

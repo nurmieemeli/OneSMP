@@ -40,7 +40,7 @@ public final class TeleportWarmup {
         boolean cancelOnMove = plugin.getConfig().getBoolean("teleport.cancel-warmup-on-move", true);
         plugin.messages().send(player, "teleport.teleporting", Placeholder.unparsed("seconds", String.valueOf(warmupSeconds)));
 
-        plugin.scheduler().runAtEntityDelayed(player, () -> {
+        boolean scheduled = plugin.scheduler().runAtEntityDelayed(player, () -> {
             pending.remove(uuid);
             if (cancelOnMove && hasMoved(start, player.getLocation())) {
                 plugin.messages().send(player, "teleport.teleport-cancelled-move");
@@ -48,6 +48,13 @@ public final class TeleportWarmup {
             }
             onComplete.run();
         }, () -> pending.remove(uuid), warmupSeconds * 20L);
+
+        if (!scheduled) {
+            // Player was already retired at the exact moment we tried to schedule - Folia invokes
+            // neither callback in that case, so we must clear our own pending state right here or
+            // it stays stuck forever, permanently blocking this player's future teleports.
+            pending.remove(uuid);
+        }
     }
 
     private boolean hasMoved(Location a, Location b) {

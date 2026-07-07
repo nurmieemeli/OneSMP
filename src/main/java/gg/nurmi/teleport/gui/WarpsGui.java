@@ -15,11 +15,6 @@ import java.util.List;
 
 public final class WarpsGui extends AbstractGui {
 
-    private static final int PAGE_SIZE = 45;
-    private static final int PREV_SLOT = 48;
-    private static final int CLOSE_SLOT = 49;
-    private static final int NEXT_SLOT = 50;
-
     public WarpsGui(CanvasSuitePlugin plugin, TeleportExecutor teleportExecutor, List<Warp> warps) {
         this(plugin, teleportExecutor, warps, 0);
     }
@@ -43,24 +38,7 @@ public final class WarpsGui extends AbstractGui {
             });
         }
 
-        ItemStack close = new ItemBuilder(Material.BARRIER).name(plugin.messages().parse("<red>Close")).build();
-        setButton(CLOSE_SLOT, close, event -> event.getWhoClicked().closeInventory());
-
-        if (page > 0) {
-            ItemStack prev = new ItemBuilder(Material.PAPER).name(plugin.messages().parse("<gray>« Previous Page")).build();
-            setButton(PREV_SLOT, prev, event -> {
-                if (event.getWhoClicked() instanceof Player player) {
-                    new WarpsGui(plugin, teleportExecutor, warps, page - 1).open(player);
-                }
-            });
-        }
-        if (page < pagination.pageCount() - 1) {
-            ItemStack next = new ItemBuilder(Material.PAPER).name(plugin.messages().parse("<gray>Next Page »")).build();
-            setButton(NEXT_SLOT, next, event -> {
-                if (event.getWhoClicked() instanceof Player player) {
-                    new WarpsGui(plugin, teleportExecutor, warps, page + 1).open(player);
-                }
-            });
-        }
+        addPaginationFooter(pagination, page, (player, targetPage) ->
+                new WarpsGui(plugin, teleportExecutor, warps, targetPage).open(player));
     }
 }

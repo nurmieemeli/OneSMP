@@ -53,8 +53,14 @@ public final class TablistManager {
         }
     }
 
-    /** Recomputes how many filler slots are needed and broadcasts only the difference. */
-    public void onPlayerCountChanged() {
+    /**
+     * Recomputes how many filler slots are needed and broadcasts only the difference.
+     * Synchronized because join/quit events for different players can fire on different region
+     * threads concurrently, and this reads-then-writes {@link #currentFillerCount} - without a lock
+     * two overlapping calls could race and leave viewers with a slot count that's out of sync with
+     * what's actually been sent.
+     */
+    public synchronized void onPlayerCountChanged() {
         if (!fillerSlotsEnabled()) {
             return;
         }
@@ -87,7 +93,7 @@ public final class TablistManager {
     }
 
     /** A freshly joined player has never seen the currently active filler entries - introduce them directly. */
-    public void introduceFillersTo(Player joined) {
+    public synchronized void introduceFillersTo(Player joined) {
         if (!fillerSlotsEnabled() || currentFillerCount == 0) {
             return;
         }

@@ -94,6 +94,11 @@ public final class EconomyManager {
             }
             return startingBalance;
         } catch (SQLException ex) {
+            // Logged here rather than left to whatever generic uncaught-exception handling the
+            // async scheduler applies - none of this class's callers (getBalance/withdraw/deposit)
+            // attach an .exceptionally() of their own, so without this the failure was otherwise
+            // invisible: the returned future just dies silently with nothing in the console.
+            plugin.getLogger().log(Level.WARNING, "Failed to load balance for " + uuid, ex);
             throw new RuntimeException("Failed to load balance for " + uuid, ex);
         }
     }
@@ -176,6 +181,7 @@ public final class EconomyManager {
                     return resultSet.next() ? UUID.fromString(resultSet.getString("uuid")) : null;
                 }
             } catch (SQLException ex) {
+                plugin.getLogger().log(Level.WARNING, "Failed to resolve UUID for name " + name, ex);
                 throw new RuntimeException(ex);
             }
         });

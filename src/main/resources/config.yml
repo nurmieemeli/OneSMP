@@ -113,9 +113,15 @@ nametag:
     # via a fake TEXT_DISPLAY entity (there's no vanilla way to stack a second line on a player's
     # own nametag). <tag> is the guild's tag.
     format: "<gray>[<tag>]</gray>"
-    # How far above the player's head this second line floats. Vanilla doesn't expose the exact
-    # height a passenger-mounted entity rides at, so this may need visual tuning in-game.
+    # This line rides as a passenger on the player, so the client positions it with zero ongoing
+    # packet cost. Since a generic passenger has no defined seat height like a horse/boat, this
+    # offset controls how far above the mount point it floats. May need visual tuning in-game.
     y-offset: 0.55
+    # The real server's own entity-tracking can silently clear our fake mount (it sends its own
+    # SetPassengers reflecting no passengers whenever the owner becomes newly visible to a viewer,
+    # e.g. on join) - this re-asserts the mount periodically to win it back. Cheap (a tiny packet,
+    # not a position update), so this can be infrequent.
+    remount-interval-ticks: 100
 
 tablist:
   enabled: true

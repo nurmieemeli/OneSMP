@@ -2,6 +2,7 @@ package gg.nurmi.nametag;
 
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.player.PlayerChangedWorldEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 
@@ -21,5 +22,10 @@ public final class NametagListener implements Listener {
     @EventHandler
     public void onQuit(PlayerQuitEvent event) {
         manager.handleQuit(event.getPlayer());
+    }
+
+    @EventHandler
+    public void onWorldChange(PlayerChangedWorldEvent event) {
+        manager.handleWorldChange(event.getPlayer());
     }
 }

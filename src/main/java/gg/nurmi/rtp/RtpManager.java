@@ -19,6 +19,7 @@ import java.util.Random;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedDeque;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Consumer;
 
 /**
@@ -35,7 +36,7 @@ public final class RtpManager {
     private final Cooldown cooldown = new Cooldown();
     private final Random random = new Random();
     private final Map<String, ConcurrentLinkedDeque<Location>> precache = new ConcurrentHashMap<>();
-    private volatile boolean filling;
+    private final AtomicBoolean filling = new AtomicBoolean();
 
     public RtpManager(CanvasSuitePlugin plugin) {
         this.plugin = plugin;
@@ -155,11 +156,12 @@ public final class RtpManager {
      * of bursting all {@code target-size} lookups back to back.
      */
     public void precacheTick() {
-        if (!plugin.getConfig().getBoolean("rtp.precache.enabled", true) || filling) {
+        if (!plugin.getConfig().getBoolean("rtp.precache.enabled", true) || !filling.compareAndSet(false, true)) {
             return;
         }
         double minTps = plugin.getConfig().getDouble("rtp.precache.min-tps", 18.0);
         if (Bukkit.getTPS()[0] < minTps) {
+            filling.set(false);
             return;
         }
 
@@ -173,13 +175,13 @@ public final class RtpManager {
                 continue;
             }
 
-            filling = true;
             findSafeLocation(world, location -> {
                 queue.addLast(location);
-                filling = false;
-            }, () -> filling = false);
+                filling.set(false);
+            }, () -> filling.set(false));
             return;
         }
+        filling.set(false);
     }
 
     /** Safe to call from any thread. {@code onFound}/{@code onFail} run off the calling thread. */

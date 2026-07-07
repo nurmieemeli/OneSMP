@@ -36,15 +36,25 @@ public final class WorldCreationGui extends AbstractGui {
     private final CanvasSuitePlugin plugin;
     private final WorldManager worldManager;
     private final UUID adminUuid;
+    private final WorldSettings settings;
     private boolean resolved;
 
     public WorldCreationGui(CanvasSuitePlugin plugin, WorldManager worldManager, UUID adminUuid) {
+        this(plugin, worldManager, adminUuid, worldManager.getSession(adminUuid));
+    }
+
+    /**
+     * Reopens with the exact session object this GUI was already mutating, instead of re-reading
+     * {@link WorldManager#getSession}. If the admin starts a second /world create before closing
+     * this one, that lookup would return the newer session instead of this GUI's own, so a toggle
+     * click here would silently reopen into someone else's in-progress settings.
+     */
+    private WorldCreationGui(CanvasSuitePlugin plugin, WorldManager worldManager, UUID adminUuid, WorldSettings settings) {
         super(plugin.messages().parse("<gradient:#34d399:#10b981><bold>Create World</bold></gradient>"), 6);
         this.plugin = plugin;
         this.worldManager = worldManager;
         this.adminUuid = adminUuid;
-
-        WorldSettings settings = worldManager.getSession(adminUuid);
+        this.settings = settings;
 
         setItem(INFO_SLOT, new ItemBuilder(Material.NAME_TAG)
                 .name(plugin.messages().parse("<white><name>", Placeholder.unparsed("name", settings.name())))
@@ -146,7 +156,7 @@ public final class WorldCreationGui extends AbstractGui {
             // This instance is being replaced by a fresh one reading the same (still-live) session,
             // so its own close (triggered by opening the replacement) must not clear that session.
             resolved = true;
-            new WorldCreationGui(plugin, worldManager, adminUuid).open(player);
+            new WorldCreationGui(plugin, worldManager, adminUuid, settings).open(player);
         }
     }
 

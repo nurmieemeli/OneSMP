@@ -29,6 +29,7 @@ import org.bukkit.entity.Player;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -44,8 +45,19 @@ import java.util.concurrent.atomic.AtomicInteger;
  *   <a href="https://github.com/alexdev03/UnlimitedNametags">UnlimitedNametags</a> use, since
  *   vanilla team prefixes/suffixes can only add text to the *same* line as a player's name, never
  *   a second stacked line. Riding as a passenger means the client keeps it positioned correctly on
- *   its own; we only resend anything when the entity is created/destroyed or its text changes.</li>
+ *   its own with zero ongoing position-packet traffic.</li>
  * </ul>
+ *
+ * <p><b>Why the mount kept appearing to "fail" for other viewers:</b> {@code SetPassengers}
+ * replaces an entity's <i>entire</i> passenger list rather than adding to it, and the real server
+ * sends its own {@code SetPassengers} packet for the subject whenever they become newly visible to
+ * a viewer (ordinary entity-tracking, e.g. on join) - reflecting the subject's real (empty, since
+ * our fake entity was never a real passenger) passenger list. That packet can race ours and
+ * silently clear the mount right after we set it. Continuously re-teleporting the entity's
+ * position works around this but is expensive; instead, {@link #reassertMounts()} periodically
+ * re-sends just the (tiny) mount packet to win back any mount vanilla cleared - a fraction of the
+ * cost of tracking position, since the client still does the actual per-frame following for free
+ * once the mount sticks.</p>
  *
  * <p>There's no LuckPerms hook available here (prefixes are resolved purely through the
  * MiniPlaceholders-LuckPerms expansion, never the LuckPerms API directly), so permission-group
@@ -57,8 +69,15 @@ public final class NametagManager {
 
     private final CanvasSuitePlugin plugin;
     private final Map<UUID, Component> lastSent = new ConcurrentHashMap<>();
-    private final Map<UUID, Integer> guildTagEntityIds = new ConcurrentHashMap<>();
-    private final Map<UUID, Component> lastGuildTag = new ConcurrentHashMap<>();
+    /**
+     * Entity id + display UUID + last-rendered tag for a player's guild-tag entity, kept as one
+     * unit so readers (handleJoin, reassertMounts) always see a consistent triple - splitting these
+     * across three separate maps let a viewer be introduced to an entity id that a concurrent
+     * handleQuit/handleWorldChange had already destroyed.
+     */
+    private record GuildTagState(int entityId, UUID displayUuid, Component tag) {}
+
+    private final Map<UUID, GuildTagState> guildTagState = new ConcurrentHashMap<>();
     private final AtomicInteger fakeEntityIdCounter = new AtomicInteger(2_000_000_000);
 
     public NametagManager(CanvasSuitePlugin plugin) {
@@ -79,12 +98,13 @@ public final class NametagManager {
                 sendPacketTo(joined, buildPacket(other, prefix, TeamMode.CREATE));
             }
 
-            Integer entityId = guildTagEntityIds.get(other.getUniqueId());
-            Component tag = lastGuildTag.get(other.getUniqueId());
-            if (entityId != null && tag != null) {
-                // Placeholder position only - the follow-up mount packet repositions it onto
-                // `other` immediately, so where exactly this spawns for one tick doesn't matter.
-                introduceGuildTagEntity(joined, entityId, joined.getLocation(), other.getEntityId(), tag);
+            GuildTagState state = guildTagState.get(other.getUniqueId());
+            if (state != null) {
+                // Reading another player's live location/entity id must happen on their own entity thread.
+                plugin.scheduler().runAtEntity(other,
+                        () -> introduceGuildTagEntity(joined, state.entityId(), state.displayUuid(), other.getLocation(),
+                                other.getEntityId(), state.tag()),
+                        () -> {});
             }
         }
     }
@@ -101,11 +121,39 @@ public final class NametagManager {
             }
         }
 
-        Integer entityId = guildTagEntityIds.remove(left.getUniqueId());
-        lastGuildTag.remove(left.getUniqueId());
-        if (entityId != null) {
-            destroyGuildTagEntity(entityId);
+        GuildTagState state = guildTagState.remove(left.getUniqueId());
+        if (state != null) {
+            destroyGuildTagEntity(state.entityId());
         }
+    }
+
+    /**
+     * A world change fully destroys and recreates the real player entity client-side for viewers
+     * (a different world is effectively a different set of regions/viewers entirely) - our fake
+     * entity is never told about that, so it's left behind in the old world. Destroy it and spawn
+     * a fresh one (new entity ID/UUID, same as any other respawn) at the player's new location.
+     */
+    public void handleWorldChange(Player player) {
+        if (!plugin.packetEvents().available()) {
+            return;
+        }
+        UUID uuid = player.getUniqueId();
+        GuildTagState old = guildTagState.get(uuid);
+        if (old == null) {
+            return;
+        }
+
+        // Destroying the old entity and swapping in the new one both happen inside the hop, so if
+        // the entity retires before this task runs (ifRetired, a no-op) the map is left untouched -
+        // still pointing at the old (never-destroyed) entity - instead of a stale id for one we'd
+        // already told every viewer to scrap.
+        plugin.scheduler().runAtEntity(player, () -> {
+            destroyGuildTagEntity(old.entityId());
+            int newId = fakeEntityIdCounter.decrementAndGet();
+            UUID displayUuid = UUID.randomUUID();
+            guildTagState.put(uuid, new GuildTagState(newId, displayUuid, old.tag()));
+            spawnGuildTagEntity(newId, displayUuid, player, player.getLocation(), old.tag());
+        }, () -> {});
     }
 
     /** Re-renders one player's prefix/guild tag and broadcasts either only if actually changed since last sent. */
@@ -125,8 +173,10 @@ public final class NametagManager {
             }
 
             Location location = player.getLocation();
-            plugin.guilds().getGuildByMember(player.getUniqueId())
-                    .thenAccept(optionalGuild -> applyGuildTag(player, location, optionalGuild.map(Guild::tag).orElse(null)));
+            plugin.guilds().getGuildByMember(player.getUniqueId()).thenAccept(optionalGuild -> {
+                String tag = optionalGuild.map(Guild::tag).orElse(null);
+                plugin.scheduler().runAtEntity(player, () -> applyGuildTag(player, location, tag), () -> {});
+            });
         }, () -> {});
     }
 
@@ -139,14 +189,36 @@ public final class NametagManager {
         }
     }
 
+    /**
+     * Re-sends just the (tiny) mount packet for every active guild-tag entity, to win back any
+     * mount the real server's own entity-tracking silently cleared - see the class doc for why
+     * that happens. Meant to run on a low-frequency repeating task (a couple of times a minute is
+     * plenty); this is not a position sync, so it costs nothing proportional to player movement.
+     */
+    public void reassertMounts() {
+        if (!plugin.packetEvents().available() || guildTagState.isEmpty()) {
+            return;
+        }
+        PlayerManager playerManager = PacketEvents.getAPI().getPlayerManager();
+        for (Map.Entry<UUID, GuildTagState> entry : guildTagState.entrySet()) {
+            Player owner = Bukkit.getPlayer(entry.getKey());
+            if (owner == null) {
+                continue;
+            }
+            WrapperPlayServerSetPassengers mount = new WrapperPlayServerSetPassengers(owner.getEntityId(), new int[]{entry.getValue().entityId()});
+            for (Player viewer : Bukkit.getOnlinePlayers()) {
+                playerManager.sendPacket(viewer, mount);
+            }
+        }
+    }
+
     private void applyGuildTag(Player player, Location spawnLocation, String tag) {
         UUID uuid = player.getUniqueId();
 
         if (tag == null) {
-            Integer entityId = guildTagEntityIds.remove(uuid);
-            lastGuildTag.remove(uuid);
-            if (entityId != null) {
-                destroyGuildTagEntity(entityId);
+            GuildTagState removed = guildTagState.remove(uuid);
+            if (removed != null) {
+                destroyGuildTagEntity(removed.entityId());
             }
             return;
         }
@@ -154,63 +226,56 @@ public final class NametagManager {
         String format = plugin.getConfig().getString("nametag.guild-tag.format", "<gray>[<tag>]");
         Component rendered = plugin.messages().parse(format, player, Placeholder.unparsed("tag", tag));
 
-        Integer entityId = guildTagEntityIds.get(uuid);
-        if (entityId == null) {
+        GuildTagState existing = guildTagState.get(uuid);
+        if (existing == null) {
             int newId = fakeEntityIdCounter.decrementAndGet();
-            guildTagEntityIds.put(uuid, newId);
-            lastGuildTag.put(uuid, rendered);
-            spawnGuildTagEntity(newId, player, spawnLocation, rendered);
+            UUID displayUuid = UUID.randomUUID();
+            guildTagState.put(uuid, new GuildTagState(newId, displayUuid, rendered));
+            spawnGuildTagEntity(newId, displayUuid, player, spawnLocation, rendered);
             return;
         }
 
-        Component previous = lastGuildTag.put(uuid, rendered);
-        if (!rendered.equals(previous)) {
-            sendTextUpdate(entityId, rendered);
+        if (!rendered.equals(existing.tag())) {
+            guildTagState.put(uuid, new GuildTagState(existing.entityId(), existing.displayUuid(), rendered));
+            sendTextUpdate(existing.entityId(), rendered);
         }
     }
 
-    private void spawnGuildTagEntity(int entityId, Player owner, Location location, Component text) {
+    private void spawnGuildTagEntity(int entityId, UUID displayUuid, Player owner, Location location, Component text) {
         PlayerManager playerManager = PacketEvents.getAPI().getPlayerManager();
-        WrapperPlayServerSpawnEntity spawn = buildSpawnPacket(entityId, location);
+        WrapperPlayServerSpawnEntity spawn = buildSpawnPacket(entityId, displayUuid, location);
         WrapperPlayServerEntityMetadata metaPacket = new WrapperPlayServerEntityMetadata(entityId, buildMetadata(text));
+        WrapperPlayServerSetPassengers mount = new WrapperPlayServerSetPassengers(owner.getEntityId(), new int[]{entityId});
 
         for (Player viewer : Bukkit.getOnlinePlayers()) {
             playerManager.sendPacket(viewer, spawn);
             playerManager.sendPacket(viewer, metaPacket);
+            playerManager.sendPacket(viewer, mount);
         }
-        mountNextTick(entityId, owner.getEntityId());
     }
 
     /** Spawns+mounts the entity for a single newly-joined viewer, who has never seen it before. */
-    private void introduceGuildTagEntity(Player viewer, int entityId, Location placeholderLocation, int ownerEntityId, Component text) {
+    private void introduceGuildTagEntity(Player viewer, int entityId, UUID displayUuid, Location location,
+                                          int ownerEntityId, Component text) {
         PlayerManager playerManager = PacketEvents.getAPI().getPlayerManager();
-        playerManager.sendPacket(viewer, buildSpawnPacket(entityId, placeholderLocation));
+        playerManager.sendPacket(viewer, buildSpawnPacket(entityId, displayUuid, location));
         playerManager.sendPacket(viewer, new WrapperPlayServerEntityMetadata(entityId, buildMetadata(text)));
-        plugin.scheduler().runGlobalDelayed(() ->
-                playerManager.sendPacket(viewer, new WrapperPlayServerSetPassengers(ownerEntityId, new int[]{entityId})), 1L);
+        playerManager.sendPacket(viewer, new WrapperPlayServerSetPassengers(ownerEntityId, new int[]{entityId}));
     }
 
-    private void mountNextTick(int entityId, int ownerEntityId) {
-        plugin.scheduler().runGlobalDelayed(() -> {
-            PlayerManager playerManager = PacketEvents.getAPI().getPlayerManager();
-            WrapperPlayServerSetPassengers mount = new WrapperPlayServerSetPassengers(ownerEntityId, new int[]{entityId});
-            for (Player viewer : Bukkit.getOnlinePlayers()) {
-                playerManager.sendPacket(viewer, mount);
-            }
-        }, 1L);
-    }
-
-    private WrapperPlayServerSpawnEntity buildSpawnPacket(int entityId, Location location) {
+    private WrapperPlayServerSpawnEntity buildSpawnPacket(int entityId, UUID displayUuid, Location location) {
         Vector3d position = new Vector3d(location.getX(), location.getY(), location.getZ());
-        return new WrapperPlayServerSpawnEntity(entityId, java.util.Optional.of(UUID.randomUUID()),
-                EntityTypes.TEXT_DISPLAY, position, 0f, 0f, 0f, 0, java.util.Optional.empty());
+        return new WrapperPlayServerSpawnEntity(entityId, Optional.of(displayUuid),
+                EntityTypes.TEXT_DISPLAY, position, 0f, 0f, 0f, 0, Optional.empty());
     }
 
     /** Index table per the vanilla Display/TextDisplay entity metadata layout - see Minecraft's protocol docs. */
     private List<EntityData<?>> buildMetadata(Component text) {
         List<EntityData<?>> list = new ArrayList<>();
         list.add(new EntityData<>(5, EntityDataTypes.BOOLEAN, true)); // no gravity
-        float yOffset = (float) plugin.getConfig().getDouble("nametag.guild-tag.y-offset", 0.3);
+        // While riding, the passenger has no defined seat height (unlike a horse/boat) - this
+        // translation is the only thing controlling how far above the mount point it floats.
+        float yOffset = (float) plugin.getConfig().getDouble("nametag.guild-tag.y-offset", 0.55);
         list.add(new EntityData<>(11, EntityDataTypes.VECTOR3F, new Vector3f(0f, yOffset, 0f))); // translation
         list.add(new EntityData<>(15, EntityDataTypes.BYTE, (byte) 3)); // billboard: CENTER (always faces viewer)
         list.add(new EntityData<>(23, EntityDataTypes.ADV_COMPONENT, text)); // text

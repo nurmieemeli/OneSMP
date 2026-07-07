@@ -49,6 +49,7 @@ teleport:
   teleporting: "<prefix><gray>Teleporting in <white><seconds>s</white>, don't move..."
   teleport-cancelled-move: "<prefix><red>Teleport cancelled — you moved."
   teleported: "<prefix><green>Teleported."
+  destination-unavailable: "<prefix><red>That destination's world isn't loaded right now."
   back-none: "<prefix><red>You have no previous location to return to."
   tpa-sent: "<prefix><gray>Teleport request sent to <white><target></white>."
   tpa-received: "<prefix><yellow><sender></yellow> wants to teleport to you. <green><click:run_command:'/tpaccept'>[Accept]</click></green> <red><click:run_command:'/tpdeny'>[Deny]</click></red>"

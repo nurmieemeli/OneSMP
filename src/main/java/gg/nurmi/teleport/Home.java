@@ -1,16 +1,12 @@
 package gg.nurmi.teleport;
 
-import org.bukkit.Bukkit;
+import gg.nurmi.util.LocationUtil;
 import org.bukkit.Location;
-import org.bukkit.World;
 
 public record Home(String name, String world, double x, double y, double z, float yaw, float pitch) {
 
+    /** Null if the stored world isn't currently loaded. */
     public Location toLocation() {
-        World bukkitWorld = Bukkit.getWorld(world);
-        if (bukkitWorld == null) {
-            return null;
-        }
-        return new Location(bukkitWorld, x, y, z, yaw, pitch);
+        return LocationUtil.resolve(world, x, y, z, yaw, pitch);
     }
 }

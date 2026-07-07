@@ -7,6 +7,9 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.WorldCreator;
+import org.bukkit.entity.Player;
+
+import java.util.concurrent.CompletableFuture;
 
 /**
  * Owns the single void spawn world: creates it once on first enable (with a small starter
@@ -63,12 +66,26 @@ public final class SpawnWorldManager {
         if (world == null) {
             world = Bukkit.getWorld(voidWorldName());
         }
+        if (world == null) {
+            // The void world is created asynchronously (see ensureWorldExists()), so there's a brief
+            // startup window where nothing is loaded yet under that name. Fall back to whatever world
+            // is loaded rather than handing back a Location with a null world, which would NPE the
+            // first time anything tries to teleport a player there.
+            world = Bukkit.getWorlds().get(0);
+            plugin.getLogger().warning("Spawn world '" + worldName + "' isn't loaded yet; "
+                    + "falling back to '" + world.getName() + "' until it finishes loading.");
+        }
         double x = plugin.getConfig().getDouble("spawn.x", 1.5);
         double y = plugin.getConfig().getDouble("spawn.y", 65.0);
         double z = plugin.getConfig().getDouble("spawn.z", 1.5);
         float yaw = (float) plugin.getConfig().getDouble("spawn.yaw", 0.0);
         float pitch = (float) plugin.getConfig().getDouble("spawn.pitch", 0.0);
         return new Location(world, x, y, z, yaw, pitch);
+    }
+
+    /** Teleports the player to the current spawn location, whichever world that resolves to right now. */
+    public CompletableFuture<Boolean> teleportToSpawn(Player player) {
+        return player.teleportAsync(getSpawn());
     }
 
     public void setSpawn(Location location) {

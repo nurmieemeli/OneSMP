@@ -151,12 +151,13 @@ All player-facing text is rendered with [Adventure MiniMessage](https://docs.adv
 
 ## Configuration
 
-Four files are created in `plugins/CanvasSuite/` on first start (plus `worlds.yml`, written the first time `/world create` is used):
+Five files are created in `plugins/CanvasSuite/` on first start (plus `worlds.yml`, written the first time `/world create` is used):
 
 - **`config.yml`** — storage backend (MySQL credentials with automatic SQLite fallback), economy settings, teleport warmup/TPA timeouts, home limits, RTP radius/cooldown/per-world enable+fee/precache, guild rules and costs, chat format, protection toggles, spawn/void-world settings, nametag/tablist/scoreboard settings, and private-message cooldown.
 - **`messages.yml`** — every message the plugin sends, in MiniMessage. Change colors, add gradients, hover/click events, or MiniPlaceholders tags freely. The shared `<prefix>` is defined once at the top.
 - **`shop.yml`** — shop categories and per-item `buy-price` / `sell-price` values.
 - **`worlds.yml`** — one entry per world created via `/world create`, storing its generator settings so they're reapplied identically on every restart. Managed entirely by the `/world` command — hand-editing isn't necessary.
+- **`aliases.yml`** — extra aliases for every command (e.g. `/bal` for `/balance`), applied at enable by registering the same command object under each configured alias in Bukkit's command map. Edit freely; a command's own name always works regardless of what's listed here. Changes take effect on the next restart.
 
 Example chat format from `config.yml`:
 

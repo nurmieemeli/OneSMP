@@ -1,7 +1,6 @@
 package gg.nurmi.spawn;
 
 import org.bukkit.GameMode;
-import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -45,7 +44,6 @@ public final class VoidFallRescueListener implements Listener {
             return;
         }
 
-        Location spawn = spawnWorldManager.getSpawn();
-        player.teleportAsync(spawn).thenAccept(success -> rescuing.remove(player.getUniqueId()));
+        spawnWorldManager.teleportToSpawn(player).thenAccept(success -> rescuing.remove(player.getUniqueId()));
     }
 }
