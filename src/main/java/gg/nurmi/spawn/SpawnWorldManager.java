@@ -86,6 +86,6 @@ public final class SpawnWorldManager {
     }
 
     private String voidWorldName() {
-        return plugin.getConfig().getString("spawn.world-name", "canvassuite_void");
+        return plugin.getConfig().getString("spawn.world-name", "canvassuite_spawn");
     }
 }

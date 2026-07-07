@@ -38,9 +38,13 @@ rtp:
   min-radius: 500
   max-radius: 5000
   cooldown-seconds: 300
-  cost: 0.0
   max-attempts: 30
-  disallowed-worlds: []
+  # Random teleport is opt-in per world - a world only shows up in /rtp's GUI (or works with
+  # /rtp <world>) if it's listed here with enabled: true. Each world can charge its own fee.
+  worlds:
+    world:
+      enabled: true
+      cost: 0.0
   # Biome keys (namespaced) players should never be randomly teleported into.
   avoid-biomes:
     - "minecraft:ocean"
@@ -48,6 +52,16 @@ rtp:
     - "minecraft:frozen_ocean"
     - "minecraft:river"
     - "minecraft:void"
+  precache:
+    enabled: true
+    # Up to this many already-found safe locations are kept ready per world, so /rtp usually
+    # teleports instantly instead of waiting on a fresh search.
+    target-size: 15
+    # Tries to add one more cached location this often.
+    interval-seconds: 5
+    # Skips topping off the cache if the server's recent TPS drops below this - only precaches
+    # "whenever the server can handle it."
+    min-tps: 18.0
 
 guild:
   max-name-length: 16
@@ -80,7 +94,7 @@ spawn:
   # /spawn and first-join teleports have solid ground before any admin has run /setspawn.
   platform-material: "STONE"
   # Populated by /setspawn; these defaults are only used before any admin has run it.
-  world: "canvassuite_spawnworld"
+  world: "spawnworld"
   x: 1.5
   y: 65.0
   z: 1.5
@@ -128,6 +142,7 @@ scoreboard:
   lines:
     - "<gray>---------------"
     - "<white>Player: <player_name>"
-    - "<white><luckperms_prefix>"
+    - " "
+    - "<white>Rank: <luckperms_primary_group_name>"
     - "<gray>---------------"
     - "<white>play.example.com"

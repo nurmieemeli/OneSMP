@@ -203,6 +203,11 @@ public final class CanvasSuitePlugin extends JavaPlugin {
     private void registerRtp() {
         this.rtpManager = new RtpManager(this);
         getCommand("rtp").setExecutor(new RtpCommand(this, rtpManager));
+
+        if (getConfig().getBoolean("rtp.precache.enabled", true)) {
+            int periodSeconds = Math.max(1, getConfig().getInt("rtp.precache.interval-seconds", 5));
+            schedulerUtil.runGlobalRepeating(rtpManager::precacheTick, periodSeconds * 20L, periodSeconds * 20L);
+        }
     }
 
     private void registerGuild() {

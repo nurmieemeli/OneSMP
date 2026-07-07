@@ -2,7 +2,7 @@
 # Supports MiniPlaceholders tags (e.g. <player_name>, <player_world>) anywhere,
 # plus the message-specific placeholders documented next to each entry.
 
-prefix: "<gradient:#38bdf8:#818cf8><bold>Canvas</bold></gradient><dark_gray>» </dark_gray>"
+prefix: "<gradient:#38bdf8:#818cf8><bold>Canvas</bold></gradient><dark_gray> » </dark_gray>"
 
 general:
   no-permission: "<prefix><red>You don't have permission to do that."
@@ -67,6 +67,7 @@ rtp:
   cooldown: "<prefix><red>You must wait <white><seconds>s</white> before using this again."
   insufficient-funds: "<prefix><red>Random teleport costs <green><price></green>."
   world-disallowed: "<prefix><red>Random teleport isn't allowed in this world."
+  no-worlds-enabled: "<prefix><red>Random teleport isn't enabled in any world yet."
 
 guild:
   created: "<prefix><green>Guild <white><name></white> [<tag>] created."
