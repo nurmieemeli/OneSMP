@@ -1,6 +1,6 @@
 # CanvasSuite
 
-An all-in-one SMP plugin for [CanvasMC](https://canvasmc.io/) servers, bundling economy, shops, teleportation, random teleport, guilds, chat formatting, world creation, a void spawn world, moderator tools, private messaging, packet-driven nametags/tablist, a sidebar scoreboard, and world protection into a single jar — with a chest-GUI front end for every module that has one.
+An all-in-one SMP plugin for [CanvasMC](https://canvasmc.io/) servers, bundling economy, shops, teleportation, random teleport, guilds, chat formatting, world creation, a void spawn world, moderator tools, private messaging, packet-driven nametags/tablist, a sidebar scoreboard, and world protection into a single jar — with a chest-GUI front end for every module that benefits from one.
 
 CanvasMC is a fork of **Folia** (regionized multithreading — there is no main thread), and CanvasSuite is built natively for that model: every operation runs on the correct region/entity/async/global scheduler, and all teleports use `teleportAsync`. It is **not** intended for regular Paper/Spigot servers.
 
@@ -78,7 +78,7 @@ All player-facing text is rendered with [Adventure MiniMessage](https://docs.adv
 
 ### 🏷️ Nametags & Tablist
 - Overhead nametag prefixes (e.g. from `<luckperms_prefix>`) are sent as per-player scoreboard **team packets only** — no real Bukkit `Scoreboard`/`Team` is ever registered.
-- Guild members get their guild tag on a genuine **second line** above their name — vanilla team prefixes/suffixes can only add text to the *same* line as a player's name, so this is rendered via an invisible `TEXT_DISPLAY` entity mounted as a passenger on the player (the same technique plugins like [UnlimitedNametags](https://github.com/alexdev03/UnlimitedNametags) use), configurable via `nametag.guild-tag.format`/`y-offset`.
+- Guild members get their guild tag on a genuine **second line** above their name — vanilla team prefixes/suffixes can only add text to the *same* line as a player's name, so this is rendered via an invisible `TEXT_DISPLAY` entity mounted as a passenger on the player, configurable via `nametag.guild-tag.format`/`y-offset`.
 - The tablist stays **full-size at all times**: unused slots are filled with blank filler entries instead of the grid shrinking to fit the online player count. Header/footer are configurable MiniMessage templates.
 - All of the above requires the PacketEvents plugin; without it, nametags/reserved-slot filling are silently disabled (tablist header/footer still work — they use native Paper API, not packets).
 - There's no LuckPerms hook — prefixes resolve purely through the MiniPlaceholders-LuckPerms expansion, so permission-group changes are picked up on a periodic refresh, not instantly.

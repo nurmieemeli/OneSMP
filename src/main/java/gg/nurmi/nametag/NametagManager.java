@@ -33,6 +33,7 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.logging.Level;
 
 /**
  * Overhead nametags, entirely packet-driven (no real Bukkit Scoreboard/Team or entity is ever
@@ -70,12 +71,16 @@ public final class NametagManager {
     private final CanvasSuitePlugin plugin;
     private final Map<UUID, Component> lastSent = new ConcurrentHashMap<>();
     /**
-     * Entity id + display UUID + last-rendered tag for a player's guild-tag entity, kept as one
-     * unit so readers (handleJoin, reassertMounts) always see a consistent triple - splitting these
-     * across three separate maps let a viewer be introduced to an entity id that a concurrent
-     * handleQuit/handleWorldChange had already destroyed.
+     * Entity id + display UUID + last-rendered tag + the world it was last spawned into, for a
+     * player's guild-tag entity, kept as one unit so readers (handleJoin, reassertMounts) always
+     * see a consistent state - splitting these across separate maps let a viewer be introduced to
+     * an entity id that a concurrent handleQuit/handleWorldChange had already destroyed. The world
+     * is tracked so the periodic refresh cycle (applyGuildTag) can self-heal a world change even if
+     * handleWorldChange's own dedicated, immediate respawn didn't stick for whatever reason -
+     * without it, "same tag text as before" alone would wrongly look like nothing needs to be
+     * resent, even though the entity was actually left behind in the old world.
      */
-    private record GuildTagState(int entityId, UUID displayUuid, Component tag) {}
+    private record GuildTagState(int entityId, UUID displayUuid, Component tag, String world) {}
 
     private final Map<UUID, GuildTagState> guildTagState = new ConcurrentHashMap<>();
     private final AtomicInteger fakeEntityIdCounter = new AtomicInteger(2_000_000_000);
@@ -151,8 +156,15 @@ public final class NametagManager {
             destroyGuildTagEntity(old.entityId());
             int newId = fakeEntityIdCounter.decrementAndGet();
             UUID displayUuid = UUID.randomUUID();
-            guildTagState.put(uuid, new GuildTagState(newId, displayUuid, old.tag()));
-            spawnGuildTagEntity(newId, displayUuid, player, player.getLocation(), old.tag());
+            Location location = player.getLocation();
+            guildTagState.put(uuid, new GuildTagState(newId, displayUuid, old.tag(), location.getWorld().getName()));
+            spawnGuildTagEntity(newId, displayUuid, player, location, old.tag());
+
+            // Every viewer in the new world experiences this as a fresh "entity became visible"
+            // tracking event for the player, so vanilla's own SetPassengers (see class doc) races
+            // ours far more reliably here than during ordinary play. Win that race deterministically
+            // with a quick follow-up instead of waiting for the next periodic reassertMounts() tick.
+            plugin.scheduler().runAtEntityDelayed(player, () -> sendMount(player, newId), () -> {}, 5L);
         }, () -> {});
     }
 
@@ -172,10 +184,12 @@ public final class NametagManager {
                 }
             }
 
-            Location location = player.getLocation();
             plugin.guilds().getGuildByMember(player.getUniqueId()).thenAccept(optionalGuild -> {
                 String tag = optionalGuild.map(Guild::tag).orElse(null);
-                plugin.scheduler().runAtEntity(player, () -> applyGuildTag(player, location, tag), () -> {});
+                // Re-hop rather than trust a Location captured before this async guild lookup
+                // started - by the time it completes the player may have changed worlds, and
+                // applyGuildTag needs their *current* world to notice that.
+                plugin.scheduler().runAtEntity(player, () -> applyGuildTag(player, tag), () -> {});
             });
         }, () -> {});
     }
@@ -199,20 +213,32 @@ public final class NametagManager {
         if (!plugin.packetEvents().available() || guildTagState.isEmpty()) {
             return;
         }
-        PlayerManager playerManager = PacketEvents.getAPI().getPlayerManager();
         for (Map.Entry<UUID, GuildTagState> entry : guildTagState.entrySet()) {
-            Player owner = Bukkit.getPlayer(entry.getKey());
-            if (owner == null) {
-                continue;
-            }
-            WrapperPlayServerSetPassengers mount = new WrapperPlayServerSetPassengers(owner.getEntityId(), new int[]{entry.getValue().entityId()});
-            for (Player viewer : Bukkit.getOnlinePlayers()) {
-                playerManager.sendPacket(viewer, mount);
+            try {
+                Player owner = Bukkit.getPlayer(entry.getKey());
+                if (owner != null) {
+                    sendMount(owner, entry.getValue().entityId());
+                }
+            } catch (Exception ex) {
+                // One bad entry must not take down this whole repeating task: Folia's fixed-rate
+                // global scheduler does not reschedule a task that threw, so an uncaught exception
+                // here would silently and permanently disable the only mechanism that wins guild-tag
+                // mounts back from vanilla's own entity-tracking (see class doc) for every player,
+                // for the rest of the server's uptime - not just the one entry that failed.
+                plugin.getLogger().log(Level.WARNING, "Failed to reassert guild-tag mount for " + entry.getKey(), ex);
             }
         }
     }
 
-    private void applyGuildTag(Player player, Location spawnLocation, String tag) {
+    private void sendMount(Player owner, int fakeEntityId) {
+        WrapperPlayServerSetPassengers mount = new WrapperPlayServerSetPassengers(owner.getEntityId(), new int[]{fakeEntityId});
+        PlayerManager playerManager = PacketEvents.getAPI().getPlayerManager();
+        for (Player viewer : Bukkit.getOnlinePlayers()) {
+            playerManager.sendPacket(viewer, mount);
+        }
+    }
+
+    private void applyGuildTag(Player player, String tag) {
         UUID uuid = player.getUniqueId();
 
         if (tag == null) {
@@ -225,18 +251,26 @@ public final class NametagManager {
 
         String format = plugin.getConfig().getString("nametag.guild-tag.format", "<gray>[<tag>]");
         Component rendered = plugin.messages().parse(format, player, Placeholder.unparsed("tag", tag));
+        String currentWorld = player.getWorld().getName();
 
         GuildTagState existing = guildTagState.get(uuid);
-        if (existing == null) {
+        if (existing == null || !existing.world().equals(currentWorld)) {
+            // No entity yet, OR the one we think is alive was actually left behind in a different
+            // world - e.g. handleWorldChange's own dedicated respawn didn't stick. Respawn fresh
+            // rather than trusting a stale reference no client in this world has ever seen; this is
+            // what makes recovery self-healing within one refresh cycle even if that fast path fails.
+            if (existing != null) {
+                destroyGuildTagEntity(existing.entityId());
+            }
             int newId = fakeEntityIdCounter.decrementAndGet();
             UUID displayUuid = UUID.randomUUID();
-            guildTagState.put(uuid, new GuildTagState(newId, displayUuid, rendered));
-            spawnGuildTagEntity(newId, displayUuid, player, spawnLocation, rendered);
+            guildTagState.put(uuid, new GuildTagState(newId, displayUuid, rendered, currentWorld));
+            spawnGuildTagEntity(newId, displayUuid, player, player.getLocation(), rendered);
             return;
         }
 
         if (!rendered.equals(existing.tag())) {
-            guildTagState.put(uuid, new GuildTagState(existing.entityId(), existing.displayUuid(), rendered));
+            guildTagState.put(uuid, new GuildTagState(existing.entityId(), existing.displayUuid(), rendered, existing.world()));
             sendTextUpdate(existing.entityId(), rendered);
         }
     }

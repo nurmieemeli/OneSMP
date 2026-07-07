@@ -66,7 +66,7 @@ public final class TablistManager {
         }
         int totalSlots = rows() * COLUMNS;
         int online = Bukkit.getOnlinePlayers().size();
-        int needed = Math.min(Math.max(0, totalSlots - online), fillerIds.size());
+        int needed = Math.clamp(totalSlots - online, 0, fillerIds.size());
         if (needed == currentFillerCount) {
             return;
         }
@@ -111,7 +111,7 @@ public final class TablistManager {
     }
 
     private int rows() {
-        return Math.max(1, Math.min(20, plugin.getConfig().getInt("tablist.rows", 20)));
+        return Math.clamp(plugin.getConfig().getInt("tablist.rows", 20), 1, 20);
     }
 
     private WrapperPlayServerPlayerInfoUpdate.PlayerInfo buildFillerInfo(int index) {
