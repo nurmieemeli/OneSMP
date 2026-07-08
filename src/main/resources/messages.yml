@@ -28,12 +28,12 @@ economy:
 
 shop:
   bought: "<prefix><green>Bought <white><amount>x <item></white> for <green><price></green>."
-  sold: "<prefix><green>Sold <white><amount>x <item></white> for <green><price></green>."
-  not-sellable: "<prefix><red>That item can't be sold here."
   not-buyable: "<prefix><red>That item can't be bought here."
-  not-enough-items: "<prefix><red>You don't have <amount>x <item>."
   inventory-full: "<prefix><red>Your inventory is full, some items were refunded."
   insufficient-funds: "<prefix><red>You need <green><price></green> to buy that."
+  sold-bulk: "<prefix><green>Sold <white><amount></white> items for <green><price></green>."
+  sell-empty: "<prefix><red>You don't have any sellable items in the menu."
+  items-dropped: "<prefix><yellow>Your inventory was full — leftover items were dropped at your feet."
 
 teleport:
   home-set: "<prefix><green>Home <white><name></white> set."

@@ -111,7 +111,7 @@ public final class LeaderboardHologramManager {
 
     private void refreshOne(String fancyName, Hologram hologram, StatsManager.StatType statType, int limit) {
         plugin.stats().top(statType, limit).thenAccept(entries -> {
-            List<String> lines = buildLines(statType, entries);
+            List<String> lines = buildLines(statType, entries, limit);
             Location location = hologram.getData().getLocation();
             plugin.scheduler().runAtLocation(location, () -> {
                 if (hologram.getData() instanceof TextHologramData textData) {
@@ -122,18 +122,24 @@ public final class LeaderboardHologramManager {
         });
     }
 
-    private List<String> buildLines(StatsManager.StatType statType, List<StatsManager.TopEntry> entries) {
+    /**
+     * Always renders exactly {@code limit} entry lines, regardless of how many players actually
+     * have tracked stats yet - slots past the end of {@code entries} are padded with the same
+     * "#rank name - value" style, just with name/value shown as N/A, so the hologram doesn't
+     * visually shrink/jump as more players get tracked over time.
+     */
+    private List<String> buildLines(StatsManager.StatType statType, List<StatsManager.TopEntry> entries, int limit) {
         List<String> lines = new ArrayList<>();
         lines.add(statType.title());
-        if (entries.isEmpty()) {
-            lines.add("<gray>No data yet");
-            return lines;
-        }
-        for (int i = 0; i < entries.size(); i++) {
-            StatsManager.TopEntry entry = entries.get(i);
-            String name = entry.name() == null ? "?" : entry.name();
-            lines.add("<gray>#" + (i + 1) + " <white>" + name + "</white> <dark_gray>-</dark_gray> <green>"
-                    + statType.formatValue(entry.value()));
+        for (int i = 0; i < limit; i++) {
+            if (i < entries.size()) {
+                StatsManager.TopEntry entry = entries.get(i);
+                String name = entry.name() == null ? "?" : entry.name();
+                lines.add("<gray>#" + (i + 1) + " <white>" + name + "</white> <dark_gray>-</dark_gray> <green>"
+                        + statType.formatValue(entry.value()));
+            } else {
+                lines.add("<gray>#" + (i + 1) + " <white>N/A</white> <dark_gray>-</dark_gray> <green>N/A");
+            }
         }
         return lines;
     }

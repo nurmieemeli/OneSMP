@@ -42,7 +42,8 @@ import gg.nurmi.scoreboard.ScoreboardListener;
 import gg.nurmi.scoreboard.ScoreboardManager;
 import gg.nurmi.teleport.rtp.RtpManager;
 import gg.nurmi.util.SchedulerUtil;
-import gg.nurmi.shop.ShopCommand;
+import gg.nurmi.shop.BuyCommand;
+import gg.nurmi.shop.SellCommand;
 import gg.nurmi.shop.ShopManager;
 import gg.nurmi.spawn.FirstJoinListener;
 import gg.nurmi.spawn.PlayerRespawnListener;
@@ -102,7 +103,6 @@ public final class CanvasSuitePlugin extends JavaPlugin {
     private WorldManager worldManager;
     private StatsManager statsManager;
     private Expansion statsPlaceholderExpansion;
-    private LeaderboardHologramManager hologramManager;
 
     @Override
     public void onEnable() {
@@ -165,7 +165,7 @@ public final class CanvasSuitePlugin extends JavaPlugin {
                     + "Install FancyHolograms to enable /statshologram.");
         }
 
-        this.hologramManager = available ? new LeaderboardHologramManager(this) : null;
+        LeaderboardHologramManager hologramManager = available ? new LeaderboardHologramManager(this) : null;
         Objects.requireNonNull(getCommand("statshologram")).setExecutor(new LeaderboardHologramCommand(this, hologramManager));
 
         if (available) {
@@ -296,7 +296,8 @@ public final class CanvasSuitePlugin extends JavaPlugin {
 
     private void registerShop() {
         this.shopManager = new ShopManager(this);
-        Objects.requireNonNull(getCommand("shop")).setExecutor(new ShopCommand(this));
+        Objects.requireNonNull(getCommand("buy")).setExecutor(new BuyCommand(this));
+        Objects.requireNonNull(getCommand("sell")).setExecutor(new SellCommand(this));
     }
 
     private void registerEconomy() {
@@ -390,9 +391,5 @@ public final class CanvasSuitePlugin extends JavaPlugin {
 
     public StatsManager stats() {
         return statsManager;
-    }
-
-    public LeaderboardHologramManager holograms() {
-        return hologramManager;
     }
 }

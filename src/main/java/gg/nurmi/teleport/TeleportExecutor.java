@@ -15,23 +15,31 @@ public final class TeleportExecutor {
     }
 
     public void execute(Player player, Location destination) {
+        execute(player, destination, "teleport.teleported");
+    }
+
+    public void execute(Player player, Location destination, String successMessageKey) {
         if (destination == null) {
             plugin.messages().send(player, "teleport.destination-unavailable");
             return;
         }
-        warmup.start(player, () -> teleportNow(player, destination));
+        warmup.start(player, () -> teleportNow(player, destination, successMessageKey));
     }
 
-    private void teleportNow(Player player, Location destination) {
+    private void teleportNow(Player player, Location destination, String successMessageKey) {
         player.teleportAsync(destination).thenAccept(success -> {
             if (success) {
-                plugin.messages().send(player, "teleport.teleported");
+                plugin.messages().send(player, successMessageKey);
             }
         });
     }
 
     public void executeSafely(Player player, Location destination) {
         plugin.scheduler().runAtEntity(player, () -> execute(player, destination), () -> {});
+    }
+
+    public void executeSafely(Player player, Location destination, String successMessageKey) {
+        plugin.scheduler().runAtEntity(player, () -> execute(player, destination, successMessageKey), () -> {});
     }
 
     public void teleportToPlayerLocation(Player toTeleport, Player destinationOwner) {

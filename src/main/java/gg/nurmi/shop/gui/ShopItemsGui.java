@@ -13,7 +13,6 @@ import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.PlayerInventory;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -76,12 +75,7 @@ public final class ShopItemsGui extends AbstractGui {
             lore.add(plugin.messages().parse("<gray>Buy: <green><price></green> <dark_gray>(click)</dark_gray>",
                     Placeholder.unparsed("price", plugin.economy().format(BigDecimal.valueOf(item.buyPrice())))));
         }
-        if (item.sellable()) {
-            double effectiveSell = item.sellPrice() * plugin.shop().sellPriceMultiplier();
-            lore.add(plugin.messages().parse("<gray>Sell: <green><price></green> <dark_gray>(right-click)</dark_gray>",
-                    Placeholder.unparsed("price", plugin.economy().format(BigDecimal.valueOf(effectiveSell)))));
-        }
-        lore.add(plugin.messages().parse("<dark_gray>Shift-click to trade in bulk"));
+        lore.add(plugin.messages().parse("<dark_gray>Shift-click to buy in bulk"));
 
         return new ItemBuilder(item.material())
                 .name(plugin.messages().parse("<white>" + TextUtil.prettyName(item.material())))
@@ -94,21 +88,12 @@ public final class ShopItemsGui extends AbstractGui {
             return;
         }
 
-        if (event.getClick().isRightClick()) {
-            if (!item.sellable()) {
-                plugin.messages().send(player, "shop.not-sellable");
-                return;
-            }
-            int amount = event.getClick().isShiftClick() ? countMaterial(player.getInventory(), item.material()) : 1;
-            handleSell(player, item, amount);
-        } else {
-            if (!item.buyable()) {
-                plugin.messages().send(player, "shop.not-buyable");
-                return;
-            }
-            int amount = event.getClick().isShiftClick() ? item.material().getMaxStackSize() : 1;
-            handleBuy(player, item, amount);
+        if (!item.buyable()) {
+            plugin.messages().send(player, "shop.not-buyable");
+            return;
         }
+        int amount = event.getClick().isShiftClick() ? item.material().getMaxStackSize() : 1;
+        handleBuy(player, item, amount);
     }
 
     private void handleBuy(Player player, ShopItem item, int amount) {
@@ -139,36 +124,5 @@ public final class ShopItemsGui extends AbstractGui {
                                 Placeholder.unparsed("price", plugin.economy().format(unitPrice.multiply(BigDecimal.valueOf(given)))));
                     }
                 }, () -> {}));
-    }
-
-    private void handleSell(Player player, ShopItem item, int amount) {
-        int have = countMaterial(player.getInventory(), item.material());
-        int toSell = Math.min(have, amount);
-        if (toSell <= 0) {
-            plugin.messages().send(player, "shop.not-enough-items",
-                    Placeholder.unparsed("amount", String.valueOf(Math.max(amount, 1))),
-                    Placeholder.unparsed("item", TextUtil.prettyName(item.material())));
-            return;
-        }
-
-        player.getInventory().removeItem(new ItemStack(item.material(), toSell));
-        double effectiveSell = item.sellPrice() * plugin.shop().sellPriceMultiplier();
-        BigDecimal payout = BigDecimal.valueOf(effectiveSell).multiply(BigDecimal.valueOf(toSell));
-
-        plugin.economy().deposit(player.getUniqueId(), payout).thenRun(() ->
-                plugin.messages().send(player, "shop.sold",
-                        Placeholder.unparsed("amount", String.valueOf(toSell)),
-                        Placeholder.unparsed("item", TextUtil.prettyName(item.material())),
-                        Placeholder.unparsed("price", plugin.economy().format(payout))));
-    }
-
-    private int countMaterial(PlayerInventory inventory, Material material) {
-        int count = 0;
-        for (ItemStack stack : inventory.getStorageContents()) {
-            if (stack != null && stack.getType() == material) {
-                count += stack.getAmount();
-            }
-        }
-        return count;
     }
 }

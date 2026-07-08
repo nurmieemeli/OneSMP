@@ -15,7 +15,9 @@ import org.bukkit.inventory.ItemStack;
 import org.jspecify.annotations.NonNull;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 import java.util.function.BiConsumer;
 
 public abstract class AbstractGui implements InventoryHolder {
@@ -27,6 +29,7 @@ public abstract class AbstractGui implements InventoryHolder {
 
     private final Inventory inventory;
     private final Map<Integer, GuiButton> buttons = new HashMap<>();
+    private final Set<Integer> openSlots = new HashSet<>();
 
     protected AbstractGui(Component title, int rows) {
         this.inventory = Bukkit.createInventory(this, rows * 9, title);
@@ -50,6 +53,32 @@ public abstract class AbstractGui implements InventoryHolder {
     protected void clearSlot(int slot) {
         inventory.setItem(slot, null);
         buttons.remove(slot);
+    }
+
+    /**
+     * Marks slots as freely editable by the viewer (e.g. an input area for a sell GUI),
+     * bypassing the click/drag cancellation that {@link gg.nurmi.gui.GuiListener} otherwise
+     * applies to every GUI's top inventory.
+     */
+    protected void openSlots(int fromInclusive, int toExclusive) {
+        for (int slot = fromInclusive; slot < toExclusive; slot++) {
+            openSlots.add(slot);
+        }
+    }
+
+    final boolean isOpenSlot(int slot) {
+        return openSlots.contains(slot);
+    }
+
+    final boolean hasOpenSlots() {
+        return !openSlots.isEmpty();
+    }
+
+    /**
+     * Called whenever the viewer places, removes, or drags items into an open slot.
+     * Override to react to input changes, e.g. refreshing a computed total display.
+     */
+    protected void onOpenSlotChange(HumanEntity viewer) {
     }
 
     final void handleClick(InventoryClickEvent event) {

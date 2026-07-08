@@ -17,9 +17,17 @@ public final class GuiListener implements Listener {
         }
 
         if (event.getClickedInventory() != null && event.getClickedInventory().equals(top)) {
+            if (gui.isOpenSlot(event.getSlot())) {
+                gui.onOpenSlotChange(event.getWhoClicked());
+                return;
+            }
             event.setCancelled(true);
             gui.handleClick(event);
         } else if (event.getClick().isShiftClick()) {
+            if (gui.hasOpenSlots()) {
+                gui.onOpenSlotChange(event.getWhoClicked());
+                return;
+            }
             event.setCancelled(true);
         }
     }
@@ -27,9 +35,21 @@ public final class GuiListener implements Listener {
     @EventHandler
     public void onDrag(InventoryDragEvent event) {
         Inventory top = event.getView().getTopInventory();
-        if (top.getHolder() instanceof AbstractGui && event.getRawSlots().stream().anyMatch(slot -> slot < top.getSize())) {
-            event.setCancelled(true);
+        if (!(top.getHolder() instanceof AbstractGui gui)) {
+            return;
         }
+        boolean touchesTop = event.getRawSlots().stream().anyMatch(slot -> slot < top.getSize());
+        if (!touchesTop) {
+            return;
+        }
+        boolean allOpen = event.getRawSlots().stream()
+                .filter(slot -> slot < top.getSize())
+                .allMatch(gui::isOpenSlot);
+        if (!allOpen) {
+            event.setCancelled(true);
+            return;
+        }
+        gui.onOpenSlotChange(event.getWhoClicked());
     }
 
     @EventHandler

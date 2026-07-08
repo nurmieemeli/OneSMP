@@ -1,8 +1,11 @@
 package gg.nurmi.spawn;
 
+import org.bukkit.block.Bed;
+import org.bukkit.block.data.type.RespawnAnchor;
+import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
-import org.bukkit.event.player.PlayerRespawnEvent;
+import org.bukkit.event.entity.PlayerDeathEvent;
 
 public final class PlayerRespawnListener implements Listener {
 
@@ -13,10 +16,12 @@ public final class PlayerRespawnListener implements Listener {
     }
 
     @EventHandler
-    public void onRespawn(PlayerRespawnEvent event) {
-        if (event.isBedSpawn() || event.isAnchorSpawn()) {
+    public void onRespawn(PlayerDeathEvent event) {
+        Player player = event.getPlayer();
+        if (player.getBedLocation().getBlock() instanceof Bed
+                || player.getBedLocation().getBlock() instanceof RespawnAnchor) {
             return;
         }
-        event.setRespawnLocation(spawnWorldManager.getSpawn());
+        player.setRespawnLocation(spawnWorldManager.getSpawn());
     }
 }

@@ -46,7 +46,13 @@ rtp:
   worlds:
     world:
       enabled: true
-      cost: 0.0
+      cost: 0
+    the_nether:
+      enabled: true
+      cost: 5000
+    the_end:
+      enabled: false
+      cost: 500000
   # Biomes players should never be randomly teleported into.
   avoid-biomes:
     - "minecraft:ocean"
@@ -178,14 +184,14 @@ scoreboard:
   lines:
     - "<gradient:#818cf8:#38bdf8><strikethrough>                         </strikethrough>"
     - " "
-    - "<green><bold>$</bold><gray> Money: </gray><economy_balance></green>"
-    - "<dark_red><bold>🗡</bold><gray> Kills: </gray><stats_kills></dark_red>"
-    - "<#F54927><bold>☠</bold><gray> Deaths: </gray><stats_deaths></#F54927>"
-    - "<yellow><bold>🕓</bold><gray> Playtime: </gray><stats_playtime></yellow>"
-    - "<#818cf8><bold>⚑</bold><gray> Guild: </gray><guild_own_name></#818cf8>"
+    - " <green><bold>$</bold><gray> Money: </gray><economy_balance></green>"
+    - " <dark_red><bold>🗡</bold><gray> Kills: </gray><stats_kills></dark_red>"
+    - " <#F54927>☠<gray> Deaths: </gray><stats_deaths></#F54927>"
+    - " <yellow><bold>🕓</bold><gray> Playtime: </gray><stats_playtime></yellow>"
+    - " <#818cf8>⚑<gray> Guild: </gray><guild_own_name></#818cf8>"
     - " "
     - "<gradient:#818cf8:#38bdf8><strikethrough>                         </strikethrough>"
-    - "<white>  play.example.com  "
+    - "<white>   play.example.com"
 
 stats:
   # A server-wide broadcast is sent (stats.killstreak-broadcast in messages.yml) whenever a

@@ -116,11 +116,7 @@ public final class RtpManager {
 
     private void teleport(Player player, Location location) {
         applyCooldown(player.getUniqueId());
-        plugin.scheduler().runAtEntity(player, () -> player.teleportAsync(location).thenAccept(success -> {
-            if (success) {
-                plugin.messages().send(player, "rtp.success");
-            }
-        }), () -> {});
+        plugin.teleportExecutor().executeSafely(player, location, "rtp.success");
     }
 
     public Location pollCached(World world) {

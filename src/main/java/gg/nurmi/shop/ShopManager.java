@@ -73,6 +73,16 @@ public final class ShopManager {
         return categories.get(key);
     }
 
+    public ShopItem findItem(Material material) {
+        for (ShopCategory category : categories.values()) {
+            ShopItem item = category.items().get(material);
+            if (item != null) {
+                return item;
+            }
+        }
+        return null;
+    }
+
     public double sellPriceMultiplier() {
         return plugin.getConfig().getDouble("shop.sell-price-multiplier", 1.0);
     }

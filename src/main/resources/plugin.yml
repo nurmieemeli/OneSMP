@@ -21,9 +21,12 @@ commands:
   eco:
     description: Administrate the economy.
     usage: /eco <give|take|set> <player> <amount>
-  shop:
+  buy:
     description: Open the server shop.
-    usage: /shop
+    usage: /buy
+  sell:
+    description: Sell items from your inventory.
+    usage: /sell
   sethome:
     description: Set a home at your current location.
     usage: /sethome [name]
@@ -109,6 +112,7 @@ permissions:
   canvassuite.economy.use: { default: true }
   canvassuite.economy.admin: { default: op }
   canvassuite.shop.use: { default: true }
+  canvassuite.shop.sell: { default: true }
   canvassuite.home.use: { default: true }
   canvassuite.home.unlimited: { default: false }
   canvassuite.warp.use: { default: true }

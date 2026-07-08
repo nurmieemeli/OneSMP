@@ -49,9 +49,10 @@ All player-facing text is rendered with [Adventure MiniMessage](https://docs.adv
 - Automatically registers as the server's Vault economy provider when Vault is installed, so any other Vault-aware plugin can use CanvasSuite's currency without extra setup.
 
 ### 🛒 Shop
-- `/shop` opens a category-browser GUI defined entirely in `shop.yml` — categories, display items, and per-item buy/sell prices.
+- `/buy` opens a category-browser GUI defined entirely in `shop.yml` — categories, display items, and per-item buy/sell prices.
+- `/sell` opens an empty inventory to drop items into; it shows a running sell value as you fill it and pays out on confirm.
 - A global `shop.sell-price-multiplier` in `config.yml` scales every sell price at once (e.g. `0.75` = sell for 75% of list price).
-- Overflow-safe: if your inventory fills mid-purchase, the undeliverable portion is refunded.
+- Overflow-safe: if your inventory fills mid-purchase, the undeliverable portion is refunded; closing `/sell` with unsold items in it drops any that don't fit back in your inventory.
 
 ### 🏠 Teleportation
 - **Homes** — `/sethome [name]`, `/home [name]`, `/delhome <name>`. Multiple named homes with per-rank limits via permission nodes (`canvassuite.home.limit.<n>`, or `canvassuite.home.unlimited`). Running `/home` with no arguments opens a GUI of all your homes (click to teleport, shift-click to delete).
@@ -76,7 +77,8 @@ All player-facing text is rendered with [Adventure MiniMessage](https://docs.adv
 ### 🎲 Random Teleport
 - `/rtp [world]` (aliases `/wild`, `/randomtp`) teleports you to a random safe spot within a configurable min/max radius. Running `/rtp` with no arguments opens a GUI listing every RTP-enabled world with its fee (or "Free").
 - Random teleport is opt-in per world with configurable cost per use.
-- A background precache keeps a small pool of already-verified safe locations per world, topped off only while the server's TPS can handle it, so `/rtp` usually teleports instantly instead of searching live.
+- A background precache keeps a small pool of already-verified safe locations per world, topped off only while the server's TPS can handle it, so `/rtp` usually finds a destination instantly instead of searching live.
+- Once a destination is found, the same teleport warmup used by homes/warps/TPA applies (`teleport.teleport-warmup-seconds`/`cancel-warmup-on-move` in `config.yml`) before you're actually moved.
 - A configurable cooldown applies per player; `canvassuite.rtp.admin` bypasses it.
 - Configurable biome avoid-list (oceans, rivers, the void, etc.) so you never land somewhere unusable.
 
@@ -143,7 +145,8 @@ All player-facing text is rendered with [Adventure MiniMessage](https://docs.adv
 | `/pay <player> <amount>` | Send money | `canvassuite.economy.use` |
 | `/baltop` (`/bt`) | Rich-list GUI | `canvassuite.economy.use` |
 | `/eco <give\|take\|set> <player> <amount>` | Admin economy control | `canvassuite.economy.admin` |
-| `/shop` | Open the server shop GUI | `canvassuite.shop.use` |
+| `/buy` | Open the server shop GUI (buy) | `canvassuite.shop.use` |
+| `/sell` | Open the sell GUI | `canvassuite.shop.sell` |
 | `/sethome [name]` / `/home [name]` (`/homes`) / `/delhome <name>` | Manage & use homes | `canvassuite.home.use` |
 | `/setwarp <name>` / `/delwarp <name>` | Manage warps | `canvassuite.warp.admin` |
 | `/warp [name]` (`/warps`) | Warp browser / teleport | `canvassuite.warp.use` |
@@ -174,7 +177,8 @@ Every command's *own* name always works no matter what's configured — the alia
 |---|---|---|
 | `canvassuite.admin` | op | Grants every admin node below |
 | `canvassuite.economy.use` / `.admin` | true / op | Economy commands / `/eco` |
-| `canvassuite.shop.use` | true | Shop access |
+| `canvassuite.shop.use` | true | Shop access (buy) |
+| `canvassuite.shop.sell` | true | Sell menu access |
 | `canvassuite.home.use` | true | Homes |
 | `canvassuite.home.limit.<n>` | — | Raises that player's home limit to `n` (default limit set in config) |
 | `canvassuite.home.unlimited` | false | No home limit |
