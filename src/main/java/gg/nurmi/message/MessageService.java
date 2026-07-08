@@ -1,6 +1,6 @@
 package gg.nurmi.message;
 
-import gg.nurmi.config.ConfigMigrator;
+import gg.nurmi.util.ConfigMigrator;
 import io.github.miniplaceholders.api.MiniPlaceholders;
 import io.github.miniplaceholders.api.types.RelationalAudience;
 import net.kyori.adventure.audience.Audience;

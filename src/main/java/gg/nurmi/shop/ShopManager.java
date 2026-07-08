@@ -1,7 +1,7 @@
 package gg.nurmi.shop;
 
 import gg.nurmi.CanvasSuitePlugin;
-import gg.nurmi.config.ConfigMigrator;
+import gg.nurmi.util.ConfigMigrator;
 import org.bukkit.Material;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;

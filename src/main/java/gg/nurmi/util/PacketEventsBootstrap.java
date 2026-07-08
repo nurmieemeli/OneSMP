@@ -1,4 +1,4 @@
-package gg.nurmi.packets;
+package gg.nurmi.util;
 
 import gg.nurmi.CanvasSuitePlugin;
 import org.bukkit.Bukkit;

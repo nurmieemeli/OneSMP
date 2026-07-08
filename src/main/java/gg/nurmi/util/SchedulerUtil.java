@@ -1,4 +1,4 @@
-package gg.nurmi.scheduler;
+package gg.nurmi.util;
 
 import io.papermc.paper.threadedregions.scheduler.ScheduledTask;
 import org.bukkit.Bukkit;

@@ -1,4 +1,4 @@
-package gg.nurmi.protection;
+package gg.nurmi.world.protection;
 
 import gg.nurmi.CanvasSuitePlugin;
 import org.bukkit.entity.Player;

@@ -1,7 +1,7 @@
-package gg.nurmi.rtp;
+package gg.nurmi.teleport.rtp;
 
 import gg.nurmi.CanvasSuitePlugin;
-import gg.nurmi.rtp.gui.RtpWorldSelectGui;
+import gg.nurmi.teleport.rtp.gui.RtpWorldSelectGui;
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
 import org.bukkit.Bukkit;
 import org.bukkit.World;

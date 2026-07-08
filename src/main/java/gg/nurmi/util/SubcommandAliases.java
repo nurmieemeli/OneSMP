@@ -1,7 +1,6 @@
-package gg.nurmi.command;
+package gg.nurmi.util;
 
 import gg.nurmi.CanvasSuitePlugin;
-import gg.nurmi.config.ConfigMigrator;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
 

@@ -1,9 +1,9 @@
-package gg.nurmi.rtp.gui;
+package gg.nurmi.teleport.rtp.gui;
 
 import gg.nurmi.CanvasSuitePlugin;
 import gg.nurmi.gui.AbstractGui;
 import gg.nurmi.gui.Pagination;
-import gg.nurmi.rtp.RtpManager;
+import gg.nurmi.teleport.rtp.RtpManager;
 import gg.nurmi.util.ItemBuilder;
 import gg.nurmi.util.WorldIcons;
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;

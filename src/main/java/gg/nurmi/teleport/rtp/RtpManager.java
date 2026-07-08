@@ -1,4 +1,4 @@
-package gg.nurmi.rtp;
+package gg.nurmi.teleport.rtp;
 
 import gg.nurmi.CanvasSuitePlugin;
 import gg.nurmi.util.Cooldown;

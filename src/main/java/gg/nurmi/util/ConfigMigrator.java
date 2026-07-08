@@ -1,4 +1,4 @@
-package gg.nurmi.config;
+package gg.nurmi.util;
 
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
