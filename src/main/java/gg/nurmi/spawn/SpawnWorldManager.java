@@ -9,6 +9,7 @@ import org.bukkit.World;
 import org.bukkit.WorldCreator;
 import org.bukkit.entity.Player;
 
+import java.io.File;
 import java.util.concurrent.CompletableFuture;
 
 public final class SpawnWorldManager {
@@ -25,12 +26,16 @@ public final class SpawnWorldManager {
             return;
         }
 
+        // Already generated on a previous run, just unloaded right now (e.g. after a restart) -
+        // only load it, don't re-run the starter-platform step meant for a brand new world.
+        boolean existsOnDisk = new File(Bukkit.getWorldContainer(), worldName).isDirectory();
+
         plugin.scheduler().runGlobal(() -> {
             World world = new WorldCreator(worldName)
                     .generator(new VoidChunkGenerator())
                     .environment(World.Environment.NORMAL)
                     .createWorld();
-            if (world != null) {
+            if (world != null && !existsOnDisk) {
                 buildStarterPlatform(world);
             }
         });

@@ -38,3 +38,96 @@ crates:
         broadcast: true
         items:
           NETHERITE_INGOT: 1
+  rare:
+    display-name: "<green>Rare Crate"
+    key-name: "<green>Rare Key"
+    key-material: TRIPWIRE_HOOK
+    key-lore:
+      - "<dark_gray>Right-click a Rare Crate to open."
+    rewards:
+      iron:
+        weight: 40
+        display-name: "<white>16 Iron Ingots"
+        items:
+          IRON_INGOT: 16
+      coins-small:
+        weight: 30
+        display-name: "<green>250 Coins"
+        money: 250
+      diamonds:
+        weight: 20
+        display-name: "<aqua>4 Diamonds"
+        items:
+          DIAMOND: 4
+      coins-big:
+        weight: 9
+        display-name: "<gold>2000 Coins"
+        money: 2000
+      netherite:
+        weight: 1
+        display-name: "<light_purple><bold>Netherite Ingot"
+        broadcast: true
+        items:
+          NETHERITE_INGOT: 1
+  epic:
+    display-name: "<dark_purple>Epic Crate"
+    key-name: "<dark_purple>Epic Key"
+    key-material: TRIPWIRE_HOOK
+    key-lore:
+      - "<dark_gray>Right-click an Epic Crate to open."
+    rewards:
+      iron:
+        weight: 40
+        display-name: "<white>16 Iron Ingots"
+        items:
+          IRON_INGOT: 16
+      coins-small:
+        weight: 30
+        display-name: "<green>250 Coins"
+        money: 250
+      diamonds:
+        weight: 20
+        display-name: "<aqua>4 Diamonds"
+        items:
+          DIAMOND: 4
+      coins-big:
+        weight: 9
+        display-name: "<gold>2000 Coins"
+        money: 2000
+      netherite:
+        weight: 1
+        display-name: "<light_purple><bold>Netherite Ingot"
+        broadcast: true
+        items:
+          NETHERITE_INGOT: 1
+  legendary:
+    display-name: "<gold>Legendary Crate"
+    key-name: "<gold>Legendary Key"
+    key-material: TRIPWIRE_HOOK
+    key-lore:
+      - "<dark_gray>Right-click a Legendary Crate to open."
+    rewards:
+      iron:
+        weight: 40
+        display-name: "<white>16 Iron Ingots"
+        items:
+          IRON_INGOT: 16
+      coins-small:
+        weight: 30
+        display-name: "<green>250 Coins"
+        money: 250
+      diamonds:
+        weight: 20
+        display-name: "<aqua>4 Diamonds"
+        items:
+          DIAMOND: 4
+      coins-big:
+        weight: 9
+        display-name: "<gold>2000 Coins"
+        money: 2000
+      netherite:
+        weight: 1
+        display-name: "<light_purple><bold>Netherite Ingot"
+        broadcast: true
+        items:
+          NETHERITE_INGOT: 1

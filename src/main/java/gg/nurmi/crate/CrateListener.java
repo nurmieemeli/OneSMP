@@ -1,6 +1,7 @@
 package gg.nurmi.crate;
 
 import gg.nurmi.CanvasSuitePlugin;
+import gg.nurmi.crate.gui.CrateOpeningGui;
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
 import org.bukkit.Location;
 import org.bukkit.Particle;
@@ -76,12 +77,14 @@ public final class CrateListener implements Listener {
             player.getInventory().setItemInMainHand(held);
         }
 
-        CrateReward reward = crateManager.rollReward(type);
-        crateManager.grantReward(player, type, reward);
-
         Location effectLocation = block.getLocation().add(0.5, 0.5, 0.5);
         player.getWorld().playSound(effectLocation, Sound.BLOCK_CHEST_OPEN, 1f, 1f);
         player.getWorld().spawnParticle(Particle.HAPPY_VILLAGER, effectLocation, 30, 0.3, 0.3, 0.3, 0.05);
+
+        CrateReward reward = crateManager.rollReward(type);
+        CrateOpeningGui gui = new CrateOpeningGui(plugin, crateManager, type, reward);
+        gui.open(player);
+        gui.start(player);
     }
 
     private void pushBack(Player player, Block block) {

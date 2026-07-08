@@ -1,5 +1,9 @@
 package gg.nurmi.crate;
 
+import de.oliver.fancyholograms.api.FancyHologramsPlugin;
+import de.oliver.fancyholograms.api.HologramManager;
+import de.oliver.fancyholograms.api.data.TextHologramData;
+import de.oliver.fancyholograms.api.hologram.Hologram;
 import gg.nurmi.CanvasSuitePlugin;
 import gg.nurmi.util.ConfigMigrator;
 import gg.nurmi.util.Database;
@@ -151,11 +155,13 @@ public final class CrateManager {
     }
 
     public boolean bind(Location location, String typeKey, UUID createdBy) {
-        if (!types.containsKey(typeKey)) {
+        CrateType type = types.get(typeKey);
+        if (type == null) {
             return false;
         }
         BlockKey key = BlockKey.of(location);
         boundBlocks.put(key, typeKey);
+        createHologram(location, type);
 
         plugin.scheduler().runAsync(() -> {
             String upsert = database.isMysql()
@@ -184,6 +190,7 @@ public final class CrateManager {
         if (boundBlocks.remove(key) == null) {
             return false;
         }
+        removeHologram(location);
 
         plugin.scheduler().runAsync(() -> {
             try (Connection connection = database.getConnection();
@@ -199,6 +206,40 @@ public final class CrateManager {
             }
         });
         return true;
+    }
+
+    private boolean fancyHologramsAvailable() {
+        return Bukkit.getPluginManager().getPlugin("FancyHolograms") != null;
+    }
+
+    private String hologramName(BlockKey key) {
+        return "cs_crate_" + key.world() + "_" + key.x() + "_" + key.y() + "_" + key.z();
+    }
+
+    private void createHologram(Location location, CrateType type) {
+        if (!fancyHologramsAvailable()) {
+            return;
+        }
+        HologramManager manager = FancyHologramsPlugin.get().getHologramManager();
+        String name = hologramName(BlockKey.of(location));
+        if (manager.getHologram(name).isPresent()) {
+            return;
+        }
+
+        Location hologramLocation = location.clone().add(0.5, 1.3, 0.5);
+        TextHologramData data = new TextHologramData(name, hologramLocation);
+        data.setText(new ArrayList<>(List.of(type.displayName())));
+        Hologram hologram = manager.create(data);
+        manager.addHologram(hologram);
+        hologram.forceUpdate();
+    }
+
+    private void removeHologram(Location location) {
+        if (!fancyHologramsAvailable()) {
+            return;
+        }
+        HologramManager manager = FancyHologramsPlugin.get().getHologramManager();
+        manager.getHologram(hologramName(BlockKey.of(location))).ifPresent(manager::removeHologram);
     }
 
     public ItemStack createKey(String typeKey, int amount) {

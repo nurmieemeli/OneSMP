@@ -36,7 +36,7 @@ An all-in-one SMP plugin for <a href="https://canvasmc.io/">CanvasMC</a> servers
 | [MiniPlaceholders-LuckPerms expansion](https://github.com/MiniPlaceholders/MiniPlaceholders) | ➖ | Optional — install alongside MiniPlaceholders if you want `<luckperms_prefix>`/`<luckperms_suffix>` to resolve in chat, nametags, and the scoreboard |
 | [LuckPerms](https://luckperms.net/) | ➖ | Optional, soft-depended directly (not just through MiniPlaceholders) — used to sort the tablist by each player's effective group weight, highest first |
 | [Vault](https://www.spigotmc.org/resources/vault.34315/) | ➖ | Optional — if present, CanvasSuite registers itself as the Vault economy provider so other plugins can use its currency |
-| [FancyHolograms](https://modrinth.com/plugin/fancyholograms) | ➖ | Optional, soft-depended — powers `/statshologram` leaderboard holograms. `/statshologram` replies with a clear message instead of erroring if it's not installed |
+| [FancyHolograms](https://modrinth.com/plugin/fancyholograms) | ➖ | Optional, soft-depended — powers `/statshologram` leaderboard holograms and the name hologram `/crate create` drops above a bound crate. Both degrade gracefully (a clear message / silent skip) if it's not installed |
 | MySQL server | ➖ | Optional — falls back to a local SQLite file automatically |
 
 All player-facing text is rendered with [Adventure MiniMessage](https://docs.advntr.dev/minimessage/format.html) and supports [MiniPlaceholders](https://github.com/MiniPlaceholders/MiniPlaceholders) tags (global, audience, and relational placeholders) in every configurable message and chat format.
@@ -58,7 +58,8 @@ All player-facing text is rendered with [Adventure MiniMessage](https://docs.adv
 - Crate types (key appearance and a weighted reward pool of items/money/console commands) are defined entirely in `crates.yml`.
 - `/crate create <type>` binds the block an admin is looking at as a crate of that type; `/crate remove` unbinds it. A crate block otherwise behaves like any other block until it's bound.
 - `/crate key <type> <player> [amount]` gives an online player key items — ordinary items tagged with a hidden marker for that crate type, so they can't be duplicated by grabbing an item of the same material from elsewhere.
-- Right-clicking a bound crate block with a matching key consumes one key and instantly rolls a weighted-random reward from that crate's pool; rewards can optionally broadcast the win to the whole server.
+- Right-clicking a bound crate block with a matching key consumes one key and rolls a weighted-random reward from that crate's pool, then opens a chest GUI with a slot-machine-style reel that spins through the crate's possible rewards before landing on the one already rolled; rewards can optionally broadcast the win to the whole server. The reward is granted the moment the reel stops (or immediately if the player closes the menu early) - the animation is purely cosmetic and never re-rolls.
+- If [FancyHolograms](https://modrinth.com/plugin/fancyholograms) is installed, `/crate create` also drops a floating text hologram above the block showing that crate type's display name (removed again by `/crate remove`); skipped silently if FancyHolograms isn't installed.
 
 ### 🏠 Teleportation
 - **Homes** — `/sethome [name]`, `/home [name]`, `/delhome <name>`. Multiple named homes with per-rank limits via permission nodes (`canvassuite.home.limit.<n>`, or `canvassuite.home.unlimited`). Running `/home` with no arguments opens a GUI of all your homes (click to teleport, shift-click to delete).
