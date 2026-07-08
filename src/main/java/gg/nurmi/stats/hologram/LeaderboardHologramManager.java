@@ -20,12 +20,7 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Level;
 
-/**
- * Wraps the FancyHolograms API to create/track text holograms whose lines are periodically
- * repopulated from {@link StatsManager} leaderboard queries. FancyHolograms owns the hologram
- * entity itself (location, persistence across restarts); we only remember which of its holograms
- * are ours and which stat leaderboard each one shows, so we can push fresh text into them.
- */
+// FancyHolograms owns each hologram's entity/location/persistence; this only tracks which stat leaderboard each one shows and refreshes its text.
 public final class LeaderboardHologramManager {
 
     private static final String NAME_PREFIX = "cs_leaderboard_";
@@ -122,12 +117,7 @@ public final class LeaderboardHologramManager {
         });
     }
 
-    /**
-     * Always renders exactly {@code limit} entry lines, regardless of how many players actually
-     * have tracked stats yet - slots past the end of {@code entries} are padded with the same
-     * "#rank name - value" style, just with name/value shown as N/A, so the hologram doesn't
-     * visually shrink/jump as more players get tracked over time.
-     */
+    // Always renders exactly `limit` lines, padding unfilled ranks with N/A so the hologram doesn't visually shrink over time.
     private List<String> buildLines(StatsManager.StatType statType, List<StatsManager.TopEntry> entries, int limit) {
         List<String> lines = new ArrayList<>();
         lines.add(statType.title());

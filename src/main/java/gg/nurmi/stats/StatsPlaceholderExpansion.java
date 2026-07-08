@@ -6,11 +6,7 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.tag.Tag;
 import org.bukkit.entity.Player;
 
-/**
- * Exposes live stats as MiniPlaceholders tags (e.g. {@code <stats_kills>}), so they can be dropped
- * into any MiniMessage-rendered text - scoreboard lines, tablist, chat, nametags - without those
- * modules needing to know about {@link StatsManager} at all.
- */
+// Registers live stats (e.g. <stats_kills>) as MiniPlaceholders tags so any MiniMessage text can use them without depending on StatsManager.
 public final class StatsPlaceholderExpansion {
 
     private StatsPlaceholderExpansion() {

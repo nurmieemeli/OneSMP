@@ -262,6 +262,7 @@ public final class CrateManager {
         return stack.getItemMeta().getPersistentDataContainer().get(keyDataKey, PersistentDataType.STRING);
     }
 
+    // Weighted random pick: walks the pool accumulating weight until the roll falls within a reward's slice.
     public CrateReward rollReward(CrateType type) {
         if (type.rewards().isEmpty()) {
             return null;

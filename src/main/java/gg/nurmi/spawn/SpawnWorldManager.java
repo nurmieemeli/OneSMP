@@ -26,8 +26,7 @@ public final class SpawnWorldManager {
             return;
         }
 
-        // Already generated on a previous run, just unloaded right now (e.g. after a restart) -
-        // only load it, don't re-run the starter-platform step meant for a brand new world.
+        // If it already exists on disk it's just unloaded (e.g. a restart) - skip re-building the starter platform.
         boolean existsOnDisk = new File(Bukkit.getWorldContainer(), worldName).isDirectory();
 
         plugin.scheduler().runGlobal(() -> {

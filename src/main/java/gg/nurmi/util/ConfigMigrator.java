@@ -24,6 +24,7 @@ public final class ConfigMigrator {
         migrate(plugin, fileName, Set.of());
     }
 
+    // Adds any config keys missing vs the bundled default, backing up the old file first since re-saving drops comments.
     public static void migrate(Plugin plugin, String fileName, Set<String> opaquePaths) {
         File file = new File(plugin.getDataFolder(), fileName);
         if (!file.exists()) {
@@ -62,6 +63,7 @@ public final class ConfigMigrator {
         }
     }
 
+    // opaquePaths are copied as a whole map instead of recursing key-by-key, so a partial user edit isn't merged with new defaults.
     private static void copyMissing(ConfigurationSection defaults, ConfigurationSection existing, String path,
             List<String> added, Set<String> opaquePaths) {
         for (String key : defaults.getKeys(false)) {

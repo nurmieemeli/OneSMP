@@ -124,6 +124,7 @@ public final class RtpManager {
         return queue == null ? null : queue.pollFirst();
     }
 
+    // Tops off one world's cache by at most one location per call (relies on being invoked repeatedly), skipping entirely under low TPS.
     public void precacheTick() {
         if (!plugin.getConfig().getBoolean("rtp.precache.enabled", true) || !filling.compareAndSet(false, true)) {
             return;
@@ -160,6 +161,7 @@ public final class RtpManager {
         attempt(world, minRadius, maxRadius, maxAttempts, onFound, onFail);
     }
 
+    // Picks a random point in the radius ring, loads its chunk, and retries elsewhere if it isn't safe, until attemptsLeft runs out.
     private void attempt(World world, int minRadius, int maxRadius, int attemptsLeft, Consumer<Location> onFound, Runnable onFail) {
         if (attemptsLeft <= 0) {
             onFail.run();

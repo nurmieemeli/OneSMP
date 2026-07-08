@@ -1,10 +1,5 @@
-# Every command's own name (e.g. "balance") always works no matter what's listed here - these are
-# EXTRA aliases layered on top, applied at plugin enable by directly registering them in Bukkit's
-# command map against the same command. Add/remove/edit freely; changes take effect on next
-# server restart (aliases are applied once at enable, not re-checked while running).
-#
-# If an alias is already taken by another plugin or a vanilla command, CanvasSuite's alias won't
-# override it - check the server log at startup for a warning if that happens.
+# Extra aliases layered on a command's own name; applied once at enable via Bukkit's command map, so changes need a restart.
+# A name already taken by another plugin is skipped (see the startup log).
 aliases:
   balance: [bal, money]
   pay: []

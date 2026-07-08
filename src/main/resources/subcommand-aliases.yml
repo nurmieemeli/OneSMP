@@ -1,8 +1,5 @@
-# Configurable EXTRA aliases for individual subcommands, e.g. "/world tp" also answering to
-# "/world teleport". Each subcommand's own name (the key) always works no matter what's listed
-# here. Unlike aliases.yml, these aren't registered as real Bukkit commands - they're just extra
-# labels checked in code before dispatching. Add/remove/edit freely; changes take effect on next
-# server restart.
+# Extra subcommand labels (e.g. "/world tp" for "/world teleport") - not real Bukkit commands,
+# just checked in code before dispatching. Each subcommand's own name always works regardless.
 world:
   create: [c]
   list: [ls]

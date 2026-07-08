@@ -31,7 +31,7 @@ public final class TeleportWarmup {
 
         UUID uuid = player.getUniqueId();
         if (!pending.add(uuid)) {
-            return;
+            return; // already warming up, ignore the duplicate request
         }
 
         Location start = player.getLocation();

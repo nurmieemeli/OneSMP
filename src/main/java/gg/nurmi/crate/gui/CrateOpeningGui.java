@@ -17,11 +17,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
 
-/**
- * Purely cosmetic slot-machine-style reel: the reward was already rolled before this GUI opens,
- * this just spends a few seconds visually "landing" on it before granting it for real. Closing the
- * GUI early (or the animation finishing on its own) both fall through to the same one-shot finish.
- */
+// Reward is rolled before this opens; the reel is a cosmetic-only animation that always lands on it.
 public final class CrateOpeningGui extends AbstractGui {
 
     private static final int ROWS = 3;
@@ -69,7 +65,8 @@ public final class CrateOpeningGui extends AbstractGui {
         if (finished) {
             return;
         }
-        reel.remove(0);
+        reel.removeFirst();
+        // Queue the real reward CENTER_INDEX frames early so it reaches the center slot exactly on the last frame.
         reel.add(frame == TOTAL_FRAMES - CENTER_INDEX ? reward : randomDecoy());
 
         boolean finalFrame = frame >= TOTAL_FRAMES;

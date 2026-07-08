@@ -66,6 +66,7 @@ public final class ItemBuilder {
         return this;
     }
 
+    // Fakes an enchant glint with a hidden enchant, since there's no direct API for the glow effect alone.
     public ItemBuilder glow(boolean glow) {
         if (glow) {
             meta.addEnchant(Enchantment.LUCK_OF_THE_SEA, 1, true);

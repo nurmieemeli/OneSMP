@@ -5,11 +5,7 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.tag.Tag;
 import org.bukkit.entity.Player;
 
-/**
- * Exposes the cached balance as a MiniPlaceholders tag ({@code <economy_balance>}), so it can be
- * dropped into any MiniMessage-rendered text - scoreboard lines, tablist, chat, nametags - without
- * those modules needing to know about {@link EconomyManager} at all.
- */
+// Registers <economy_balance> as a MiniPlaceholders tag so any MiniMessage text can use it without depending on EconomyManager.
 public final class EconomyPlaceholderExpansion {
 
     private EconomyPlaceholderExpansion() {

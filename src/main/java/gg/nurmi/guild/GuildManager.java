@@ -35,11 +35,7 @@ public final class GuildManager {
         this.database = plugin.database();
     }
 
-    /**
-     * Synchronous, non-blocking read of an online player's current guild - safe to call from a
-     * MiniMessage placeholder resolver. Returns empty if the player isn't cached (offline or not
-     * in a guild).
-     */
+    // Safe to call from a placeholder resolver: non-blocking, empty if offline or not in a guild.
     public Optional<Guild> getCachedGuild(UUID uuid) {
         return Optional.ofNullable(guildCache.get(uuid));
     }
@@ -52,12 +48,7 @@ public final class GuildManager {
         guildCache.remove(uuid);
     }
 
-    /**
-     * Re-reads a single player's guild membership from storage and updates the cache used by
-     * {@link #getCachedGuild(UUID)} - call this after any change to that player's membership
-     * (create/join/kick/leave/disband) so cached placeholders don't go stale. No-ops if the
-     * player isn't online, since the cache only ever tracks online players.
-     */
+    // Call after any change to this player's membership so getCachedGuild() doesn't go stale; no-ops if offline.
     public void refreshCache(UUID uuid) {
         if (Bukkit.getPlayer(uuid) == null) {
             guildCache.remove(uuid);

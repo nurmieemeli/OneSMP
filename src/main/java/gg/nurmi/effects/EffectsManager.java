@@ -8,10 +8,7 @@ import org.bukkit.World;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Player;
 
-/**
- * Purely cosmetic sound/particle feedback layered on top of existing features - never gates
- * behavior, so every method here is safe to call unconditionally from a hot path.
- */
+// Purely cosmetic sound/particle feedback - safe to call unconditionally, it never affects behavior.
 public final class EffectsManager {
 
     private final CanvasSuitePlugin plugin;

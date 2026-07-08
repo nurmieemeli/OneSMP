@@ -30,6 +30,7 @@ public final class HomeManager {
         this.database = plugin.database();
     }
 
+    // Highest home limit granted by any canvassuite.home.limit.<n> permission the player has, default otherwise.
     public int resolveLimit(Player player) {
         if (player.hasPermission("canvassuite.home.unlimited")) {
             return Integer.MAX_VALUE;

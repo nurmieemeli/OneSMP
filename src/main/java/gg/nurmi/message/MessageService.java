@@ -87,11 +87,7 @@ public final class MessageService {
         }
     }
 
-    /**
-     * Every message in messages.yml starts with "<prefix><red>" for denials/errors or
-     * "<prefix><green>" for successes by convention - used here to play matching feedback sounds
-     * without every call site having to say whether it just succeeded or failed.
-     */
+    // Relies on messages.yml's convention that every message starts with <prefix><red> (error) or <prefix><green> (success).
     private void playFeedbackSound(Player player, String path) {
         String template = raw(path);
         if (template.startsWith("<prefix><red>")) {

@@ -72,6 +72,7 @@ public final class ScoreboardManager {
         }
     }
 
+    // Each line is its own team whose "entry" is an invisible unique string and whose prefix holds the actual text - the only way to render arbitrary rich text per sidebar row.
     private void applyLines(Scoreboard board, Objective objective, List<Component> lines) {
         if (objective == null) {
             return;

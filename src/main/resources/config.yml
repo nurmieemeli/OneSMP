@@ -1,7 +1,5 @@
 storage:
-  # Storage type: MYSQL or SQLITE. If MYSQL is selected but the connection
-  # cannot be established on startup, CanvasSuite automatically falls back
-  # to the local SQLite file below.
+  # Falls back to local SQLite automatically if MYSQL is selected but the connection fails.
   type: SQLITE
   mysql:
     host: localhost
@@ -22,41 +20,31 @@ economy:
   max-balance: 1000000000.00
 
 shop:
-  # Multiplier applied to every configured sell price, e.g. 0.75 = sell for 75% of list price.
+  # e.g. 0.75 = sell for 75% of list price.
   sell-price-multiplier: 1.0
 
-# Purely cosmetic sound/particle feedback - never affects whether an action succeeds.
+# Cosmetic sound/particle feedback only - never affects whether an action succeeds.
 effects:
   enabled: true
-  # A success chime or a "denied" grunt plays automatically based on whether the message a command
-  # sends starts with <green> (success) or <red> (error/denial) in messages.yml.
+  # Success chime or denial grunt, picked from whether the command's message starts with <green> or <red> in messages.yml.
   command-feedback: true
-  # A soft click whenever any chest-GUI menu opens (shop, sell, homes, warps, etc.).
   gui-open: true
-  # An enderman-style particle/sound burst at both ends of every /home, /warp, /tpa, /rtp, /world
-  # teleport, and /spawn teleport.
   teleport: true
-  # A short chime/particle burst for a player when they join.
   join: true
 
 teleport:
   tpa-request-timeout-seconds: 60
   teleport-warmup-seconds: 3
-  # If teleport should cancel if the player moves while waiting.
   cancel-warmup-on-move: true
   home-limit-permission-prefix: "canvassuite.home.limit."
   default-home-limit: 3
 
 rtp:
-  # Minimum x/z coordinate for a valid random teleportation location.
   min-radius: 0
-  # Maximum x/z coordinate for a valid random teleportation location.
   max-radius: 5000
-  # How long a player has to wait before using random teleport.
   cooldown-seconds: 300
   max-attempts: 30
-  # Random teleport is opt-in per world - a world only shows up in /rtp's GUI (or works with
-  # /rtp <world>) if it's listed here with enabled: true. Each world can charge its own fee.
+  # A world only shows up in /rtp (GUI or by name) if listed here with enabled: true; each can charge its own fee.
   worlds:
     world:
       enabled: true
@@ -67,7 +55,6 @@ rtp:
     the_end:
       enabled: false
       cost: 500000
-  # Biomes players should never be randomly teleported into.
   avoid-biomes:
     - "minecraft:ocean"
     - "minecraft:deep_ocean"
@@ -75,15 +62,10 @@ rtp:
     - "minecraft:river"
     - "minecraft:void"
   precache:
-    # If the server should precache safe locations.
     enabled: true
-    # Up to this many already-found safe locations are kept ready per world, so /rtp usually
-    # teleports instantly instead of waiting on a fresh search.
     target-size: 15
-    # Tries to add one more cached location this often.
     interval-seconds: 5
-    # Skips topping off the cache if the server's recent TPS drops below this - only precaches
-    # whenever the server can handle it.
+    # Skips topping off the cache while TPS is below this, so precaching never competes with real load.
     min-tps: 18.0
 
 guild:
@@ -93,23 +75,16 @@ guild:
   default-member-limit: 12
   creation-cost: 500.0
   allow-guild-bank: true
-  # Shown by the <guild_own_name>/<guild_own_tag> scoreboard/tablist placeholders (see the
-  # `scoreboard` section below) for players who aren't in a guild. MiniMessage tags are parsed.
+  # Fed into the <guild_own_name>/<guild_own_tag> placeholders for players not in a guild.
   no-guild-placeholder: "No Guild"
 
 chat:
-  # <guild_segment> renders to nothing for players with no guild - don't bake brackets around
-  # <guild_tag> directly in this format, use guild-segment-format below instead.
-  # <luckperms_prefix>/<luckperms_suffix> require the MiniPlaceholders-LuckPerms expansion plugin
-  # to be installed alongside MiniPlaceholders - remove them here if that expansion isn't installed,
-  # otherwise MiniMessage will fail to parse the unknown tag on every chat message.
-  # <player_name> deliberately isn't reset/re-colored after <luckperms_prefix> - a prefix that
-  # doesn't close its own color tag (e.g. "<red>[Admin] ") intentionally carries that color onto
-  # the name too; add your own <reset> before <player_name> here if you don't want that.
+  # <guild_segment> renders to nothing without a guild - don't hardcode brackets around <guild_tag>, use guild-segment-format below instead.
+  # Remove <luckperms_prefix>/<luckperms_suffix> if the MiniPlaceholders-LuckPerms expansion isn't installed, or parsing will fail on every message.
+  # <player_name> inherits <luckperms_prefix>'s color if that prefix doesn't close its own tag - add your own <reset> here if that's unwanted.
   format: "<guild_segment><luckperms_prefix><player_name><gray>:</gray> <white><message>"
   guild-chat-format: "<dark_aqua>[G]</dark_aqua> <gray>[<guild_tag>]</gray> <white><player_name></white><gray>:</gray><aqua><message>"
-  # Used to build <guild_segment> only when the player is in a guild; include the trailing space
-  # yourself so the no-guild case can omit both the brackets and the space cleanly.
+  # Include your own trailing space - the no-guild case omits both the brackets and the space.
   guild-segment-format: "<gray>[<guild_tag>]</gray> "
 
 protection:
@@ -117,9 +92,9 @@ protection:
   disable-nether-portal-creation: true
 
 spawn:
-  # Created automatically on first enable if it doesn't already exist.
+  # The void world CanvasSuite creates automatically on first enable.
   world-name: "spawnworld"
-  # Populated by /setspawn; these defaults are only used before any admin has run it.
+  # The current spawn point's world; only used as a default until /setspawn is run once.
   world: "spawnworld"
   x: 0.5
   y: 65.0
@@ -127,36 +102,24 @@ spawn:
   yaw: 0.0
   pitch: 0.0
 
-# Overhead nametag prefixes, sent via PacketEvents team packets only (no real scoreboard team is
-# ever registered). Requires the PacketEvents plugin to be installed - silently disabled otherwise.
+# Overhead nametag prefixes via PacketEvents team packets only - no real scoreboard team is ever registered. Requires PacketEvents, silently disabled otherwise.
 nametag:
   enabled: true
-  # There's no LuckPerms hook available (prefixes come from the MiniPlaceholders-LuckPerms
-  # expansion, not the LuckPerms API directly), so prefix changes are only picked up this often.
+  # No LuckPerms API hook is used (prefixes come via the MiniPlaceholders-LuckPerms expansion instead), so this is a polling interval.
   refresh-interval-seconds: 30
   guild-tag:
-    # Only shown while the player is in a guild - a second line above the normal nametag, rendered
-    # via a fake TEXT_DISPLAY entity (there's no vanilla way to stack a second line on a player's
-    # own nametag). <tag> is the guild's tag.
+    # Second nametag line for guild members, rendered via a fake TEXT_DISPLAY entity since there's no vanilla way to stack a second line.
     format: "<gray>[<tag>]</gray>"
-    # This line rides as a passenger on the player, so the client positions it with zero ongoing
-    # packet cost. Since a generic passenger has no defined seat height like a horse/boat, this
-    # offset controls how far above the mount point it floats. May need visual tuning in-game.
+    # How far above the mount point the line floats - a generic passenger has no defined seat height like a horse/boat.
     y-offset: 0.55
-    # Re-assert the mount periodically. Cheap way (a tiny packet,
-    # not a position update), so this can be quite frequent.
+    # Re-sent periodically since it's a cheap packet, guarding against the passenger mount desyncing client-side.
     remount-interval-ticks: 20
 
 tablist:
   enabled: true
-  # Fills unused tablist slots with blank filler entries so it stays visually full-size instead of
-  # shrinking to fit the online player count. Requires the PacketEvents plugin to be installed;
-  # header/footer below still work without it.
+  # Keeps the tablist visually full-size instead of shrinking to the online player count.
   reserved-slots-enabled: true
-  # Signed Mojang skin texture shown on every filler entry (defaults to a plain gray skin, from
-  # mineskin.org). The client silently ignores an unsigned/invalid texture and falls back to a
-  # per-UUID Steve/Alex skin instead, so leaving either value blank does the same. Generate your
-  # own at mineskin.org and paste the resulting texture/signature here to use a different skin.
+  # Signed Mojang skin texture for filler entries; blank falls back to a per-UUID Steve/Alex skin. Generate your own at mineskin.org.
   reserved-slot-skin:
     texture: "ewogICJ0aW1lc3RhbXAiIDogMTc2MDczMjUxMDYyMCwKICAicHJvZmlsZUlkIiA6ICI5ODA4NmFkMDNiZjc0YTA5OGY2YTEyMzkzOWJlZjhlNiIsCiAgInByb2ZpbGVOYW1lIiA6ICJwZXN0aWNpZGEiLAogICJzaWduYXR1cmVSZXF1aXJlZCIgOiB0cnVlLAogICJ0ZXh0dXJlcyIgOiB7CiAgICAiU0tJTiIgOiB7CiAgICAgICJ1cmwiIDogImh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNDI5NTJkZGM1MzYzMGI4NzdmOGM3NzBjYTUyYWM3OGRjMmI1ZDEwMDY5ZmQ5ZDE4ZmIzZGU4NWQ0NWExNjQ3ZiIsCiAgICAgICJtZXRhZGF0YSIgOiB7CiAgICAgICAgIm1vZGVsIiA6ICJzbGltIgogICAgICB9CiAgICB9CiAgfQp9"
     signature: "L0h+QLrw5LtaGRmPermKxEmjIw2b0mCwGt1suz1iDC6xJ9pBleksGKpdK8+BzP8rSfdlofawe5f/TkSuetM7oeMd13OS7YhlE12EWQu9rfYeeplwCCfIrhx6NsMXxAaNbSJWH2dmhWV78cd4YejGzRLBCXf9XW1yh/gWHPeousDIwvHizMpGwS6CsbCNyQovJnyOBHcxMkALcRX91V3mD41zDS2t54LMKdMzaLBbeGtwswLoQOvC0bzYZV7nnNO53b1l4q6G2XPXkA3kFwfQjR3I+wMSELGvZFpSvHl94Ks/yHZd3E+UC58RPD2P9GCH9oHjtdJdHiBX49DnG15tS2OrZ6ydC5pGOBU+oapImWgMqSWqMgXr77Ve58pNdZdBmiRN2hth1leHRsBxAGhvzP/ecCrideSEc4LBbrF7CVo8isvwh3A2IbhkcnGB9OEfGmKqWEnwaKJwm5impf+s8BzUf+nub0AJmWfdaiZaGxb8XWeabJDh0lGDYa6cE6vQskdIyJ1gee0dTnZtXAcCWZ/9krPgOVU846+k3BRl5EQ5HohNdCyM2VD8XdOSyMnx3AxC9B3kmF2f/JlzaJIR9p1KspjvPZOad5Yuwvoisr5mm8Isj239dZNGwl3yx4xxBDYfUqW/pHfXb1twfxDzDcc1F+A1XIYayhpg5+S5okc="
@@ -165,12 +128,11 @@ tablist:
   refresh-interval-seconds: 5
 
 msg:
-  # Minimum seconds between messages sent by the same player; 0 disables the cooldown entirely.
+  # 0 disables the cooldown entirely.
   cooldown-seconds: 3
 
 join-leave:
-  # Set either to false to fully suppress that message (vanilla's default join/quit line included -
-  # not just replaced with a blank one). Templates are in messages.yml under join-leave.
+  # false fully suppresses that message, including vanilla's own default line - not just a blank replacement.
   join-enabled: true
   leave-enabled: true
 
@@ -189,12 +151,7 @@ scoreboard:
   enabled: true
   refresh-interval-seconds: 5
   title: "<gradient:#38bdf8:#818cf8><bold>CanvasSuite</bold></gradient>"
-  # Rendered relationally per viewer. In addition to MiniPlaceholders tags (<player_name>,
-  # <luckperms_prefix>, ...), a couple of other modules expose their own live per-viewer tags
-  # here: the stats module (see the `stats` section below) - <stats_kills>, <stats_deaths>,
-  # <stats_kd>, <stats_killstreak>, <stats_best_killstreak>, <stats_playtime> - the economy
-  # module - <economy_balance> - and the guild module - <guild_own_name>, <guild_own_tag>
-  # (both render to nothing for players not in a guild).
+  # Rendered per viewer; besides MiniPlaceholders tags, also supports <stats_*>, <economy_balance>, and <guild_own_name>/<guild_own_tag>.
   lines:
     - "<gradient:#818cf8:#38bdf8><strikethrough>                         </strikethrough>"
     - " "
@@ -208,15 +165,11 @@ scoreboard:
     - "<white>   play.example.com"
 
 stats:
-  # A server-wide broadcast is sent (stats.killstreak-broadcast in messages.yml) whenever a
-  # player's current killstreak hits one of these numbers.
+  # Broadcasts stats.killstreak-broadcast (messages.yml) whenever a killstreak hits one of these numbers.
   killstreak-broadcast-milestones: [5, 10, 25, 50, 100]
-  # Online players' playtime is flushed to storage this often, so a crash between one player's
-  # deaths/kills (which persist immediately) doesn't lose much accrued playtime.
+  # Frequent autosave limits how much playtime a crash could lose (kills/deaths persist immediately regardless).
   playtime-autosave-interval-seconds: 60
 
+# Requires FancyHolograms (disables /statshologram otherwise). FancyHolograms owns the hologram entities themselves; this only controls how often their text is refreshed.
 hologram:
-  # Requires the FancyHolograms plugin to be installed - /statshologram is disabled otherwise.
-  # FancyHolograms owns the hologram entities themselves (location, persistence across restarts);
-  # this only controls how often we push fresh leaderboard text into the ones /statshologram made.
   refresh-interval-seconds: 30

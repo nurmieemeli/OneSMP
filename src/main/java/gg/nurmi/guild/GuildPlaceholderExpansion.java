@@ -9,23 +9,7 @@ import org.bukkit.entity.Player;
 import java.util.Optional;
 import java.util.function.Function;
 
-/**
- * Exposes the viewer's own cached guild name/tag as MiniPlaceholders tags
- * ({@code <guild_own_name>}, {@code <guild_own_tag>}), so they can be dropped into any
- * MiniMessage-rendered text - scoreboard lines, tablist, nametags - without those modules needing
- * to know about {@link GuildManager} at all.
- *
- * <p>Deliberately NOT named {@code <guild_name>}/{@code <guild_tag>}: those names are already used
- * throughout this codebase (chat formatting, {@code /guild info}, {@code /guild list}, the guild
- * GUIs) as explicit per-call placeholders that can refer to a queried/other guild, not necessarily
- * the viewer's own. Registering a global tag under the same name would silently shadow those
- * (global placeholders resolve before per-call ones - see {@code MessageService#render}), so a
- * distinct name is used here instead.</p>
- *
- * <p>For players not in a guild, resolves to the MiniMessage-parsed
- * {@code guild.no-guild-placeholder} config string (default {@code "No Guild"}) instead of an
- * empty string, so scoreboard/tablist lines built around these tags don't look broken.</p>
- */
+// Named own_name/own_tag, not guild_name/guild_tag - that name is already used elsewhere for an explicitly-queried guild, not the viewer's own.
 public final class GuildPlaceholderExpansion {
 
     private GuildPlaceholderExpansion() {

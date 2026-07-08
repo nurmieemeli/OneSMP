@@ -87,6 +87,7 @@ public final class CrateListener implements Listener {
         gui.start(player);
     }
 
+    // Knocks the player horizontally away from the block, falling back to their facing (then an arbitrary axis) if directly on top of it.
     private void pushBack(Player player, Block block) {
         Location center = block.getLocation().add(0.5, 0.5, 0.5);
         Vector direction = player.getLocation().toVector().subtract(center.toVector());

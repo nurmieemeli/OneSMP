@@ -1,5 +1,4 @@
-# buy-price: cost to buy one unit (set to -1 to disable buying).
-# sell-price: payout for selling one unit (set to -1 to disable selling).
+# buy-price/sell-price: -1 disables that action for the item.
 categories:
   blocks:
     display-name: "<gold>Blocks"

@@ -1,6 +1,4 @@
-# Full support for MiniPlaceholders tags (https://miniplaceholders.github.io/docs/user-guide/Placeholders)
-# and MiniMessage formatting (https://docs.papermc.io/adventure/minimessage/format/) anywhere.
-
+# Every value here supports MiniMessage formatting and MiniPlaceholders tags.
 prefix: "<gradient:#38bdf8:#818cf8><bold>Canvas</bold></gradient><dark_gray> » </dark_gray>"
 
 general:
@@ -134,8 +132,7 @@ tablist:
   header: "<newline><gradient:#38bdf8:#818cf8><bold>CanvasSuite</bold></gradient><newline>"
   footer: "<newline><gray>/discord /store /help<newline>"
   name-format: "<luckperms_prefix><player_name>"
-  # Shown in the very last slot instead of a 80th individual player once there are more real
-  # players online than the grid has room for.
+  # Shown instead of an 80th individual entry once more real players are online than the grid has room for.
   overflow: "<gray>+<count> more players"
 
 msg:

@@ -36,6 +36,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.logging.Level;
 
+// Uses raw PacketEvents packets for everything here: a fake scoreboard team gives the prefix line (no real team is ever registered), and a fake TEXT_DISPLAY entity mounted as a passenger gives the second guild-tag line, since Bukkit has no API for either.
 public final class NametagManager {
 
     private final CanvasSuitePlugin plugin;
@@ -91,6 +92,7 @@ public final class NametagManager {
         }
     }
 
+    // The fake entity and its passenger mount don't survive a world change, so it's destroyed and respawned/remounted here.
     public void handleWorldChange(Player player) {
         if (!plugin.packetEvents().available()) {
             return;
@@ -144,6 +146,7 @@ public final class NametagManager {
         }
     }
 
+    // Passenger mounts can silently desync client-side over time; periodically re-sending the mount packet is cheap insurance.
     public void reassertMounts() {
         if (!plugin.packetEvents().available() || guildTagState.isEmpty()) {
             return;
@@ -263,6 +266,7 @@ public final class NametagManager {
         return new WrapperPlayServerTeams(teamName(subject), mode, info, members);
     }
 
+    // Scoreboard teams need a single plain color, so this walks to the last child to find the prefix's effective trailing color.
     private NamedTextColor trailingColor(Component component, NamedTextColor inherited) {
         TextColor own = component.color();
         NamedTextColor current = own != null ? NamedTextColor.nearestTo(own) : inherited;
@@ -274,6 +278,7 @@ public final class NametagManager {
         PacketEvents.getAPI().getPlayerManager().sendPacket(viewer, packet);
     }
 
+    // Scoreboard team names are capped at 16 characters, hence the truncated UUID.
     private String teamName(Player player) {
         return "csnt_" + player.getUniqueId().toString().replace("-", "").substring(0, 11);
     }

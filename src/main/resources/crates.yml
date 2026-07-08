@@ -1,11 +1,7 @@
-# Each top-level entry under "crates" is a crate type, bound to physical blocks in the world with
-# /crate create <type> and opened by right-clicking that block while holding a matching key.
-#
-# key-material: the item Material used for this crate's key (display name/lore are set below,
-#   regardless of what the item would normally look like).
-# rewards: a weighted pool - each entry needs "weight" (higher = more common) and at least one of
-#   "items" (Material -> amount), "money", or "commands" (console commands, %player% is replaced
-#   with the winner's name). "broadcast: true" announces the win to the whole server.
+# Each entry under "crates" is a crate type, bound to a block with /crate create <type>.
+# key-material is just the base item; its display name/lore below can make it look like anything.
+# Each reward needs "weight" (higher = more common) and at least one of "items" (Material -> amount),
+# "money", or "commands" (%player% is replaced with the winner's name); "broadcast: true" announces it server-wide.
 crates:
   common:
     display-name: "<gray>Common Crate"

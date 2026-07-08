@@ -107,7 +107,7 @@ public final class GuildCommand implements CommandExecutor, TabCompleter {
             double cost = plugin.getConfig().getDouble("guild.creation-cost", 0);
             Runnable doCreate = () -> guildManager.createGuild(player.getUniqueId(), name, tag).thenAccept(result -> {
                 if (result != GuildManager.CreateResult.SUCCESS && cost > 0) {
-                    plugin.economy().deposit(player.getUniqueId(), BigDecimal.valueOf(cost));
+                    plugin.economy().deposit(player.getUniqueId(), BigDecimal.valueOf(cost)); // refund the upfront withdrawal below
                 }
                 switch (result) {
                     case SUCCESS -> {

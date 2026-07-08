@@ -113,12 +113,7 @@ public final class StatsManager {
         }
     }
 
-    /**
-     * Same as {@link #flushOnline()} but writes synchronously on the calling thread instead of
-     * scheduling an async task. Scheduling any new task (even async) from {@code onDisable()}
-     * throws {@code IllegalPluginAccessException} - the plugin is already considered disabled by
-     * the time that callback runs - so this is the only safe way to flush on shutdown.
-     */
+    // Scheduling any task from onDisable() throws IllegalPluginAccessException, so this writes synchronously instead.
     public void flushOnlineBlocking() {
         long now = System.currentTimeMillis();
         for (Map.Entry<UUID, Stats> entry : cache.entrySet()) {
@@ -135,9 +130,7 @@ public final class StatsManager {
         }
     }
 
-    /**
-     * Returns the killstreak the killer is now on, for milestone broadcasts.
-     */
+    // Returns the killer's current killstreak after this kill, for milestone broadcasts.
     public int recordKill(UUID killer, String killerName) {
         Stats stats = cache.computeIfAbsent(killer, ignored -> loadOrCreate(killer, killerName));
         stats.kills.incrementAndGet();
@@ -162,10 +155,7 @@ public final class StatsManager {
         return plugin.scheduler().supplyAsync(() -> loadSnapshotFromDb(uuid));
     }
 
-    /**
-     * Synchronous, non-blocking read of an online player's current stats - safe to call from a
-     * MiniMessage placeholder resolver. Returns null if the player isn't cached (i.e. offline).
-     */
+    // Safe to call from a placeholder resolver: non-blocking, returns null if the player isn't cached (offline).
     public Snapshot getLiveSnapshot(UUID uuid) {
         Stats cached = cache.get(uuid);
         if (cached == null) {

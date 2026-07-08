@@ -58,11 +58,7 @@ public abstract class AbstractGui implements InventoryHolder {
         buttons.remove(slot);
     }
 
-    /**
-     * Marks slots as freely editable by the viewer (e.g. an input area for a sell GUI),
-     * bypassing the click/drag cancellation that {@link gg.nurmi.gui.GuiListener} otherwise
-     * applies to every GUI's top inventory.
-     */
+    // Bypasses GuiListener's default click/drag cancellation for these slots (e.g. a sell GUI's input area).
     protected void openSlots(int fromInclusive, int toExclusive) {
         for (int slot = fromInclusive; slot < toExclusive; slot++) {
             openSlots.add(slot);
@@ -77,10 +73,7 @@ public abstract class AbstractGui implements InventoryHolder {
         return !openSlots.isEmpty();
     }
 
-    /**
-     * Called whenever the viewer places, removes, or drags items into an open slot.
-     * Override to react to input changes, e.g. refreshing a computed total display.
-     */
+    // Override to react when the viewer edits an open slot, e.g. refreshing a computed total.
     protected void onOpenSlotChange(HumanEntity viewer) {
     }
 

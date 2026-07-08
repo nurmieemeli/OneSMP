@@ -9,6 +9,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.logging.Level;
 
+// There's no direct API to disable a vanilla structure; this writes a per-world datapack that overrides the stronghold structure_set's count to 0 instead.
 public final class StrongholdDatapackInstaller {
 
     private static final String PACK_NAME = "canvassuite_no_stronghold";

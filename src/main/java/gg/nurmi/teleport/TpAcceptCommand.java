@@ -47,6 +47,7 @@ public final class TpAcceptCommand implements CommandExecutor {
 
         plugin.messages().send(requester, "teleport.tpa-accepted", Placeholder.unparsed("target", player.getName()));
 
+        // here = /tpahere, so the *requester* asked to be teleported to the accepter, not the other way around.
         if (request.here()) {
             teleportExecutor.teleportToPlayerLocation(player, requester);
         } else {
