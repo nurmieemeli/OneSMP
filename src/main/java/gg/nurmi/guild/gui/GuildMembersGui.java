@@ -28,7 +28,7 @@ public final class GuildMembersGui extends AbstractGui {
     }
 
     public GuildMembersGui(CanvasSuitePlugin plugin, GuildManager guildManager, Guild guild, UUID viewerUuid, int page) {
-        super(plugin.messages().parse("<white>Members of <guild_name>", Placeholder.unparsed("guild_name", guild.name())), 6);
+        super(plugin, plugin.messages().parse("<white>Members of <guild_name>", Placeholder.unparsed("guild_name", guild.name())), 6);
 
         GuildRole viewerRole = guild.member(viewerUuid).map(GuildMember::role).orElse(GuildRole.MEMBER);
         Pagination<GuildMember> pagination = new Pagination<>(guild.members(), PAGE_SIZE);

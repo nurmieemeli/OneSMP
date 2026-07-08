@@ -21,7 +21,7 @@ public final class HomesGui extends AbstractGui {
     }
 
     public HomesGui(CanvasSuitePlugin plugin, HomeManager homeManager, TeleportExecutor teleportExecutor, List<Home> homes, int page) {
-        super(plugin.messages().parse("<gradient:#60a5fa:#3b82f6><bold>Your Homes</bold></gradient>"), 6);
+        super(plugin, plugin.messages().parse("<gradient:#60a5fa:#3b82f6><bold>Your Homes</bold></gradient>"), 6);
 
         Pagination<Home> pagination = new Pagination<>(homes, PAGE_SIZE);
         List<Home> pageHomes = pagination.page(page);

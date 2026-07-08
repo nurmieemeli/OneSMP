@@ -19,7 +19,7 @@ public final class BalTopGui extends AbstractGui {
     private static final int CLOSE_SLOT = 49;
 
     public BalTopGui(CanvasSuitePlugin plugin, List<EconomyManager.BalanceEntry> entries) {
-        super(plugin.messages().parse("<gradient:#facc15:#fbbf24><bold>Balance Leaderboard</bold></gradient>"), ROWS);
+        super(plugin, plugin.messages().parse("<gradient:#facc15:#fbbf24><bold>Balance Leaderboard</bold></gradient>"), ROWS);
 
         for (int i = 0; i < entries.size() && i < 45; i++) {
             EconomyManager.BalanceEntry entry = entries.get(i);

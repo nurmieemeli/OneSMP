@@ -1,5 +1,6 @@
 package gg.nurmi.message;
 
+import gg.nurmi.CanvasSuitePlugin;
 import gg.nurmi.util.ConfigMigrator;
 import io.github.miniplaceholders.api.MiniPlaceholders;
 import io.github.miniplaceholders.api.types.RelationalAudience;
@@ -10,7 +11,7 @@ import net.kyori.adventure.text.minimessage.MiniMessage;
 import net.kyori.adventure.text.minimessage.tag.Tag;
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 import org.bukkit.configuration.file.YamlConfiguration;
-import org.bukkit.plugin.Plugin;
+import org.bukkit.entity.Player;
 
 import java.io.File;
 import java.io.IOException;
@@ -21,12 +22,12 @@ import java.util.Objects;
 
 public final class MessageService {
 
-    private final Plugin plugin;
+    private final CanvasSuitePlugin plugin;
     private final MiniMessage miniMessage = MiniMessage.miniMessage();
     private YamlConfiguration messages;
     private Component prefixComponent = Component.empty();
 
-    public MessageService(Plugin plugin) {
+    public MessageService(CanvasSuitePlugin plugin) {
         this.plugin = plugin;
         reload();
     }
@@ -81,6 +82,23 @@ public final class MessageService {
     public void send(Audience audience, String path, TagResolver... extra) {
         Pointered target = audience instanceof Pointered pointered ? pointered : Audience.empty();
         audience.sendMessage(render(target, path, extra));
+        if (audience instanceof Player player) {
+            playFeedbackSound(player, path);
+        }
+    }
+
+    /**
+     * Every message in messages.yml starts with "<prefix><red>" for denials/errors or
+     * "<prefix><green>" for successes by convention - used here to play matching feedback sounds
+     * without every call site having to say whether it just succeeded or failed.
+     */
+    private void playFeedbackSound(Player player, String path) {
+        String template = raw(path);
+        if (template.startsWith("<prefix><red>")) {
+            plugin.effects().failure(player);
+        } else if (template.startsWith("<prefix><green>")) {
+            plugin.effects().success(player);
+        }
     }
 
     public MiniMessage miniMessage() {

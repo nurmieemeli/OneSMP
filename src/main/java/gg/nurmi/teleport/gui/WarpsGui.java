@@ -20,7 +20,7 @@ public final class WarpsGui extends AbstractGui {
     }
 
     public WarpsGui(CanvasSuitePlugin plugin, TeleportExecutor teleportExecutor, List<Warp> warps, int page) {
-        super(plugin.messages().parse("<gradient:#c084fc:#a855f7><bold>Server Warps</bold></gradient>"), 6);
+        super(plugin, plugin.messages().parse("<gradient:#c084fc:#a855f7><bold>Server Warps</bold></gradient>"), 6);
 
         Pagination<Warp> pagination = new Pagination<>(warps, PAGE_SIZE);
         List<Warp> pageWarps = pagination.page(page);

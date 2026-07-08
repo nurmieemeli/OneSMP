@@ -1,23 +1,19 @@
-package gg.nurmi.spawn;
+package gg.nurmi.shop;
 
 import gg.nurmi.CanvasSuitePlugin;
-import gg.nurmi.teleport.TeleportExecutor;
+import gg.nurmi.shop.gui.ShopCategoriesGui;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.jspecify.annotations.NonNull;
 
-public final class SpawnCommand implements CommandExecutor {
+public final class BuyCommand implements CommandExecutor {
 
     private final CanvasSuitePlugin plugin;
-    private final SpawnWorldManager spawnWorldManager;
-    private final TeleportExecutor teleportExecutor;
 
-    public SpawnCommand(CanvasSuitePlugin plugin, SpawnWorldManager spawnWorldManager, TeleportExecutor teleportExecutor) {
+    public BuyCommand(CanvasSuitePlugin plugin) {
         this.plugin = plugin;
-        this.spawnWorldManager = spawnWorldManager;
-        this.teleportExecutor = teleportExecutor;
     }
 
     @Override
@@ -26,12 +22,11 @@ public final class SpawnCommand implements CommandExecutor {
             plugin.messages().send(sender, "general.player-only");
             return true;
         }
-        if (!player.hasPermission("canvassuite.spawn.use")) {
+        if (!player.hasPermission("canvassuite.shop.use")) {
             plugin.messages().send(sender, "general.no-permission");
             return true;
         }
-
-        teleportExecutor.executeSafely(player, spawnWorldManager.getSpawn(), "spawn.teleported");
+        new ShopCategoriesGui(plugin).open(player);
         return true;
     }
 }

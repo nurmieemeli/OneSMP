@@ -25,6 +25,20 @@ shop:
   # Multiplier applied to every configured sell price, e.g. 0.75 = sell for 75% of list price.
   sell-price-multiplier: 1.0
 
+# Purely cosmetic sound/particle feedback - never affects whether an action succeeds.
+effects:
+  enabled: true
+  # A success chime or a "denied" grunt plays automatically based on whether the message a command
+  # sends starts with <green> (success) or <red> (error/denial) in messages.yml.
+  command-feedback: true
+  # A soft click whenever any chest-GUI menu opens (shop, sell, homes, warps, etc.).
+  gui-open: true
+  # An enderman-style particle/sound burst at both ends of every /home, /warp, /tpa, /rtp, /world
+  # teleport, and /spawn teleport.
+  teleport: true
+  # A short chime/particle burst for a player when they join.
+  join: true
+
 teleport:
   tpa-request-timeout-seconds: 60
   teleport-warmup-seconds: 3

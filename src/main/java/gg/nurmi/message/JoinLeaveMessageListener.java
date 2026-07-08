@@ -17,6 +17,8 @@ public final class JoinLeaveMessageListener implements Listener {
 
     @EventHandler(priority = EventPriority.HIGH)
     public void onJoin(PlayerJoinEvent event) {
+        plugin.effects().join(event.getPlayer());
+
         if (!plugin.getConfig().getBoolean("join-leave.join-enabled", true)) {
             event.joinMessage(null);
             return;

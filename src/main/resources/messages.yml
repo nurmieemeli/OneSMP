@@ -59,6 +59,19 @@ teleport:
   tpa-self: "<prefix><red>You can't request to teleport to yourself."
   tpa-already-pending: "<prefix><red>You already have a pending request to <target>."
 
+crate:
+  unknown-type: "<prefix><red>No crate type named <white><type></white> exists."
+  no-target-block: "<prefix><red>You need to be looking at a block."
+  already-bound: "<prefix><red>That block is already a <white><type></white> crate."
+  created: "<prefix><green>Bound this block as a <type> <green>crate."
+  not-a-crate: "<prefix><red>That block isn't a usable crate."
+  removed: "<prefix><green>Crate removed from this block."
+  key-given: "<prefix><green>Gave <white><target></white> <white><amount>x</white> <type> <green>key(s)."
+  need-key: "<prefix><red>You need a <key> <red>to open this."
+  wrong-key: "<prefix><red>That key doesn't fit this crate."
+  opened: "<prefix><green>You opened a <type> <green>crate and won <reward><green>!"
+  broadcast: "<prefix><yellow><player></yellow> opened a <type> <yellow>crate and won <reward><yellow>!"
+
 rtp:
   searching: "<prefix><gray>Searching for a safe location..."
   success: "<prefix><green>Teleported to a random location."

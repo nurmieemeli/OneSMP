@@ -20,7 +20,7 @@ public final class WorldDetailGui extends AbstractGui {
     private static final int CLOSE_SLOT = 49;
 
     public WorldDetailGui(CanvasSuitePlugin plugin, WorldManager worldManager, String worldName) {
-        super(plugin.messages().parse("<white><name>", Placeholder.unparsed("name", worldName)), 6);
+        super(plugin, plugin.messages().parse("<white><name>", Placeholder.unparsed("name", worldName)), 6);
 
         WorldSettings settings = worldManager.getSettings(worldName);
 

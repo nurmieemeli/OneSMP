@@ -31,3 +31,7 @@ statshologram:
   create: []
   remove: []
   list: [ls]
+crate:
+  create: [c]
+  remove: [delete, del]
+  key: []

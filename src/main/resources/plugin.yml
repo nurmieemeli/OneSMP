@@ -27,6 +27,9 @@ commands:
   sell:
     description: Sell items from your inventory.
     usage: /sell
+  crate:
+    description: Manage crates (admin) - keys are used automatically by right-clicking a bound crate block.
+    usage: /crate <create|remove|key> ...
   sethome:
     description: Set a home at your current location.
     usage: /sethome [name]
@@ -109,10 +112,13 @@ permissions:
       canvassuite.spawn.admin: true
       canvassuite.world.admin: true
       canvassuite.msg.socialspy: true
+      canvassuite.crate.admin: true
   canvassuite.economy.use: { default: true }
   canvassuite.economy.admin: { default: op }
   canvassuite.shop.use: { default: true }
   canvassuite.shop.sell: { default: true }
+  canvassuite.crate.use: { default: true }
+  canvassuite.crate.admin: { default: op }
   canvassuite.home.use: { default: true }
   canvassuite.home.unlimited: { default: false }
   canvassuite.warp.use: { default: true }

@@ -30,7 +30,7 @@ public final class ShopItemsGui extends AbstractGui {
     private final CanvasSuitePlugin plugin;
 
     public ShopItemsGui(CanvasSuitePlugin plugin, ShopCategory category, int page) {
-        super(plugin.messages().parse(category.displayName()), 6);
+        super(plugin, plugin.messages().parse(category.displayName()), 6);
         this.plugin = plugin;
 
         Pagination<ShopItem> pagination = new Pagination<>(category.itemList(), PAGE_SIZE);

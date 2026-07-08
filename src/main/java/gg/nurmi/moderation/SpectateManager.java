@@ -34,8 +34,9 @@ public final class SpectateManager {
         if (!active.remove(moderator.getUniqueId())) {
             return;
         }
-        vanishController.show(moderator);
-        moderator.setGameMode(GameMode.SURVIVAL);
-        moderator.teleportAsync(spawnLocation);
+        moderator.teleportAsync(spawnLocation).thenAccept(ignored -> {
+            vanishController.show(moderator);
+            moderator.setGameMode(GameMode.SURVIVAL);
+        });
     }
 }

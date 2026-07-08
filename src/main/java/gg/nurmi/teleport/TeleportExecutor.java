@@ -27,8 +27,12 @@ public final class TeleportExecutor {
     }
 
     private void teleportNow(Player player, Location destination, String successMessageKey) {
+        Location origin = player.getLocation();
         player.teleportAsync(destination).thenAccept(success -> {
             if (success) {
+                // origin may now belong to a different region than this callback runs on
+                plugin.scheduler().runAtLocation(origin, () -> plugin.effects().teleport(origin));
+                plugin.effects().teleport(player.getLocation());
                 plugin.messages().send(player, successMessageKey);
             }
         });

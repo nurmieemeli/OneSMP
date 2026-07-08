@@ -19,7 +19,7 @@ import java.util.UUID;
 public final class GuildMainGui extends AbstractGui {
 
     public GuildMainGui(CanvasSuitePlugin plugin, GuildManager guildManager, Guild guild, UUID viewerUuid) {
-        super(plugin.messages().parse("<gradient:#fbbf24:#f59e0b><bold><guild_name></bold></gradient> <gray>[<guild_tag>]</gray>",
+        super(plugin, plugin.messages().parse("<gradient:#fbbf24:#f59e0b><bold><guild_name></bold></gradient> <gray>[<guild_tag>]</gray>",
                 Placeholder.unparsed("guild_name", guild.name()), Placeholder.unparsed("guild_tag", guild.tag())), 3);
 
         GuildRole viewerRole = guild.member(viewerUuid).map(GuildMember::role).orElse(GuildRole.MEMBER);

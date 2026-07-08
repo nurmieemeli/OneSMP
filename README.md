@@ -10,7 +10,7 @@
 </p>
 
 <p align="center">
-An all-in-one SMP plugin for <a href="https://canvasmc.io/">CanvasMC</a> servers — economy, shops, teleportation, random teleport, guilds, chat formatting, world creation, a void spawn world, moderator tools, private messaging, packet-driven nametags/tablist, a sidebar scoreboard, player stats with leaderboard holograms, and world protection, all in a single jar with a chest-GUI front end wherever one makes sense.
+An all-in-one SMP plugin for <a href="https://canvasmc.io/">CanvasMC</a> servers — economy, shops, crates, teleportation, random teleport, guilds, chat formatting, world creation, a void spawn world, moderator tools, private messaging, packet-driven nametags/tablist, a sidebar scoreboard, player stats with leaderboard holograms, and world protection, all in a single jar with a chest-GUI front end wherever one makes sense.
 </p>
 
 <p align="center">
@@ -54,6 +54,12 @@ All player-facing text is rendered with [Adventure MiniMessage](https://docs.adv
 - A global `shop.sell-price-multiplier` in `config.yml` scales every sell price at once (e.g. `0.75` = sell for 75% of list price).
 - Overflow-safe: if your inventory fills mid-purchase, the undeliverable portion is refunded; closing `/sell` with unsold items in it drops any that don't fit back in your inventory.
 
+### 🎁 Crates
+- Crate types (key appearance and a weighted reward pool of items/money/console commands) are defined entirely in `crates.yml`.
+- `/crate create <type>` binds the block an admin is looking at as a crate of that type; `/crate remove` unbinds it. A crate block otherwise behaves like any other block until it's bound.
+- `/crate key <type> <player> [amount]` gives an online player key items — ordinary items tagged with a hidden marker for that crate type, so they can't be duplicated by grabbing an item of the same material from elsewhere.
+- Right-clicking a bound crate block with a matching key consumes one key and instantly rolls a weighted-random reward from that crate's pool; rewards can optionally broadcast the win to the whole server.
+
 ### 🏠 Teleportation
 - **Homes** — `/sethome [name]`, `/home [name]`, `/delhome <name>`. Multiple named homes with per-rank limits via permission nodes (`canvassuite.home.limit.<n>`, or `canvassuite.home.unlimited`). Running `/home` with no arguments opens a GUI of all your homes (click to teleport, shift-click to delete).
 - **Warps** — admin-defined server warps (`/setwarp`, `/delwarp`); `/warp` with no arguments opens a warp-browser GUI for everyone.
@@ -62,7 +68,7 @@ All player-facing text is rendered with [Adventure MiniMessage](https://docs.adv
 
 ### 🌐 Spawn & Void World
 - A dedicated void world is created automatically on first enable (custom `ChunkGenerator`, no terrain, no bedrock/caves/structures/mobs) with a small starter platform so players never land in the void before an admin configures anything.
-- `/setspawn` (admin) sets the server spawn point; `/spawn` teleports there instantly (no warmup, unlike homes/warps).
+- `/setspawn` (admin) sets the server spawn point; `/spawn` teleports there through the same warmup as homes/warps.
 - First-time joiners are teleported to spawn automatically.
 - Dying with no valid bed/respawn-anchor spawn sends the player back to spawn instead of the vanilla world spawn.
 - Inside the void world, non-creative players can't interact with any block except doors, can't trample farmland, and take no damage or food loss — creative-mode players bypass every restriction. Falling out of the world (real void damage, not a fixed Y check) teleports the player straight back to spawn.
@@ -70,7 +76,7 @@ All player-facing text is rendered with [Adventure MiniMessage](https://docs.adv
 ### 🌍 World Creation
 - `/world create <name> [seed]` opens a GUI to configure a brand-new world before creating it: environment (Overworld/Nether/End), world type (Normal/Flat/Large Biomes/Amplified), generator (vanilla or the same void generator spawn uses), seed (typed up front or rerolled live in the GUI), structure generation, hardcore, difficulty, and PvP — each a one-click toggle/cycle, with a Create/Cancel step.
 - `/world list` opens a paginated browser of every CanvasSuite-managed world; clicking one opens a detail view with teleport/delete actions.
-- `/world teleport <name>` (alias `tp`) teleports to a world's spawn, going through the normal warmup path unlike `/spawn`.
+- `/world teleport <name>` (alias `tp`) teleports to a world's spawn, going through the same warmup path as `/spawn`.
 - `/world delete <name>` unloads the world and stops tracking it but **leaves the folder on disk** (recoverable); only `/world delete <name> wipe` permanently deletes the files — a deliberate extra step so a single misclick can't destroy a world.
 - Every managed world's settings persist in `worlds.yml` and are reapplied consistently on every restart, so a void world stays void as new chunks generate.
 
@@ -137,6 +143,13 @@ All player-facing text is rendered with [Adventure MiniMessage](https://docs.adv
 ### 🌍 World Protection
 - Optional toggles to block new stronghold generation and new nether portal creation, independent of each other.
 
+### ✨ Feedback & Effects
+- Every command reply is automatically paired with a sound: messages.yml's own `<green>`/`<red>` color convention (success vs. denial/error) picks the sound, so this works for every command without per-command wiring.
+- Teleporting (`/home`, `/warp`, `/tpa`, `/rtp`, `/world teleport`, `/spawn`) plays a particle/sound burst at both the origin and destination.
+- Every chest-GUI menu (shop, sell, homes, warps, guild, world list, baltop, stats leaderboards, RTP world select, ...) plays a soft click on open.
+- Joining plays a short chime and particle burst for the joining player.
+- Each of the four categories above (and cosmetic effects as a whole) can be toggled independently under `effects` in `config.yml` - purely cosmetic, never affects whether an action actually succeeds.
+
 ## 🕹️ Commands
 
 | Command | Description | Permission |
@@ -147,6 +160,7 @@ All player-facing text is rendered with [Adventure MiniMessage](https://docs.adv
 | `/eco <give\|take\|set> <player> <amount>` | Admin economy control | `canvassuite.economy.admin` |
 | `/buy` | Open the server shop GUI (buy) | `canvassuite.shop.use` |
 | `/sell` | Open the sell GUI | `canvassuite.shop.sell` |
+| `/crate <create\|remove\|key> ...` | Bind/unbind crate blocks, give keys (admin) | `canvassuite.crate.admin` |
 | `/sethome [name]` / `/home [name]` (`/homes`) / `/delhome <name>` | Manage & use homes | `canvassuite.home.use` |
 | `/setwarp <name>` / `/delwarp <name>` | Manage warps | `canvassuite.warp.admin` |
 | `/warp [name]` (`/warps`) | Warp browser / teleport | `canvassuite.warp.use` |
@@ -179,6 +193,8 @@ Every command's *own* name always works no matter what's configured — the alia
 | `canvassuite.economy.use` / `.admin` | true / op | Economy commands / `/eco` |
 | `canvassuite.shop.use` | true | Shop access (buy) |
 | `canvassuite.shop.sell` | true | Sell menu access |
+| `canvassuite.crate.use` | true | Open a bound crate with a matching key |
+| `canvassuite.crate.admin` | op | `/crate` (create/remove/key) |
 | `canvassuite.home.use` | true | Homes |
 | `canvassuite.home.limit.<n>` | — | Raises that player's home limit to `n` (default limit set in config) |
 | `canvassuite.home.unlimited` | false | No home limit |
@@ -201,9 +217,10 @@ Every command's *own* name always works no matter what's configured — the alia
 
 Five files are created in `plugins/CanvasSuite/` on first start, plus `worlds.yml` once you first use `/world create`:
 
-- **`config.yml`** — storage backend (MySQL credentials with automatic SQLite fallback), economy settings, teleport warmup/TPA timeouts, home limits, RTP radius/cooldown/per-world enable+fee/precache, guild rules/costs/no-guild placeholder string, chat format, join/leave message toggles, protection toggles, spawn/void-world settings, nametag/tablist/scoreboard settings, private-message cooldown, killstreak broadcast milestones/playtime autosave interval, and leaderboard hologram refresh interval.
+- **`config.yml`** — storage backend (MySQL credentials with automatic SQLite fallback), economy settings, teleport warmup/TPA timeouts, home limits, RTP radius/cooldown/per-world enable+fee/precache, guild rules/costs/no-guild placeholder string, chat format, join/leave message toggles, protection toggles, spawn/void-world settings, nametag/tablist/scoreboard settings, private-message cooldown, killstreak broadcast milestones/playtime autosave interval, leaderboard hologram refresh interval, and cosmetic sound/particle effect toggles.
 - **`messages.yml`** — every message the plugin sends, in MiniMessage. Change colors, add gradients, hover/click events, or MiniPlaceholders tags freely. The shared `<prefix>` is defined once at the top.
 - **`shop.yml`** — shop categories and per-item `buy-price` / `sell-price` values.
+- **`crates.yml`** — crate types: key appearance and a weighted reward pool of items/money/console commands per type.
 - **`aliases.yml`** — extra aliases for every command (e.g. `/bal` for `/balance`), applied at enable by registering the same command object under each configured alias in Bukkit's command map. Edit freely; a command's own name always works regardless of what's listed here. Changes take effect on the next restart.
 - **`subcommand-aliases.yml`** — extra aliases for individual subcommands of `/world`, `/guild`, and `/eco` (e.g. `/world tp` for `/world teleport`). Unlike `aliases.yml` these aren't real Bukkit commands, just extra labels checked in code; a subcommand's own name always works regardless of what's listed here. Changes take effect on the next restart.
 - **`worlds.yml`** — one entry per world created via `/world create`, storing its generator settings so they're reapplied identically on every restart. Managed entirely by the `/world` command — hand-editing isn't necessary. Not part of the auto-migration below since it has no bundled default to compare against.

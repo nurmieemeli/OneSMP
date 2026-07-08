@@ -1,5 +1,8 @@
 package gg.nurmi;
 
+import gg.nurmi.crate.CrateCommand;
+import gg.nurmi.crate.CrateListener;
+import gg.nurmi.crate.CrateManager;
 import gg.nurmi.economy.BalTopCommand;
 import gg.nurmi.economy.BalanceCommand;
 import gg.nurmi.economy.EcoCommand;
@@ -8,6 +11,7 @@ import gg.nurmi.economy.EconomyManager;
 import gg.nurmi.economy.EconomyPlaceholderExpansion;
 import gg.nurmi.economy.PayCommand;
 import gg.nurmi.economy.VaultEconomyProvider;
+import gg.nurmi.effects.EffectsManager;
 import gg.nurmi.message.ChatFormatListener;
 import gg.nurmi.message.JoinLeaveMessageListener;
 import gg.nurmi.util.AliasManager;
@@ -88,11 +92,13 @@ public final class CanvasSuitePlugin extends JavaPlugin {
 
     private SchedulerUtil schedulerUtil;
     private Database database;
+    private EffectsManager effectsManager;
     private MessageService messageService;
     private SubcommandAliases subcommandAliases;
     private EconomyManager economyManager;
     private Expansion economyPlaceholderExpansion;
     private ShopManager shopManager;
+    private CrateManager crateManager;
     private TeleportExecutor teleportExecutor;
     private GuildManager guildManager;
     private GuildChatToggle guildChatToggle;
@@ -110,6 +116,7 @@ public final class CanvasSuitePlugin extends JavaPlugin {
         reloadConfig();
 
         this.schedulerUtil = new SchedulerUtil(this);
+        this.effectsManager = new EffectsManager(this);
         this.messageService = new MessageService(this);
         this.subcommandAliases = new SubcommandAliases(this);
         subcommandAliases.load();
@@ -124,6 +131,7 @@ public final class CanvasSuitePlugin extends JavaPlugin {
 
         registerEconomy();
         registerShop();
+        registerCrates();
         registerTeleport();
         registerRtp();
         registerGuild();
@@ -239,7 +247,7 @@ public final class CanvasSuitePlugin extends JavaPlugin {
         spawnWorldManager.ensureWorldExists();
 
         Objects.requireNonNull(getCommand("setspawn")).setExecutor(new SetSpawnCommand(this, spawnWorldManager));
-        Objects.requireNonNull(getCommand("spawn")).setExecutor(new SpawnCommand(this, spawnWorldManager));
+        Objects.requireNonNull(getCommand("spawn")).setExecutor(new SpawnCommand(this, spawnWorldManager, teleportExecutor));
 
         getServer().getPluginManager().registerEvents(new FirstJoinListener(this, spawnWorldManager), this);
         getServer().getPluginManager().registerEvents(new VoidWorldListener(spawnWorldManager), this);
@@ -300,6 +308,12 @@ public final class CanvasSuitePlugin extends JavaPlugin {
         Objects.requireNonNull(getCommand("sell")).setExecutor(new SellCommand(this));
     }
 
+    private void registerCrates() {
+        this.crateManager = new CrateManager(this);
+        Objects.requireNonNull(getCommand("crate")).setExecutor(new CrateCommand(this, crateManager));
+        getServer().getPluginManager().registerEvents(new CrateListener(this, crateManager), this);
+    }
+
     private void registerEconomy() {
         this.economyManager = new EconomyManager(this);
         getServer().getPluginManager().registerEvents(new EconomyListener(economyManager), this);
@@ -353,6 +367,10 @@ public final class CanvasSuitePlugin extends JavaPlugin {
         return messageService;
     }
 
+    public EffectsManager effects() {
+        return effectsManager;
+    }
+
     public SubcommandAliases subcommandAliases() {
         return subcommandAliases;
     }
@@ -363,6 +381,10 @@ public final class CanvasSuitePlugin extends JavaPlugin {
 
     public ShopManager shop() {
         return shopManager;
+    }
+
+    public CrateManager crates() {
+        return crateManager;
     }
 
     public TeleportExecutor teleportExecutor() {

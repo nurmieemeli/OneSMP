@@ -175,6 +175,18 @@ public final class Database {
                     entry_limit INT NOT NULL DEFAULT 10
                 )
                 """);
+
+            statement.executeUpdate("""
+                CREATE TABLE IF NOT EXISTS crates (
+                    world VARCHAR(64) NOT NULL,
+                    x INT NOT NULL,
+                    y INT NOT NULL,
+                    z INT NOT NULL,
+                    crate_type VARCHAR(32) NOT NULL,
+                    created_by VARCHAR(36),
+                    PRIMARY KEY (world, x, y, z)
+                )
+                """);
         } catch (SQLException ex) {
             throw new RuntimeException("Failed to run CanvasSuite schema migration", ex);
         }

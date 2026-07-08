@@ -16,7 +16,7 @@ import java.util.List;
 public final class WorldListGui extends AbstractGui {
 
     public WorldListGui(CanvasSuitePlugin plugin, WorldManager worldManager, int page) {
-        super(plugin.messages().parse("<gradient:#38bdf8:#818cf8><bold>Managed Worlds</bold></gradient>"), 6);
+        super(plugin, plugin.messages().parse("<gradient:#38bdf8:#818cf8><bold>Managed Worlds</bold></gradient>"), 6);
 
         List<WorldSettings> worlds = List.copyOf(worldManager.listWorlds());
         Pagination<WorldSettings> pagination = new Pagination<>(worlds, PAGE_SIZE);

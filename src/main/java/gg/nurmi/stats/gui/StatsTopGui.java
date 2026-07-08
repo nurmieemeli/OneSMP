@@ -20,7 +20,7 @@ public final class StatsTopGui extends AbstractGui {
     private static final int CLOSE_SLOT = 49;
 
     public StatsTopGui(CanvasSuitePlugin plugin, String title, List<StatsManager.TopEntry> entries, LongFunction<String> valueFormatter) {
-        super(plugin.messages().parse(title), ROWS);
+        super(plugin, plugin.messages().parse(title), ROWS);
 
         for (int i = 0; i < entries.size() && i < 45; i++) {
             StatsManager.TopEntry entry = entries.get(i);

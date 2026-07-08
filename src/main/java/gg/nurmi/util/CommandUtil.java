@@ -20,4 +20,13 @@ public final class CommandUtil {
             return null;
         }
     }
+
+    public static Integer parseInt(MessageService messages, CommandSender sender, String input) {
+        try {
+            return Integer.parseInt(input);
+        } catch (NumberFormatException ex) {
+            messages.send(sender, "general.invalid-number", Placeholder.unparsed("input", input));
+            return null;
+        }
+    }
 }

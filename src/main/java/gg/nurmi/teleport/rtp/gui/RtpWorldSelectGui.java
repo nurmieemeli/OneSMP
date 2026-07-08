@@ -21,7 +21,7 @@ public final class RtpWorldSelectGui extends AbstractGui {
     }
 
     public RtpWorldSelectGui(CanvasSuitePlugin plugin, RtpManager rtpManager, int page) {
-        super(plugin.messages().parse("<gradient:#34d399:#10b981><bold>Random Teleport</bold></gradient>"), 6);
+        super(plugin, plugin.messages().parse("<gradient:#34d399:#10b981><bold>Random Teleport</bold></gradient>"), 6);
 
         List<World> worlds = rtpManager.enabledWorlds();
         Pagination<World> pagination = new Pagination<>(worlds, PAGE_SIZE);

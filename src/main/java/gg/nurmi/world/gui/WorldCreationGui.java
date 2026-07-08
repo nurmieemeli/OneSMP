@@ -39,7 +39,7 @@ public final class WorldCreationGui extends AbstractGui {
     }
 
     private WorldCreationGui(CanvasSuitePlugin plugin, WorldManager worldManager, UUID adminUuid, WorldSettings settings) {
-        super(plugin.messages().parse("<gradient:#34d399:#10b981><bold>Create World</bold></gradient>"), 6);
+        super(plugin, plugin.messages().parse("<gradient:#34d399:#10b981><bold>Create World</bold></gradient>"), 6);
         this.plugin = plugin;
         this.worldManager = worldManager;
         this.adminUuid = adminUuid;

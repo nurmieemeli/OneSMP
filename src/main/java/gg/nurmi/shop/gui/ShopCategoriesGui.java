@@ -10,7 +10,7 @@ import org.bukkit.inventory.ItemStack;
 public final class ShopCategoriesGui extends AbstractGui {
 
     public ShopCategoriesGui(CanvasSuitePlugin plugin) {
-        super(plugin.messages().parse("<gradient:#34d399:#10b981><bold>Server Shop</bold></gradient>"), rows(plugin));
+        super(plugin, plugin.messages().parse("<gradient:#34d399:#10b981><bold>Server Shop</bold></gradient>"), rows(plugin));
 
         for (ShopCategory category : plugin.shop().categories().values()) {
             ItemStack icon = new ItemBuilder(category.icon())
