@@ -276,7 +276,7 @@ public final class GuildCommand implements CommandExecutor, TabCompleter {
                 plugin.messages().send(player, "guild.home-not-set");
                 return;
             }
-            plugin.teleportExecutor().executeSafely(player, guild.homeLocation(), true);
+            plugin.teleportExecutor().executeSafely(player, guild.homeLocation());
         });
     }
 

@@ -1,6 +1,7 @@
 package gg.nurmi.command;
 
 import gg.nurmi.CanvasSuitePlugin;
+import gg.nurmi.config.ConfigMigrator;
 import org.bukkit.command.CommandMap;
 import org.bukkit.command.PluginCommand;
 import org.bukkit.configuration.ConfigurationSection;
@@ -10,16 +11,6 @@ import java.io.File;
 import java.util.List;
 import java.util.Locale;
 
-/**
- * Layers configurable extra aliases from aliases.yml on top of every command already declared in
- * plugin.yml, by directly registering the existing PluginCommand object (the one that already has
- * its executor/tab-completer set) under each extra label in Bukkit's own CommandMap - no reflection
- * or custom Command subclass needed, and tab completion/permissions work identically since it's
- * literally the same Command instance handling dispatch regardless of which label was typed.
- *
- * <p>Must run after every command has been registered via plugin.yml (which happens automatically
- * at plugin load, before onEnable), so call this once, near the end of onEnable().</p>
- */
 public final class AliasManager {
 
     private final CanvasSuitePlugin plugin;
@@ -29,10 +20,8 @@ public final class AliasManager {
     }
 
     public void applyAliases() {
+        ConfigMigrator.migrate(plugin, "aliases.yml");
         File file = new File(plugin.getDataFolder(), "aliases.yml");
-        if (!file.exists()) {
-            plugin.saveResource("aliases.yml", false);
-        }
         YamlConfiguration config = YamlConfiguration.loadConfiguration(file);
         ConfigurationSection section = config.getConfigurationSection("aliases");
         if (section == null) {

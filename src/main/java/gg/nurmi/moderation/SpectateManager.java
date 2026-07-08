@@ -21,11 +21,8 @@ public final class SpectateManager {
         return active.contains(moderator);
     }
 
-    /** Must already be running on the moderator's own entity thread. */
     public void enter(Player moderator, Location targetLocation) {
         if (!active.add(moderator.getUniqueId())) {
-            // Already spectating - a fast double /spectate can otherwise queue two of these before
-            // the first one's async hops resolve, re-hiding/re-teleporting redundantly.
             return;
         }
         moderator.setGameMode(GameMode.SPECTATOR);
@@ -33,7 +30,6 @@ public final class SpectateManager {
         moderator.teleportAsync(targetLocation);
     }
 
-    /** Must already be running on the moderator's own entity thread. Always restores Survival gamemode. */
     public void exit(Player moderator, Location spawnLocation) {
         if (!active.remove(moderator.getUniqueId())) {
             return;

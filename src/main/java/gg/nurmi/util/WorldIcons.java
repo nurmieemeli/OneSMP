@@ -3,7 +3,6 @@ package gg.nurmi.util;
 import org.bukkit.Material;
 import org.bukkit.World;
 
-/** Shared GUI-icon mapping for a world's environment, used by both the RTP and world-list menus. */
 public final class WorldIcons {
 
     private WorldIcons() {

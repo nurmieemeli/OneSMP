@@ -6,7 +6,7 @@ folia-supported: true
 description: ${project.description}
 
 depend: [MiniPlaceholders]
-softdepend: [Vault, PacketEvents]
+softdepend: [Vault, PacketEvents, LuckPerms]
 
 commands:
   balance:
@@ -54,9 +54,6 @@ commands:
   tpdeny:
     description: Deny an incoming teleport request.
     usage: /tpdeny
-  back:
-    description: Teleport to your previous location.
-    usage: /back
   rtp:
     description: Randomly teleport within the world border.
     usage: /rtp [world]

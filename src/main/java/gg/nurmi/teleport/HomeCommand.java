@@ -36,7 +36,7 @@ public final class HomeCommand implements CommandExecutor {
                 if (homes.isEmpty()) {
                     plugin.messages().send(player, "teleport.no-homes");
                 } else if (homes.size() == 1) {
-                    teleportExecutor.executeSafely(player, homes.get(0).toLocation(), true);
+                    teleportExecutor.executeSafely(player, homes.get(0).toLocation());
                 } else {
                     plugin.scheduler().runAtEntity(player, () -> new HomesGui(plugin, homeManager, teleportExecutor, homes).open(player), () -> {});
                 }
@@ -50,7 +50,7 @@ public final class HomeCommand implements CommandExecutor {
                 plugin.messages().send(player, "teleport.home-not-found", Placeholder.unparsed("name", name));
                 return;
             }
-            teleportExecutor.executeSafely(player, optionalHome.get().toLocation(), true);
+            teleportExecutor.executeSafely(player, optionalHome.get().toLocation());
         });
         return true;
     }

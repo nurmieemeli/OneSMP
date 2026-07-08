@@ -7,9 +7,11 @@ import gg.nurmi.economy.EconomyListener;
 import gg.nurmi.economy.EconomyManager;
 import gg.nurmi.economy.PayCommand;
 import gg.nurmi.economy.VaultEconomyProvider;
-import gg.nurmi.chat.ChatFormatListener;
+import gg.nurmi.message.ChatFormatListener;
+import gg.nurmi.message.JoinLeaveMessageListener;
 import gg.nurmi.command.AliasManager;
 import gg.nurmi.command.SubcommandAliases;
+import gg.nurmi.config.ConfigMigrator;
 import gg.nurmi.guild.GuildChatToggle;
 import gg.nurmi.guild.GuildCommand;
 import gg.nurmi.guild.GuildManager;
@@ -47,8 +49,6 @@ import gg.nurmi.spawn.VoidWorldListener;
 import gg.nurmi.storage.Database;
 import gg.nurmi.tablist.TablistListener;
 import gg.nurmi.tablist.TablistManager;
-import gg.nurmi.teleport.BackCommand;
-import gg.nurmi.teleport.BackManager;
 import gg.nurmi.teleport.DelHomeCommand;
 import gg.nurmi.teleport.DelWarpCommand;
 import gg.nurmi.teleport.HomeCommand;
@@ -69,6 +69,8 @@ import net.milkbowl.vault.economy.Economy;
 import org.bukkit.plugin.ServicePriority;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import java.util.Set;
+
 public final class CanvasSuitePlugin extends JavaPlugin {
 
     private SchedulerUtil schedulerUtil;
@@ -79,7 +81,6 @@ public final class CanvasSuitePlugin extends JavaPlugin {
     private ShopManager shopManager;
     private HomeManager homeManager;
     private WarpManager warpManager;
-    private BackManager backManager;
     private TpaManager tpaManager;
     private TeleportExecutor teleportExecutor;
     private RtpManager rtpManager;
@@ -97,7 +98,8 @@ public final class CanvasSuitePlugin extends JavaPlugin {
 
     @Override
     public void onEnable() {
-        saveDefaultConfig();
+        ConfigMigrator.migrate(this, "config.yml", Set.of("rtp.worlds"));
+        reloadConfig();
 
         this.schedulerUtil = new SchedulerUtil(this);
         this.messageService = new MessageService(this);
@@ -118,6 +120,7 @@ public final class CanvasSuitePlugin extends JavaPlugin {
         registerRtp();
         registerGuild();
         getServer().getPluginManager().registerEvents(new ChatFormatListener(this), this);
+        getServer().getPluginManager().registerEvents(new JoinLeaveMessageListener(this), this);
         registerProtection();
         registerSpawn();
         registerWorlds();
@@ -127,7 +130,6 @@ public final class CanvasSuitePlugin extends JavaPlugin {
         registerTablist();
         registerScoreboard();
 
-        // Must run last - it needs every command above to already be registered via plugin.yml.
         new AliasManager(this).applyAliases();
 
         getLogger().info("CanvasSuite enabled.");
@@ -232,12 +234,9 @@ public final class CanvasSuitePlugin extends JavaPlugin {
     private void registerTeleport() {
         this.homeManager = new HomeManager(this);
         this.warpManager = new WarpManager(this);
-        this.backManager = new BackManager();
         this.tpaManager = new TpaManager(this);
         TeleportWarmup warmup = new TeleportWarmup(this);
-        this.teleportExecutor = new TeleportExecutor(this, backManager, warmup);
-
-        getServer().getPluginManager().registerEvents(backManager, this);
+        this.teleportExecutor = new TeleportExecutor(this, warmup);
 
         getCommand("sethome").setExecutor(new SetHomeCommand(this, homeManager));
         getCommand("home").setExecutor(new HomeCommand(this, homeManager, teleportExecutor));
@@ -251,8 +250,6 @@ public final class CanvasSuitePlugin extends JavaPlugin {
         getCommand("tpahere").setExecutor(new TpaCommand(this, tpaManager, true));
         getCommand("tpaccept").setExecutor(new TpAcceptCommand(this, tpaManager, teleportExecutor));
         getCommand("tpdeny").setExecutor(new TpDenyCommand(this, tpaManager));
-
-        getCommand("back").setExecutor(new BackCommand(this, backManager, teleportExecutor));
     }
 
     private void registerShop() {
@@ -278,6 +275,9 @@ public final class CanvasSuitePlugin extends JavaPlugin {
 
     @Override
     public void onDisable() {
+        if (tablistManager != null) {
+            tablistManager.shutdown();
+        }
         if (database != null) {
             database.close();
         }
@@ -314,10 +314,6 @@ public final class CanvasSuitePlugin extends JavaPlugin {
 
     public WarpManager warps() {
         return warpManager;
-    }
-
-    public BackManager backs() {
-        return backManager;
     }
 
     public TpaManager tpa() {

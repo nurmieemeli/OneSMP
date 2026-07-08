@@ -12,11 +12,6 @@ public final class LocationUtil {
     private LocationUtil() {
     }
 
-    /**
-     * Whether a player could safely stand at this location: solid, non-hazardous ground with
-     * two air blocks above it. Safe to call off the region thread against a {@link org.bukkit.Chunk}
-     * that has already been loaded (e.g. via an async chunk snapshot), since it only reads blocks.
-     */
     public static boolean isSafe(Location location) {
         World world = location.getWorld();
         if (world == null) {
@@ -37,7 +32,6 @@ public final class LocationUtil {
                 && groundType != Material.WATER;
     }
 
-    /** Shared by every stored location record (Home, Warp, ...); null if the world isn't currently loaded. */
     public static Location resolve(String worldName, double x, double y, double z, float yaw, float pitch) {
         World world = Bukkit.getWorld(worldName);
         if (world == null) {

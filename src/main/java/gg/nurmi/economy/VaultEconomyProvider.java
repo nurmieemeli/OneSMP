@@ -9,12 +9,6 @@ import java.math.BigDecimal;
 import java.util.List;
 import java.util.UUID;
 
-/**
- * Bridges CanvasSuite's economy into Vault so other plugins can use it. Vault's contract is
- * fully synchronous (returns a primitive double), so this blocks the calling thread on the async
- * DB lookup when a balance isn't already cached — that impedance mismatch is inherent to Vault,
- * not something this plugin can avoid, since third-party callers expect an immediate result.
- */
 public final class VaultEconomyProvider implements Economy {
 
     private final EconomyManager economyManager;

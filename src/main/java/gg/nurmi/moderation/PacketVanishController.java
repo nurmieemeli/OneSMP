@@ -26,17 +26,6 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
-/**
- * Makes a moderator truly invisible by intercepting outgoing packets that reference them - not
- * Bukkit's Player#hidePlayer/showPlayer API. Hiding proactively strips existing client-side state
- * (tab list entry + entity) and then blocks any future packet about the hidden player from being
- * sent to anyone except themselves; showing removes the block and manually rebuilds the minimum
- * packets needed for everyone else's client to see them again.
- *
- * <p>The rebuilt spawn-entity/tab-entry on {@link #show(Player)} is intentionally minimal (no skin
- * texture properties, equipment, or pose state) - good enough for the moderator to reappear, but a
- * full-fidelity re-sync is what Bukkit's own entity tracker would normally provide on next tick.</p>
- */
 public final class PacketVanishController {
 
     private final CanvasSuitePlugin plugin;

@@ -1,6 +1,7 @@
 package gg.nurmi.command;
 
 import gg.nurmi.CanvasSuitePlugin;
+import gg.nurmi.config.ConfigMigrator;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
 
@@ -11,12 +12,6 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
-/**
- * Layers configurable extra aliases on top of individual subcommands (e.g. "/world tp" also
- * answering to "/world teleport"), loaded from subcommand-aliases.yml. Unlike top-level command
- * aliases, subcommands aren't real Bukkit commands, so this just builds an alias -> canonical
- * lookup per command that each multi-subcommand executor consults before dispatching on args[0].
- */
 public final class SubcommandAliases {
 
     private final CanvasSuitePlugin plugin;
@@ -28,10 +23,8 @@ public final class SubcommandAliases {
     }
 
     public void load() {
+        ConfigMigrator.migrate(plugin, "subcommand-aliases.yml");
         File file = new File(plugin.getDataFolder(), "subcommand-aliases.yml");
-        if (!file.exists()) {
-            plugin.saveResource("subcommand-aliases.yml", false);
-        }
         YamlConfiguration config = YamlConfiguration.loadConfiguration(file);
 
         for (String commandName : config.getKeys(false)) {
@@ -69,11 +62,6 @@ public final class SubcommandAliases {
         }
     }
 
-    /**
-     * Resolves a typed subcommand label to its canonical name. Returns the input (lowercased)
-     * unchanged if it's not a recognized alias, so callers can still fall through to their own
-     * "unknown subcommand" handling.
-     */
     public String resolve(String command, String input) {
         String normalized = input.toLowerCase(Locale.ROOT);
         Map<String, String> lookup = aliasToCanonical.get(command.toLowerCase(Locale.ROOT));
@@ -83,7 +71,6 @@ public final class SubcommandAliases {
         return lookup.getOrDefault(normalized, normalized);
     }
 
-    /** All labels (canonical names + configured aliases) for a command's subcommands, for tab completion. */
     public List<String> labels(String command) {
         return labels.getOrDefault(command.toLowerCase(Locale.ROOT), List.of());
     }

@@ -14,7 +14,6 @@ import org.bukkit.inventory.ItemStack;
 import java.math.BigDecimal;
 import java.util.List;
 
-/** Lists every RTP-enabled world; clicking one runs the same flow as `/rtp <world>`. */
 public final class RtpWorldSelectGui extends AbstractGui {
 
     public RtpWorldSelectGui(CanvasSuitePlugin plugin, RtpManager rtpManager) {

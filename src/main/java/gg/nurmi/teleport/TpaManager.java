@@ -11,7 +11,6 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
-/** In-memory, expiring /tpa request tracking — keyed by the target (the player who must accept/deny). */
 public final class TpaManager {
 
     public record TpaRequest(UUID requester, UUID target, boolean here, long expiresAtMillis) {

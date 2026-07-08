@@ -12,7 +12,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-/** Small fluent helper for building menu-icon ItemStacks with Adventure components. */
 public final class ItemBuilder {
 
     private final ItemStack stack;

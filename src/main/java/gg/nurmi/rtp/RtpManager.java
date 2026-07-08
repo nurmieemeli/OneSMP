@@ -22,14 +22,6 @@ import java.util.concurrent.ConcurrentLinkedDeque;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Consumer;
 
-/**
- * Picks a random, safe location within a configurable radius. Candidate chunks are loaded via
- * World#getChunkAtAsync (safe to call from any thread) and then re-entered on the owning region
- * thread via RegionScheduler before any block is actually read, per Folia's threading rules.
- *
- * <p>Also keeps a small per-world precache of already-found safe locations so /rtp can usually
- * teleport instantly instead of waiting on a fresh search - see {@link #precacheTick()}.</p>
- */
 public final class RtpManager {
 
     private final CanvasSuitePlugin plugin;
@@ -57,19 +49,16 @@ public final class RtpManager {
         }
     }
 
-    /** Whether random teleport is configured on for this world at all - opt-in per world, not a blacklist. */
     public boolean isEnabled(World world) {
         ConfigurationSection section = worldSection(world);
         return section != null && section.getBoolean("enabled", false);
     }
 
-    /** This world's configured RTP fee; 0 if unset or the world isn't RTP-enabled. */
     public double cost(World world) {
         ConfigurationSection section = worldSection(world);
         return section == null ? 0 : section.getDouble("cost", 0);
     }
 
-    /** Every currently-loaded world with RTP enabled, in {@link Bukkit#getWorlds()} order. */
     public List<World> enabledWorlds() {
         List<World> worlds = new ArrayList<>();
         for (World world : Bukkit.getWorlds()) {
@@ -85,12 +74,6 @@ public final class RtpManager {
         return worlds == null ? null : worlds.getConfigurationSection(world.getName());
     }
 
-    /**
-     * Full /rtp flow for a player into a specific world: permission-gated cooldown bypass, the
-     * world's configured fee (if any), then a cached or freshly-searched safe location. Sends its
-     * own feedback messages, so callers (the command and the world-select GUI) just resolve the
-     * target world and call this.
-     */
     public void teleportRandomly(Player player, World world) {
         if (!isEnabled(world)) {
             plugin.messages().send(player, "rtp.world-disallowed");
@@ -134,7 +117,6 @@ public final class RtpManager {
     private void teleport(Player player, Location location) {
         applyCooldown(player.getUniqueId());
         plugin.scheduler().runAtEntity(player, () -> {
-            plugin.backs().record(player);
             player.teleportAsync(location).thenAccept(success -> {
                 if (success) {
                     plugin.messages().send(player, "rtp.success");
@@ -143,18 +125,11 @@ public final class RtpManager {
         }, () -> {});
     }
 
-    /** Pulls one pre-cached safe location for the world, if any are ready; null if the cache is currently empty. */
     public Location pollCached(World world) {
         ConcurrentLinkedDeque<Location> queue = precache.get(world.getName());
         return queue == null ? null : queue.pollFirst();
     }
 
-    /**
-     * Tops off one allowed world's precache by a single location, but only while the server is
-     * keeping up (recent TPS at or above the configured floor) - "whenever the server can handle
-     * it." Meant to be driven by a repeating task so the search cost spreads out over time instead
-     * of bursting all {@code target-size} lookups back to back.
-     */
     public void precacheTick() {
         if (!plugin.getConfig().getBoolean("rtp.precache.enabled", true) || !filling.compareAndSet(false, true)) {
             return;
@@ -184,7 +159,6 @@ public final class RtpManager {
         filling.set(false);
     }
 
-    /** Safe to call from any thread. {@code onFound}/{@code onFail} run off the calling thread. */
     public void findSafeLocation(World world, Consumer<Location> onFound, Runnable onFail) {
         int minRadius = Math.max(0, plugin.getConfig().getInt("rtp.min-radius", 500));
         int maxRadius = Math.max(minRadius + 1, plugin.getConfig().getInt("rtp.max-radius", 5000));

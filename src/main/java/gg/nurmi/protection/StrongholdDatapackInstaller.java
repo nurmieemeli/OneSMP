@@ -9,16 +9,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.logging.Level;
 
-/**
- * Bukkit/Paper has no cancellable "structure about to generate" event for strongholds
- * (AsyncStructureGenerateEvent exists but isn't Cancellable), and structure placement is baked
- * into a world's registries at load time — there is no supported runtime API to turn a structure
- * off in an already-loaded world. The only real fix is a datapack that overrides the stronghold
- * structure set to place zero of them, seeded into each world folder so it applies on next load.
- *
- * <p>This only prevents *new* stronghold generation; it does not remove strongholds that have
- * already generated in previously-visited chunks.</p>
- */
 public final class StrongholdDatapackInstaller {
 
     private static final String PACK_NAME = "canvassuite_no_stronghold";

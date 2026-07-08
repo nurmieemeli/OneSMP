@@ -47,7 +47,7 @@ public final class HomesGui extends AbstractGui {
                                         () -> new HomesGui(plugin, homeManager, teleportExecutor, refreshed, 0).open(player), () -> {}));
                     });
                 } else {
-                    teleportExecutor.executeSafely(player, home.toLocation(), true);
+                    teleportExecutor.executeSafely(player, home.toLocation());
                 }
             });
         }

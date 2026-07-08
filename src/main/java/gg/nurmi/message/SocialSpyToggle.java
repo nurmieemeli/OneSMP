@@ -4,7 +4,6 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
-/** Tracks which online staff currently have private messages mirrored to them. */
 public final class SocialSpyToggle {
 
     private final Set<UUID> enabled = ConcurrentHashMap.newKeySet();
@@ -13,7 +12,6 @@ public final class SocialSpyToggle {
         return enabled.contains(uuid);
     }
 
-    /** Flips the toggle and returns the new state. */
     public boolean toggle(UUID uuid) {
         if (!enabled.remove(uuid)) {
             enabled.add(uuid);

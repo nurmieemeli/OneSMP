@@ -12,11 +12,6 @@ import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.FoodLevelChangeEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 
-/**
- * In the void spawn world, non-creative players can't interact with blocks (except opening/closing
- * doors), trample farmland, take damage, or lose food — it's a lobby, not somewhere to survive in.
- * Creative-mode players bypass every rule here.
- */
 public final class VoidWorldListener implements Listener {
 
     private final SpawnWorldManager spawnWorldManager;
