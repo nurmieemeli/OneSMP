@@ -49,7 +49,7 @@ public final class GuildCommand implements CommandExecutor, TabCompleter {
             return true;
         }
 
-        String sub = args[0].toLowerCase(Locale.ROOT);
+        String sub = plugin.subcommandAliases().resolve("guild", args[0]);
         switch (sub) {
             case "create" -> handleCreate(player, args);
             case "disband" -> handleDisband(player);
@@ -343,9 +343,11 @@ public final class GuildCommand implements CommandExecutor, TabCompleter {
     @Override
     public List<String> onTabComplete(CommandSender sender, Command command, String alias, String[] args) {
         if (args.length == 1) {
-            return SUBCOMMANDS.stream().filter(s -> s.startsWith(args[0].toLowerCase(Locale.ROOT))).toList();
+            String prefix = args[0].toLowerCase(Locale.ROOT);
+            return plugin.subcommandAliases().labels("guild").stream().filter(s -> s.startsWith(prefix)).toList();
         }
-        if (args.length == 2 && List.of("invite", "kick", "promote", "demote").contains(args[0].toLowerCase(Locale.ROOT))) {
+        if (args.length == 2 && List.of("invite", "kick", "promote", "demote")
+                .contains(plugin.subcommandAliases().resolve("guild", args[0]))) {
             return Bukkit.getOnlinePlayers().stream().map(Player::getName)
                     .filter(n -> n.toLowerCase(Locale.ROOT).startsWith(args[1].toLowerCase(Locale.ROOT))).toList();
         }

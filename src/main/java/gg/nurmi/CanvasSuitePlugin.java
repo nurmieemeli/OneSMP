@@ -9,6 +9,7 @@ import gg.nurmi.economy.PayCommand;
 import gg.nurmi.economy.VaultEconomyProvider;
 import gg.nurmi.chat.ChatFormatListener;
 import gg.nurmi.command.AliasManager;
+import gg.nurmi.command.SubcommandAliases;
 import gg.nurmi.guild.GuildChatToggle;
 import gg.nurmi.guild.GuildCommand;
 import gg.nurmi.guild.GuildManager;
@@ -73,6 +74,7 @@ public final class CanvasSuitePlugin extends JavaPlugin {
     private SchedulerUtil schedulerUtil;
     private Database database;
     private MessageService messageService;
+    private SubcommandAliases subcommandAliases;
     private EconomyManager economyManager;
     private ShopManager shopManager;
     private HomeManager homeManager;
@@ -99,6 +101,8 @@ public final class CanvasSuitePlugin extends JavaPlugin {
 
         this.schedulerUtil = new SchedulerUtil(this);
         this.messageService = new MessageService(this);
+        this.subcommandAliases = new SubcommandAliases(this);
+        subcommandAliases.load();
 
         this.database = new Database(this);
         database.connect();
@@ -290,6 +294,10 @@ public final class CanvasSuitePlugin extends JavaPlugin {
 
     public MessageService messages() {
         return messageService;
+    }
+
+    public SubcommandAliases subcommandAliases() {
+        return subcommandAliases;
     }
 
     public EconomyManager economy() {

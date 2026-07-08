@@ -151,13 +151,14 @@ All player-facing text is rendered with [Adventure MiniMessage](https://docs.adv
 
 ## Configuration
 
-Five files are created in `plugins/CanvasSuite/` on first start (plus `worlds.yml`, written the first time `/world create` is used):
+Six files are created in `plugins/CanvasSuite/` on first start (plus `worlds.yml`, written the first time `/world create` is used):
 
 - **`config.yml`** — storage backend (MySQL credentials with automatic SQLite fallback), economy settings, teleport warmup/TPA timeouts, home limits, RTP radius/cooldown/per-world enable+fee/precache, guild rules and costs, chat format, protection toggles, spawn/void-world settings, nametag/tablist/scoreboard settings, and private-message cooldown.
 - **`messages.yml`** — every message the plugin sends, in MiniMessage. Change colors, add gradients, hover/click events, or MiniPlaceholders tags freely. The shared `<prefix>` is defined once at the top.
 - **`shop.yml`** — shop categories and per-item `buy-price` / `sell-price` values.
 - **`worlds.yml`** — one entry per world created via `/world create`, storing its generator settings so they're reapplied identically on every restart. Managed entirely by the `/world` command — hand-editing isn't necessary.
 - **`aliases.yml`** — extra aliases for every command (e.g. `/bal` for `/balance`), applied at enable by registering the same command object under each configured alias in Bukkit's command map. Edit freely; a command's own name always works regardless of what's listed here. Changes take effect on the next restart.
+- **`subcommand-aliases.yml`** — extra aliases for individual subcommands of `/world`, `/guild`, and `/eco` (e.g. `/world tp` for `/world teleport`). Unlike `aliases.yml` these aren't real Bukkit commands, just extra labels checked in code; a subcommand's own name always works regardless of what's listed here. Changes take effect on the next restart.
 
 Example chat format from `config.yml`:
 
@@ -215,7 +216,7 @@ Requires JDK 25 and Maven. The shaded jar lands at `target/CanvasSuite-<version>
 
 - **Without PacketEvents installed**: overhead nametags and the tablist's reserved-slot filler are silently disabled (everything else, including tablist header/footer, still works); `/spectate` refuses to run at all rather than offer a moderator a false sense of invisibility.
 - The guild-tag second nametag line rides as a passenger entity on the player; vanilla doesn't document the exact height a passenger-mounted entity renders at, so `nametag.guild-tag.y-offset` may need visual tuning in-game.
-- Random teleport is opt-in per world as of the current config shape — if you're upgrading from an older version that used a `disallowed-worlds` blacklist and a single global `cost`, you'll need to add each world you want reachable to `rtp.worlds` with `enabled: true`.
+- Random teleport is opt-in per world with configurable cost per use.
 - Stronghold blocking only prevents **new** generation — strongholds in already-generated chunks remain, and the datapack needs one world reload/server restart after first install.
 - Nether portal blocking prevents new portal **creation**; portals that existed before the plugin was installed remain usable.
 - The Vault bridge is synchronous by contract (Vault's API returns plain doubles), so third-party plugins calling it from a region thread may block briefly on uncached (offline-player) balance lookups.

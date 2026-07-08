@@ -1,0 +1,31 @@
+# CanvasSuite subcommand aliases.
+#
+# Configurable EXTRA aliases for individual subcommands, e.g. "/world tp" also answering to
+# "/world teleport". Each subcommand's own name (the key) always works no matter what's listed
+# here. Unlike aliases.yml, these aren't registered as real Bukkit commands - they're just extra
+# labels checked in code before dispatching. Add/remove/edit freely; changes take effect on next
+# server restart.
+world:
+  create: []
+  list: []
+  delete: []
+  teleport: [tp]
+guild:
+  create: []
+  disband: []
+  invite: []
+  accept: []
+  kick: []
+  promote: []
+  demote: []
+  sethome: []
+  home: []
+  info: []
+  list: []
+  chat: []
+  leave: []
+  gui: []
+eco:
+  give: []
+  take: []
+  set: []

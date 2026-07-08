@@ -35,7 +35,7 @@ public final class EcoCommand implements CommandExecutor {
             return true;
         }
 
-        String action = args[0].toLowerCase();
+        String action = plugin.subcommandAliases().resolve("eco", args[0]);
         String targetName = args[1];
         BigDecimal amount = CommandUtil.parseAmount(plugin.messages(), sender, args[2]);
         if (amount == null) {
