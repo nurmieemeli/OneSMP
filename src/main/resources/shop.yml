@@ -1,4 +1,3 @@
-# CanvasSuite shop — preconfigured buy/sell prices.
 # buy-price: cost to buy one unit (set to -1 to disable buying).
 # sell-price: payout for selling one unit (set to -1 to disable selling).
 categories:

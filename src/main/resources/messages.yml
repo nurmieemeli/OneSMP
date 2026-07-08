@@ -1,6 +1,5 @@
-# CanvasSuite messages — MiniMessage format.
-# Supports MiniPlaceholders tags (e.g. <player_name>, <player_world>) anywhere,
-# plus the message-specific placeholders documented next to each entry.
+# Full support for MiniPlaceholders tags (https://miniplaceholders.github.io/docs/user-guide/Placeholders)
+# and MiniMessage formatting (https://docs.papermc.io/adventure/minimessage/format/) anywhere.
 
 prefix: "<gradient:#38bdf8:#818cf8><bold>Canvas</bold></gradient><dark_gray> » </dark_gray>"
 
@@ -111,8 +110,6 @@ spawn:
   teleported: "<prefix><green>Teleported to spawn."
 
 nametag:
-  # Rendered per-player (not per-viewer - team packets aren't relational, one team assignment is
-  # broadcast identically to every viewer), used as the overhead nametag prefix.
   format: "<luckperms_prefix>"
 
 moderation:
@@ -141,8 +138,8 @@ msg:
   socialspy-disabled: "<prefix><gray>Social spy disabled."
 
 join-leave:
-  join: "<gray>[<green>+</green>] <white><player_name>"
-  leave: "<gray>[<red>-</red>] <white><player_name>"
+  join: "<gray>[<green>+</green>] <player_name>"
+  leave: "<gray>[<red>-</red>] <player_name>"
 
 world:
   created: "<prefix><green>World <white><name></white> created."

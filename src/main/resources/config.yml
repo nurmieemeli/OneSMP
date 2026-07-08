@@ -1,5 +1,3 @@
-# CanvasSuite configuration
-
 storage:
   # Storage type: MYSQL or SQLITE. If MYSQL is selected but the connection
   # cannot be established on startup, CanvasSuite automatically falls back
@@ -30,13 +28,17 @@ shop:
 teleport:
   tpa-request-timeout-seconds: 60
   teleport-warmup-seconds: 3
+  # If teleport should cancel if the player moves while waiting.
   cancel-warmup-on-move: true
   home-limit-permission-prefix: "canvassuite.home.limit."
   default-home-limit: 3
 
 rtp:
-  min-radius: 500
+  # Minimum x/z coordinate for a valid random teleportation location.
+  min-radius: 0
+  # Maximum x/z coordinate for a valid random teleportation location.
   max-radius: 5000
+  # How long a player has to wait before using random teleport.
   cooldown-seconds: 300
   max-attempts: 30
   # Random teleport is opt-in per world - a world only shows up in /rtp's GUI (or works with
@@ -45,7 +47,7 @@ rtp:
     world:
       enabled: true
       cost: 0.0
-  # Biome keys (namespaced) players should never be randomly teleported into.
+  # Biomes players should never be randomly teleported into.
   avoid-biomes:
     - "minecraft:ocean"
     - "minecraft:deep_ocean"
@@ -53,6 +55,7 @@ rtp:
     - "minecraft:river"
     - "minecraft:void"
   precache:
+    # If the server should precache safe locations.
     enabled: true
     # Up to this many already-found safe locations are kept ready per world, so /rtp usually
     # teleports instantly instead of waiting on a fresh search.
@@ -60,14 +63,14 @@ rtp:
     # Tries to add one more cached location this often.
     interval-seconds: 5
     # Skips topping off the cache if the server's recent TPS drops below this - only precaches
-    # "whenever the server can handle it."
+    # whenever the server can handle it.
     min-tps: 18.0
 
 guild:
-  max-name-length: 16
+  max-name-length: 10
   min-name-length: 3
   max-tag-length: 5
-  default-member-limit: 10
+  default-member-limit: 12
   creation-cost: 500.0
   allow-guild-bank: true
 
@@ -142,7 +145,7 @@ tablist:
 
 msg:
   # Minimum seconds between messages sent by the same player; 0 disables the cooldown entirely.
-  cooldown-seconds: 0
+  cooldown-seconds: 3
 
 join-leave:
   # Set either to false to fully suppress that message (vanilla's default join/quit line included -

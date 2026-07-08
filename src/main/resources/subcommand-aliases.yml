@@ -1,5 +1,3 @@
-# CanvasSuite subcommand aliases.
-#
 # Configurable EXTRA aliases for individual subcommands, e.g. "/world tp" also answering to
 # "/world teleport". Each subcommand's own name (the key) always works no matter what's listed
 # here. Unlike aliases.yml, these aren't registered as real Bukkit commands - they're just extra

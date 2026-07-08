@@ -1,5 +1,3 @@
-# CanvasSuite command aliases.
-#
 # Every command's own name (e.g. "balance") always works no matter what's listed here - these are
 # EXTRA aliases layered on top, applied at plugin enable by directly registering them in Bukkit's
 # command map against the same command. Add/remove/edit freely; changes take effect on next
