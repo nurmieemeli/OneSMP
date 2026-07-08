@@ -73,6 +73,9 @@ guild:
   default-member-limit: 12
   creation-cost: 500.0
   allow-guild-bank: true
+  # Shown by the <guild_own_name>/<guild_own_tag> scoreboard/tablist placeholders (see the
+  # `scoreboard` section below) for players who aren't in a guild. MiniMessage tags are parsed.
+  no-guild-placeholder: "No Guild"
 
 chat:
   # <guild_segment> renders to nothing for players with no guild - don't bake brackets around
@@ -166,13 +169,22 @@ scoreboard:
   enabled: true
   refresh-interval-seconds: 5
   title: "<gradient:#38bdf8:#818cf8><bold>CanvasSuite</bold></gradient>"
-  # Rendered relationally per viewer.
+  # Rendered relationally per viewer. In addition to MiniPlaceholders tags (<player_name>,
+  # <luckperms_prefix>, ...), a couple of other modules expose their own live per-viewer tags
+  # here: the stats module (see the `stats` section below) - <stats_kills>, <stats_deaths>,
+  # <stats_kd>, <stats_killstreak>, <stats_best_killstreak>, <stats_playtime> - the economy
+  # module - <economy_balance> - and the guild module - <guild_own_name>, <guild_own_tag>
+  # (both render to nothing for players not in a guild).
   lines:
-    - "<strikethrough>                  </strikethrough>"
-    - "<white> Player: <player_name>"
+    - "<gradient:#818cf8:#38bdf8><strikethrough>                         </strikethrough>"
     - " "
-    - "<white> Rank: <luckperms_prefix>"
-    - "<strikethrough>                  </strikethrough>"
+    - "<green><bold>$</bold><gray> Money: </gray><economy_balance></green>"
+    - "<dark_red><bold>🗡</bold><gray> Kills: </gray><stats_kills></dark_red>"
+    - "<#F54927><bold>☠</bold><gray> Deaths: </gray><stats_deaths></#F54927>"
+    - "<yellow><bold>🕓</bold><gray> Playtime: </gray><stats_playtime></yellow>"
+    - "<#818cf8><bold>⚑</bold><gray> Guild: </gray><guild_own_name></#818cf8>"
+    - " "
+    - "<gradient:#818cf8:#38bdf8><strikethrough>                         </strikethrough>"
     - "<white>  play.example.com  "
 
 stats:

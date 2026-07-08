@@ -1,7 +1,7 @@
 package gg.nurmi.teleport;
 
 import gg.nurmi.CanvasSuitePlugin;
-import gg.nurmi.storage.Database;
+import gg.nurmi.util.Database;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.permissions.PermissionAttachmentInfo;

@@ -1,7 +1,7 @@
 package gg.nurmi.message;
 
 import gg.nurmi.CanvasSuitePlugin;
-import gg.nurmi.storage.Database;
+import gg.nurmi.util.Database;
 import gg.nurmi.util.Cooldown;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;

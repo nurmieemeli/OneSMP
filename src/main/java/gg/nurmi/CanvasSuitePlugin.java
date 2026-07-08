@@ -5,6 +5,7 @@ import gg.nurmi.economy.BalanceCommand;
 import gg.nurmi.economy.EcoCommand;
 import gg.nurmi.economy.EconomyListener;
 import gg.nurmi.economy.EconomyManager;
+import gg.nurmi.economy.EconomyPlaceholderExpansion;
 import gg.nurmi.economy.PayCommand;
 import gg.nurmi.economy.VaultEconomyProvider;
 import gg.nurmi.message.ChatFormatListener;
@@ -12,9 +13,11 @@ import gg.nurmi.message.JoinLeaveMessageListener;
 import gg.nurmi.util.AliasManager;
 import gg.nurmi.util.SubcommandAliases;
 import gg.nurmi.util.ConfigMigrator;
+import gg.nurmi.guild.GuildCacheListener;
 import gg.nurmi.guild.GuildChatToggle;
 import gg.nurmi.guild.GuildCommand;
 import gg.nurmi.guild.GuildManager;
+import gg.nurmi.guild.GuildPlaceholderExpansion;
 import gg.nurmi.gui.GuiListener;
 import gg.nurmi.stats.hologram.LeaderboardHologramCommand;
 import gg.nurmi.stats.hologram.LeaderboardHologramManager;
@@ -51,8 +54,9 @@ import gg.nurmi.spawn.VoidWorldListener;
 import gg.nurmi.stats.StatsCommand;
 import gg.nurmi.stats.StatsListener;
 import gg.nurmi.stats.StatsManager;
+import gg.nurmi.stats.StatsPlaceholderExpansion;
 import gg.nurmi.stats.StatsTopCommand;
-import gg.nurmi.storage.Database;
+import gg.nurmi.util.Database;
 import gg.nurmi.tablist.TablistListener;
 import gg.nurmi.tablist.TablistManager;
 import gg.nurmi.teleport.DelHomeCommand;
@@ -71,6 +75,7 @@ import gg.nurmi.teleport.WarpCommand;
 import gg.nurmi.teleport.WarpManager;
 import gg.nurmi.world.WorldCommand;
 import gg.nurmi.world.WorldManager;
+import io.github.miniplaceholders.api.Expansion;
 import net.milkbowl.vault.economy.Economy;
 import org.bukkit.plugin.ServicePriority;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -85,15 +90,18 @@ public final class CanvasSuitePlugin extends JavaPlugin {
     private MessageService messageService;
     private SubcommandAliases subcommandAliases;
     private EconomyManager economyManager;
+    private Expansion economyPlaceholderExpansion;
     private ShopManager shopManager;
     private TeleportExecutor teleportExecutor;
     private GuildManager guildManager;
     private GuildChatToggle guildChatToggle;
+    private Expansion guildPlaceholderExpansion;
     private PacketEventsBootstrap packetEventsBootstrap;
     private SpawnWorldManager spawnWorldManager;
     private TablistManager tablistManager;
     private WorldManager worldManager;
     private StatsManager statsManager;
+    private Expansion statsPlaceholderExpansion;
     private LeaderboardHologramManager hologramManager;
 
     @Override
@@ -146,6 +154,8 @@ public final class CanvasSuitePlugin extends JavaPlugin {
 
         int periodSeconds = Math.max(5, getConfig().getInt("stats.playtime-autosave-interval-seconds", 60));
         schedulerUtil.runGlobalRepeating(statsManager::flushOnline, periodSeconds * 20L, periodSeconds * 20L);
+
+        this.statsPlaceholderExpansion = StatsPlaceholderExpansion.register(statsManager);
     }
 
     private void registerHolograms() {
@@ -258,6 +268,9 @@ public final class CanvasSuitePlugin extends JavaPlugin {
         GuildCommand guildCommand = new GuildCommand(this, guildManager, guildChatToggle);
         Objects.requireNonNull(getCommand("guild")).setExecutor(guildCommand);
         Objects.requireNonNull(getCommand("guild")).setTabCompleter(guildCommand);
+
+        getServer().getPluginManager().registerEvents(new GuildCacheListener(guildManager), this);
+        this.guildPlaceholderExpansion = GuildPlaceholderExpansion.register(this, guildManager);
     }
 
     private void registerTeleport() {
@@ -300,6 +313,8 @@ public final class CanvasSuitePlugin extends JavaPlugin {
                     this, ServicePriority.Normal);
             getLogger().info("Hooked into Vault for economy support.");
         }
+
+        this.economyPlaceholderExpansion = EconomyPlaceholderExpansion.register(economyManager);
     }
 
     @Override
@@ -308,7 +323,16 @@ public final class CanvasSuitePlugin extends JavaPlugin {
             tablistManager.shutdown();
         }
         if (statsManager != null) {
-            statsManager.flushOnline();
+            statsManager.flushOnlineBlocking();
+        }
+        if (statsPlaceholderExpansion != null && statsPlaceholderExpansion.registered()) {
+            statsPlaceholderExpansion.unregister();
+        }
+        if (economyPlaceholderExpansion != null && economyPlaceholderExpansion.registered()) {
+            economyPlaceholderExpansion.unregister();
+        }
+        if (guildPlaceholderExpansion != null && guildPlaceholderExpansion.registered()) {
+            guildPlaceholderExpansion.unregister();
         }
         if (database != null) {
             database.close();

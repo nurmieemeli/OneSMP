@@ -1,7 +1,7 @@
 package gg.nurmi.economy;
 
 import gg.nurmi.CanvasSuitePlugin;
-import gg.nurmi.storage.Database;
+import gg.nurmi.util.Database;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;

@@ -1,7 +1,7 @@
 package gg.nurmi.stats;
 
 import gg.nurmi.CanvasSuitePlugin;
-import gg.nurmi.storage.Database;
+import gg.nurmi.util.Database;
 import gg.nurmi.util.TextUtil;
 
 import java.sql.Connection;
@@ -67,6 +67,8 @@ public final class StatsManager {
     public record Snapshot(String name, int kills, int deaths, int currentKillstreak, int bestKillstreak, long playtimeSeconds) {
     }
 
+    public static final Snapshot EMPTY_SNAPSHOT = new Snapshot(null, 0, 0, 0, 0, 0);
+
     private static final class Stats {
         volatile String name;
         final AtomicInteger kills = new AtomicInteger();
@@ -111,6 +113,20 @@ public final class StatsManager {
         }
     }
 
+    /**
+     * Same as {@link #flushOnline()} but writes synchronously on the calling thread instead of
+     * scheduling an async task. Scheduling any new task (even async) from {@code onDisable()}
+     * throws {@code IllegalPluginAccessException} - the plugin is already considered disabled by
+     * the time that callback runs - so this is the only safe way to flush on shutdown.
+     */
+    public void flushOnlineBlocking() {
+        long now = System.currentTimeMillis();
+        for (Map.Entry<UUID, Stats> entry : cache.entrySet()) {
+            accruePlaytime(entry.getValue(), now);
+            persistSync(entry.getKey(), entry.getValue());
+        }
+    }
+
     private void accruePlaytime(Stats stats, long now) {
         long elapsedSeconds = Math.max(0, (now - stats.sessionStartMillis) / 1000);
         if (elapsedSeconds > 0) {
@@ -139,14 +155,26 @@ public final class StatsManager {
     }
 
     public CompletableFuture<Snapshot> getSnapshot(UUID uuid) {
-        Stats cached = cache.get(uuid);
+        Snapshot cached = getLiveSnapshot(uuid);
         if (cached != null) {
-            long liveSeconds = cached.playtimeSeconds.get()
-                    + Math.max(0, (System.currentTimeMillis() - cached.sessionStartMillis) / 1000);
-            return CompletableFuture.completedFuture(new Snapshot(cached.name, cached.kills.get(), cached.deaths.get(),
-                    cached.currentKillstreak.get(), cached.bestKillstreak.get(), liveSeconds));
+            return CompletableFuture.completedFuture(cached);
         }
         return plugin.scheduler().supplyAsync(() -> loadSnapshotFromDb(uuid));
+    }
+
+    /**
+     * Synchronous, non-blocking read of an online player's current stats - safe to call from a
+     * MiniMessage placeholder resolver. Returns null if the player isn't cached (i.e. offline).
+     */
+    public Snapshot getLiveSnapshot(UUID uuid) {
+        Stats cached = cache.get(uuid);
+        if (cached == null) {
+            return null;
+        }
+        long liveSeconds = cached.playtimeSeconds.get()
+                + Math.max(0, (System.currentTimeMillis() - cached.sessionStartMillis) / 1000);
+        return new Snapshot(cached.name, cached.kills.get(), cached.deaths.get(),
+                cached.currentKillstreak.get(), cached.bestKillstreak.get(), liveSeconds);
     }
 
     private Snapshot loadSnapshotFromDb(UUID uuid) {
@@ -164,7 +192,7 @@ public final class StatsManager {
         } catch (SQLException ex) {
             plugin.getLogger().log(Level.WARNING, "Failed to load stats for " + uuid, ex);
         }
-        return new Snapshot(null, 0, 0, 0, 0, 0);
+        return EMPTY_SNAPSHOT;
     }
 
     private Stats loadOrCreate(UUID uuid, String knownName) {
@@ -212,36 +240,38 @@ public final class StatsManager {
     }
 
     private void persist(UUID uuid, Stats stats) {
-        plugin.scheduler().runAsync(() -> {
-            String upsert = database.isMysql()
-                    ? """
-                      INSERT INTO player_stats(uuid, name, kills, deaths, current_killstreak, best_killstreak, playtime_seconds)
-                      VALUES (?, ?, ?, ?, ?, ?, ?)
-                      ON DUPLICATE KEY UPDATE name = VALUES(name), kills = VALUES(kills), deaths = VALUES(deaths),
-                          current_killstreak = VALUES(current_killstreak), best_killstreak = VALUES(best_killstreak),
-                          playtime_seconds = VALUES(playtime_seconds)
-                      """
-                    : """
-                      INSERT INTO player_stats(uuid, name, kills, deaths, current_killstreak, best_killstreak, playtime_seconds)
-                      VALUES (?, ?, ?, ?, ?, ?, ?)
-                      ON CONFLICT(uuid) DO UPDATE SET name = excluded.name, kills = excluded.kills, deaths = excluded.deaths,
-                          current_killstreak = excluded.current_killstreak, best_killstreak = excluded.best_killstreak,
-                          playtime_seconds = excluded.playtime_seconds
-                      """;
-            try (Connection connection = database.getConnection();
-                 PreparedStatement statement = connection.prepareStatement(upsert)) {
-                statement.setString(1, uuid.toString());
-                statement.setString(2, stats.name);
-                statement.setInt(3, stats.kills.get());
-                statement.setInt(4, stats.deaths.get());
-                statement.setInt(5, stats.currentKillstreak.get());
-                statement.setInt(6, stats.bestKillstreak.get());
-                statement.setLong(7, stats.playtimeSeconds.get());
-                statement.executeUpdate();
-            } catch (SQLException ex) {
-                plugin.getLogger().log(Level.WARNING, "Failed to persist stats for " + uuid, ex);
-            }
-        });
+        plugin.scheduler().runAsync(() -> persistSync(uuid, stats));
+    }
+
+    private void persistSync(UUID uuid, Stats stats) {
+        String upsert = database.isMysql()
+                ? """
+                  INSERT INTO player_stats(uuid, name, kills, deaths, current_killstreak, best_killstreak, playtime_seconds)
+                  VALUES (?, ?, ?, ?, ?, ?, ?)
+                  ON DUPLICATE KEY UPDATE name = VALUES(name), kills = VALUES(kills), deaths = VALUES(deaths),
+                      current_killstreak = VALUES(current_killstreak), best_killstreak = VALUES(best_killstreak),
+                      playtime_seconds = VALUES(playtime_seconds)
+                  """
+                : """
+                  INSERT INTO player_stats(uuid, name, kills, deaths, current_killstreak, best_killstreak, playtime_seconds)
+                  VALUES (?, ?, ?, ?, ?, ?, ?)
+                  ON CONFLICT(uuid) DO UPDATE SET name = excluded.name, kills = excluded.kills, deaths = excluded.deaths,
+                      current_killstreak = excluded.current_killstreak, best_killstreak = excluded.best_killstreak,
+                      playtime_seconds = excluded.playtime_seconds
+                  """;
+        try (Connection connection = database.getConnection();
+             PreparedStatement statement = connection.prepareStatement(upsert)) {
+            statement.setString(1, uuid.toString());
+            statement.setString(2, stats.name);
+            statement.setInt(3, stats.kills.get());
+            statement.setInt(4, stats.deaths.get());
+            statement.setInt(5, stats.currentKillstreak.get());
+            statement.setInt(6, stats.bestKillstreak.get());
+            statement.setLong(7, stats.playtimeSeconds.get());
+            statement.executeUpdate();
+        } catch (SQLException ex) {
+            plugin.getLogger().log(Level.WARNING, "Failed to persist stats for " + uuid, ex);
+        }
     }
 
     public CompletableFuture<UUID> resolveUuidByName(String name) {

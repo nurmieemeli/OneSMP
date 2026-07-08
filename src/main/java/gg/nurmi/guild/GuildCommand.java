@@ -110,8 +110,11 @@ public final class GuildCommand implements CommandExecutor, TabCompleter {
                     plugin.economy().deposit(player.getUniqueId(), BigDecimal.valueOf(cost));
                 }
                 switch (result) {
-                    case SUCCESS -> plugin.messages().send(player, "guild.created",
-                            Placeholder.unparsed("name", name), Placeholder.unparsed("tag", tag));
+                    case SUCCESS -> {
+                        guildManager.refreshCache(player.getUniqueId());
+                        plugin.messages().send(player, "guild.created",
+                                Placeholder.unparsed("name", name), Placeholder.unparsed("tag", tag));
+                    }
                     case NAME_TAKEN -> plugin.messages().send(player, "guild.name-taken");
                     case TAG_TAKEN -> plugin.messages().send(player, "guild.tag-taken");
                     case INVALID_NAME -> plugin.messages().send(player, "guild.invalid-name",
@@ -145,6 +148,7 @@ public final class GuildCommand implements CommandExecutor, TabCompleter {
             }
             guildManager.disbandGuild(guild.id()).thenAccept(deleted -> {
                 if (deleted) {
+                    guild.members().forEach(member -> guildManager.refreshCache(member.uuid()));
                     plugin.messages().send(player, "guild.disbanded");
                 }
             });
@@ -194,10 +198,12 @@ public final class GuildCommand implements CommandExecutor, TabCompleter {
                 return;
             }
             guildManager.clearInvite(player.getUniqueId());
-            guildManager.addMember(guildId, player.getUniqueId(), GuildRole.MEMBER).thenAccept(ignored ->
-                    guildManager.getGuildByMember(player.getUniqueId()).thenAccept(joined ->
-                            plugin.messages().send(player, "guild.joined",
-                                    Placeholder.unparsed("guild", joined.map(Guild::name).orElse("?")))));
+            guildManager.addMember(guildId, player.getUniqueId(), GuildRole.MEMBER).thenAccept(ignored -> {
+                guildManager.refreshCache(player.getUniqueId());
+                guildManager.getGuildByMember(player.getUniqueId()).thenAccept(joined ->
+                        plugin.messages().send(player, "guild.joined",
+                                Placeholder.unparsed("guild", joined.map(Guild::name).orElse("?"))));
+            });
         });
     }
 
@@ -224,6 +230,7 @@ public final class GuildCommand implements CommandExecutor, TabCompleter {
                 return;
             }
             guildManager.removeMember(guild.id(), targetUuid.get()).thenRun(() -> {
+                guildManager.refreshCache(targetUuid.get());
                 plugin.messages().send(player, "guild.kicked", Placeholder.unparsed("target", targetName));
                 Player targetOnline = Bukkit.getPlayer(targetUuid.get());
                 if (targetOnline != null) {
@@ -327,8 +334,10 @@ public final class GuildCommand implements CommandExecutor, TabCompleter {
                 plugin.messages().send(player, "guild.owner-must-disband");
                 return;
             }
-            guildManager.removeMember(guild.id(), player.getUniqueId()).thenRun(() ->
-                    plugin.messages().send(player, "guild.left", Placeholder.unparsed("guild", guild.name())));
+            guildManager.removeMember(guild.id(), player.getUniqueId()).thenRun(() -> {
+                guildManager.refreshCache(player.getUniqueId());
+                plugin.messages().send(player, "guild.left", Placeholder.unparsed("guild", guild.name()));
+            });
         });
     }
 

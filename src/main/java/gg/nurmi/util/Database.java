@@ -1,4 +1,4 @@
-package gg.nurmi.storage;
+package gg.nurmi.util;
 
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;

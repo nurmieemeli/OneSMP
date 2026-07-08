@@ -6,7 +6,7 @@ import de.oliver.fancyholograms.api.data.TextHologramData;
 import de.oliver.fancyholograms.api.hologram.Hologram;
 import gg.nurmi.CanvasSuitePlugin;
 import gg.nurmi.stats.StatsManager;
-import gg.nurmi.storage.Database;
+import gg.nurmi.util.Database;
 import org.bukkit.Location;
 
 import java.sql.Connection;

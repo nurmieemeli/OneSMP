@@ -1,7 +1,8 @@
 package gg.nurmi.guild;
 
 import gg.nurmi.CanvasSuitePlugin;
-import gg.nurmi.storage.Database;
+import gg.nurmi.util.Database;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 
 import java.math.BigDecimal;
@@ -27,10 +28,48 @@ public final class GuildManager {
     private final CanvasSuitePlugin plugin;
     private final Database database;
     private final Map<UUID, Integer> pendingInvites = new ConcurrentHashMap<>();
+    private final Map<UUID, Guild> guildCache = new ConcurrentHashMap<>();
 
     public GuildManager(CanvasSuitePlugin plugin) {
         this.plugin = plugin;
         this.database = plugin.database();
+    }
+
+    /**
+     * Synchronous, non-blocking read of an online player's current guild - safe to call from a
+     * MiniMessage placeholder resolver. Returns empty if the player isn't cached (offline or not
+     * in a guild).
+     */
+    public Optional<Guild> getCachedGuild(UUID uuid) {
+        return Optional.ofNullable(guildCache.get(uuid));
+    }
+
+    public void handleJoin(UUID uuid) {
+        refreshCache(uuid);
+    }
+
+    public void handleQuit(UUID uuid) {
+        guildCache.remove(uuid);
+    }
+
+    /**
+     * Re-reads a single player's guild membership from storage and updates the cache used by
+     * {@link #getCachedGuild(UUID)} - call this after any change to that player's membership
+     * (create/join/kick/leave/disband) so cached placeholders don't go stale. No-ops if the
+     * player isn't online, since the cache only ever tracks online players.
+     */
+    public void refreshCache(UUID uuid) {
+        if (Bukkit.getPlayer(uuid) == null) {
+            guildCache.remove(uuid);
+            return;
+        }
+        getGuildByMember(uuid).thenAccept(optionalGuild -> {
+            if (optionalGuild.isPresent()) {
+                guildCache.put(uuid, optionalGuild.get());
+            } else {
+                guildCache.remove(uuid);
+            }
+        });
     }
 
     public void invite(UUID target, int guildId) {
