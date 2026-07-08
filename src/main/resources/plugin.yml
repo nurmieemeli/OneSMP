@@ -74,7 +74,7 @@ commands:
     usage: /spectate [player]
   world:
     description: Create and manage worlds.
-    usage: /world <create|list|delete|tp> ...
+    usage: /world <create|list|delete|teleport> ...
   msg:
     description: Send a private message to another player.
     usage: /msg <player> <message>

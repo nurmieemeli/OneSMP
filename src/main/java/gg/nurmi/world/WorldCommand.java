@@ -17,7 +17,7 @@ import java.util.Locale;
 
 public final class WorldCommand implements CommandExecutor, TabCompleter {
 
-    private static final List<String> SUBCOMMANDS = List.of("create", "list", "delete", "tp");
+    private static final List<String> SUBCOMMANDS = List.of("create", "list", "delete", "teleport");
 
     private final CanvasSuitePlugin plugin;
     private final WorldManager worldManager;
@@ -43,11 +43,11 @@ public final class WorldCommand implements CommandExecutor, TabCompleter {
             return true;
         }
 
-        switch (args[0].toLowerCase(Locale.ROOT)) {
+        switch (plugin.subcommandAliases().resolve("world", args[0])) {
             case "create" -> handleCreate(player, args);
             case "list" -> new WorldListGui(plugin, worldManager, 0).open(player);
             case "delete" -> handleDelete(player, args);
-            case "tp" -> handleTeleport(player, args);
+            case "teleport" -> handleTeleport(player, args);
             default -> plugin.messages().send(player, "general.unknown-command",
                     Placeholder.unparsed("usage", "/world <" + String.join("|", SUBCOMMANDS) + ">"));
         }
@@ -102,7 +102,7 @@ public final class WorldCommand implements CommandExecutor, TabCompleter {
 
     private void handleTeleport(Player player, String[] args) {
         if (args.length < 2) {
-            plugin.messages().send(player, "general.unknown-command", Placeholder.unparsed("usage", "/world tp <name>"));
+            plugin.messages().send(player, "general.unknown-command", Placeholder.unparsed("usage", "/world teleport <name>"));
             return;
         }
         String name = args[1];
@@ -118,9 +118,10 @@ public final class WorldCommand implements CommandExecutor, TabCompleter {
     @Override
     public List<String> onTabComplete(CommandSender sender, Command command, String alias, String[] args) {
         if (args.length == 1) {
-            return SUBCOMMANDS.stream().filter(s -> s.startsWith(args[0].toLowerCase(Locale.ROOT))).toList();
+            String prefix = args[0].toLowerCase(Locale.ROOT);
+            return plugin.subcommandAliases().labels("world").stream().filter(s -> s.startsWith(prefix)).toList();
         }
-        if (args.length == 2 && List.of("delete", "tp").contains(args[0].toLowerCase(Locale.ROOT))) {
+        if (args.length == 2 && List.of("delete", "teleport").contains(plugin.subcommandAliases().resolve("world", args[0]))) {
             String prefix = args[1].toLowerCase(Locale.ROOT);
             return worldManager.listWorlds().stream().map(WorldSettings::name)
                     .filter(n -> n.toLowerCase(Locale.ROOT).startsWith(prefix)).toList();
