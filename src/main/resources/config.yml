@@ -77,7 +77,10 @@ chat:
   # <luckperms_prefix>/<luckperms_suffix> require the MiniPlaceholders-LuckPerms expansion plugin
   # to be installed alongside MiniPlaceholders - remove them here if that expansion isn't installed,
   # otherwise MiniMessage will fail to parse the unknown tag on every chat message.
-  format: "<guild_segment><luckperms_prefix><reset><white><player_name></white><dark_gray>:</dark_gray> <white><message>"
+  # <player_name> deliberately isn't reset/re-colored after <luckperms_prefix> - a prefix that
+  # doesn't close its own color tag (e.g. "<red>[Admin] ") intentionally carries that color onto
+  # the name too; add your own <reset> before <player_name> here if you don't want that.
+  format: "<guild_segment><luckperms_prefix><player_name><dark_gray>:</dark_gray> <white><message>"
   guild-chat-format: "<dark_aqua>[G]</dark_aqua> <gray>[<guild_tag>]</gray> <white><player_name></white><dark_gray>:</dark_gray> <aqua><message>"
   # Used to build <guild_segment> only when the player is in a guild; include the trailing space
   # yourself so the no-guild case can omit both the brackets and the space cleanly.
@@ -90,14 +93,11 @@ protection:
 spawn:
   # Created automatically on first enable if it doesn't already exist.
   world-name: "spawnworld"
-  # Block used for the small starter platform placed under the default coordinates below, so
-  # /spawn and first-join teleports have solid ground before any admin has run /setspawn.
-  platform-material: "STONE"
   # Populated by /setspawn; these defaults are only used before any admin has run it.
   world: "spawnworld"
-  x: 1.5
+  x: 0.5
   y: 65.0
-  z: 1.5
+  z: 0.5
   yaw: 0.0
   pitch: 0.0
 
@@ -129,6 +129,13 @@ tablist:
   # shrinking to fit the online player count. Requires the PacketEvents plugin to be installed;
   # header/footer below still work without it.
   reserved-slots-enabled: true
+  # Signed Mojang skin texture shown on every filler entry (defaults to a plain gray skin, from
+  # mineskin.org). The client silently ignores an unsigned/invalid texture and falls back to a
+  # per-UUID Steve/Alex skin instead, so leaving either value blank does the same. Generate your
+  # own at mineskin.org and paste the resulting texture/signature here to use a different skin.
+  reserved-slot-skin:
+    texture: "ewogICJ0aW1lc3RhbXAiIDogMTc2MDczMjUxMDYyMCwKICAicHJvZmlsZUlkIiA6ICI5ODA4NmFkMDNiZjc0YTA5OGY2YTEyMzkzOWJlZjhlNiIsCiAgInByb2ZpbGVOYW1lIiA6ICJwZXN0aWNpZGEiLAogICJzaWduYXR1cmVSZXF1aXJlZCIgOiB0cnVlLAogICJ0ZXh0dXJlcyIgOiB7CiAgICAiU0tJTiIgOiB7CiAgICAgICJ1cmwiIDogImh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNDI5NTJkZGM1MzYzMGI4NzdmOGM3NzBjYTUyYWM3OGRjMmI1ZDEwMDY5ZmQ5ZDE4ZmIzZGU4NWQ0NWExNjQ3ZiIsCiAgICAgICJtZXRhZGF0YSIgOiB7CiAgICAgICAgIm1vZGVsIiA6ICJzbGltIgogICAgICB9CiAgICB9CiAgfQp9"
+    signature: "L0h+QLrw5LtaGRmPermKxEmjIw2b0mCwGt1suz1iDC6xJ9pBleksGKpdK8+BzP8rSfdlofawe5f/TkSuetM7oeMd13OS7YhlE12EWQu9rfYeeplwCCfIrhx6NsMXxAaNbSJWH2dmhWV78cd4YejGzRLBCXf9XW1yh/gWHPeousDIwvHizMpGwS6CsbCNyQovJnyOBHcxMkALcRX91V3mD41zDS2t54LMKdMzaLBbeGtwswLoQOvC0bzYZV7nnNO53b1l4q6G2XPXkA3kFwfQjR3I+wMSELGvZFpSvHl94Ks/yHZd3E+UC58RPD2P9GCH9oHjtdJdHiBX49DnG15tS2OrZ6ydC5pGOBU+oapImWgMqSWqMgXr77Ve58pNdZdBmiRN2hth1leHRsBxAGhvzP/ecCrideSEc4LBbrF7CVo8isvwh3A2IbhkcnGB9OEfGmKqWEnwaKJwm5impf+s8BzUf+nub0AJmWfdaiZaGxb8XWeabJDh0lGDYa6cE6vQskdIyJ1gee0dTnZtXAcCWZ/9krPgOVU846+k3BRl5EQ5HohNdCyM2VD8XdOSyMnx3AxC9B3kmF2f/JlzaJIR9p1KspjvPZOad5Yuwvoisr5mm8Isj239dZNGwl3yx4xxBDYfUqW/pHfXb1twfxDzDcc1F+A1XIYayhpg5+S5okc="
   # Vanilla's tablist is a fixed 4-column grid; this is the row count (1-20, 20 = the full 80-slot grid).
   rows: 20
   refresh-interval-seconds: 5
@@ -136,6 +143,12 @@ tablist:
 msg:
   # Minimum seconds between messages sent by the same player; 0 disables the cooldown entirely.
   cooldown-seconds: 0
+
+join-leave:
+  # Set either to false to fully suppress that message (vanilla's default join/quit line included -
+  # not just replaced with a blank one). Templates are in messages.yml under join-leave.
+  join-enabled: true
+  leave-enabled: true
 
 world-creation:
   # Seeded into a fresh /world create session before the admin starts toggling anything in the GUI.

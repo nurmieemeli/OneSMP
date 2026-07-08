@@ -18,19 +18,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.function.BiConsumer;
 
-/**
- * Base class for every chest-menu GUI in the plugin. Every slot is either empty (click ignored,
- * event still cancelled) or bound to a {@link GuiButton}; there is no free-form item storage, so
- * clicks inside the menu are always cancelled to prevent players pulling/placing items.
- *
- * <p>Callers must open/refresh instances of this class only while already running on the viewing
- * player's own thread (a command handler or an existing {@link InventoryClickEvent} callback both
- * qualify on Folia/Canvas). If you're opening a GUI from an async callback, hop back via
- * {@code player.getScheduler().run(plugin, t -> gui.open(player), null)} first.</p>
- */
 public abstract class AbstractGui implements InventoryHolder {
 
-    /** Item count per page for every paginated chest menu (shop items, homes, warps, guild members, world list). */
     protected static final int PAGE_SIZE = 45;
     private static final int PREV_SLOT = 48;
     private static final int CLOSE_SLOT = 49;
@@ -70,7 +59,6 @@ public abstract class AbstractGui implements InventoryHolder {
         }
     }
 
-    /** Called when the GUI is closed; override to persist state or clean up. */
     protected void onClose(InventoryCloseEvent event) {
     }
 
@@ -82,11 +70,6 @@ public abstract class AbstractGui implements InventoryHolder {
         viewer.openInventory(inventory);
     }
 
-    /**
-     * Wires the close/prev/next footer shared by every paginated chest menu (slots 48/49/50).
-     * {@code onNavigate} is handed the target page and must open this same GUI type there - each
-     * subclass knows its own constructor, so it's simplest for it to provide that directly.
-     */
     protected void addPaginationFooter(Pagination<?> pagination, int page, BiConsumer<Player, Integer> onNavigate) {
         ItemStack close = new ItemBuilder(Material.BARRIER).name(Component.text("Close", NamedTextColor.RED)).build();
         setButton(CLOSE_SLOT, close, event -> event.getWhoClicked().closeInventory());

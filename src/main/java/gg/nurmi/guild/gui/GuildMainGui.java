@@ -45,7 +45,7 @@ public final class GuildMainGui extends AbstractGui {
             ItemStack homeIcon = new ItemBuilder(Material.RED_BED).name(plugin.messages().parse("<white>Guild Home")).build();
             setButton(13, homeIcon, event -> {
                 if (event.getWhoClicked() instanceof Player player) {
-                    plugin.teleportExecutor().executeSafely(player, guild.homeLocation(), true);
+                    plugin.teleportExecutor().executeSafely(player, guild.homeLocation());
                 }
             });
         }

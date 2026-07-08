@@ -29,8 +29,6 @@ public final class SpectateCommand implements CommandExecutor {
             plugin.messages().send(sender, "general.no-permission");
             return true;
         }
-        // A moderator who thinks they're invisible but isn't is a moderation-safety bug, so this
-        // whole command refuses outright rather than degrading to "gamemode + teleport only".
         if (!plugin.packetEvents().available()) {
             plugin.messages().send(player, "moderation.packetevents-required");
             return true;
@@ -53,8 +51,6 @@ public final class SpectateCommand implements CommandExecutor {
             return true;
         }
 
-        // Reading another player's live location must happen on their own entity thread; only
-        // once we have a plain Location do we hop to the moderator's own thread to act on it.
         plugin.scheduler().runAtEntity(target, () -> {
             Location targetLocation = target.getLocation();
             plugin.scheduler().runAtEntity(player, () -> spectateManager.enter(player, targetLocation), () -> {});

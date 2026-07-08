@@ -190,7 +190,6 @@ public final class GuildManager {
         });
     }
 
-    /** Atomic at the DB level — no read-modify-write race on the guild bank balance. */
     public CompletableFuture<Boolean> depositBank(int guildId, BigDecimal amount) {
         return plugin.scheduler().supplyAsync(() -> {
             try (Connection connection = database.getConnection();

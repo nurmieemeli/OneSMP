@@ -24,11 +24,14 @@ public final class WorldListGui extends AbstractGui {
 
         int slot = 0;
         for (WorldSettings settings : pageWorlds) {
-            ItemStack icon = new ItemBuilder(WorldIcons.iconFor(settings.environment(), settings.generatorMode() == WorldSettings.GeneratorMode.VOID))
+            ItemStack icon = new ItemBuilder(WorldIcons.iconFor(settings.environment(),
+                    settings.generatorMode() == WorldSettings.GeneratorMode.VOID))
                     .name(plugin.messages().parse("<white><name>", Placeholder.unparsed("name", settings.name())))
                     .lore(
-                            plugin.messages().parse("<gray>Environment: <white><value>", Placeholder.unparsed("value", settings.environment().name())),
-                            plugin.messages().parse("<gray>Generator: <white><value>", Placeholder.unparsed("value", settings.generatorMode().name())),
+                            plugin.messages().parse("<gray>Environment: <white><value>",
+                                    Placeholder.unparsed("value", settings.environment().name())),
+                            plugin.messages().parse("<gray>Generator: <white><value>",
+                                    Placeholder.unparsed("value", settings.generatorMode().name())),
                             plugin.messages().parse("<gray>Click for details"))
                     .build();
             setButton(slot++, icon, event -> {

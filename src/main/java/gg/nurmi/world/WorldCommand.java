@@ -111,8 +111,7 @@ public final class WorldCommand implements CommandExecutor, TabCompleter {
             plugin.messages().send(player, "world.not-found", Placeholder.unparsed("name", name));
             return;
         }
-        // TeleportExecutor sends its own "teleported" confirmation once the (possibly warmed-up) teleport actually completes.
-        plugin.teleportExecutor().executeSafely(player, world.getSpawnLocation(), true);
+        plugin.teleportExecutor().executeSafely(player, world.getSpawnLocation());
     }
 
     @Override

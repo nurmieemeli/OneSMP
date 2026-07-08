@@ -1,6 +1,7 @@
 package gg.nurmi.shop;
 
 import gg.nurmi.CanvasSuitePlugin;
+import gg.nurmi.config.ConfigMigrator;
 import org.bukkit.Material;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -8,6 +9,7 @@ import org.bukkit.configuration.file.YamlConfiguration;
 import java.io.File;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Set;
 
 public final class ShopManager {
 
@@ -20,10 +22,8 @@ public final class ShopManager {
     }
 
     public void load() {
+        ConfigMigrator.migrate(plugin, "shop.yml", Set.of("categories"));
         File file = new File(plugin.getDataFolder(), "shop.yml");
-        if (!file.exists()) {
-            plugin.saveResource("shop.yml", false);
-        }
         YamlConfiguration config = YamlConfiguration.loadConfiguration(file);
         categories.clear();
 

@@ -10,16 +10,6 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
-/**
- * Rescues non-creative players who fall out of the void spawn world back to spawn instead of
- * letting them take void damage. Triggers on the actual void damage cause rather than a
- * configured Y threshold, so it lines up exactly with when Minecraft itself would otherwise start
- * hurting the player.
- *
- * <p>{@link VoidWorldListener} already cancels this same damage event for non-creative players in
- * the void world, so this handler deliberately does not use {@code ignoreCancelled}, ensuring it
- * still fires (and rescues) regardless of registration order between the two listeners.</p>
- */
 public final class VoidFallRescueListener implements Listener {
 
     private final SpawnWorldManager spawnWorldManager;
@@ -44,6 +34,6 @@ public final class VoidFallRescueListener implements Listener {
             return;
         }
 
-        spawnWorldManager.teleportToSpawn(player).thenAccept(success -> rescuing.remove(player.getUniqueId()));
+        spawnWorldManager.teleportToSpawn(player).thenAccept(ignored -> rescuing.remove(player.getUniqueId()));
     }
 }

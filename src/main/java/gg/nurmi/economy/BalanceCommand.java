@@ -12,11 +12,6 @@ import java.math.BigDecimal;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 
-/**
- * Sending a message to a CommandSender is safe from any thread on Folia (it's just a packet
- * send), so these command handlers don't need to hop back to an entity/region thread after an
- * async DB lookup completes — only teleports/inventory/world edits need that.
- */
 public final class BalanceCommand implements CommandExecutor {
 
     private final CanvasSuitePlugin plugin;

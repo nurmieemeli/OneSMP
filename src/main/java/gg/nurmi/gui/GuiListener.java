@@ -7,7 +7,6 @@ import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.inventory.InventoryDragEvent;
 import org.bukkit.inventory.Inventory;
 
-/** Single global listener routing clicks/drags/closes to whichever {@link AbstractGui} is open. */
 public final class GuiListener implements Listener {
 
     @EventHandler
@@ -21,7 +20,6 @@ public final class GuiListener implements Listener {
             event.setCancelled(true);
             gui.handleClick(event);
         } else if (event.getClick().isShiftClick()) {
-            // Block shift-clicking items from the player's own inventory into the menu.
             event.setCancelled(true);
         }
     }

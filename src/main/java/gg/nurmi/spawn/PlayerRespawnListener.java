@@ -4,7 +4,6 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerRespawnEvent;
 
-/** Sends a dead player to the configured spawn on respawn, unless they have a valid bed/anchor spawn set. */
 public final class PlayerRespawnListener implements Listener {
 
     private final SpawnWorldManager spawnWorldManager;

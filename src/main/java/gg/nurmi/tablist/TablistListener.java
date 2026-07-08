@@ -16,12 +16,11 @@ public final class TablistListener implements Listener {
     @EventHandler
     public void onJoin(PlayerJoinEvent event) {
         manager.refreshHeaderFooter(event.getPlayer());
-        manager.onPlayerCountChanged();
-        manager.introduceFillersTo(event.getPlayer());
+        manager.refreshLayout();
     }
 
     @EventHandler
     public void onQuit(PlayerQuitEvent event) {
-        manager.onPlayerCountChanged();
+        manager.refreshLayout();
     }
 }

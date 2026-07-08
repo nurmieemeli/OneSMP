@@ -2,7 +2,6 @@ package gg.nurmi.gui;
 
 import java.util.List;
 
-/** Simple slice-by-page helper shared by every paginated menu (shop items, homes, warps, guild members). */
 public final class Pagination<T> {
 
     private final List<T> items;

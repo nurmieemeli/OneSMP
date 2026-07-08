@@ -17,11 +17,6 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.logging.Level;
 
-/**
- * Central balance store. Online players' balances live in an in-memory cache (populated on join,
- * dropped on quit) that's mutated atomically and persisted to the database asynchronously
- * write-through style; offline lookups (e.g. /eco on someone not online) fall back to the DB.
- */
 public final class EconomyManager {
 
     public record BalanceEntry(UUID uuid, String name, BigDecimal balance) {
@@ -50,7 +45,6 @@ public final class EconomyManager {
         return currencySymbol() + amount.setScale(2, RoundingMode.HALF_UP).toPlainString();
     }
 
-    /** Cached, non-blocking read; 0 if the player's balance hasn't been loaded (e.g. never joined). */
     public BigDecimal getCached(UUID uuid) {
         return cache.getOrDefault(uuid, BigDecimal.ZERO);
     }
@@ -63,7 +57,6 @@ public final class EconomyManager {
         return plugin.scheduler().supplyAsync(() -> loadOrCreate(uuid, null));
     }
 
-    /** Called on player join: warms the cache and refreshes the stored display name. */
     public void handleJoin(UUID uuid, String name) {
         plugin.scheduler().runAsync(() -> cache.put(uuid, loadOrCreate(uuid, name)));
     }
@@ -94,10 +87,6 @@ public final class EconomyManager {
             }
             return startingBalance;
         } catch (SQLException ex) {
-            // Logged here rather than left to whatever generic uncaught-exception handling the
-            // async scheduler applies - none of this class's callers (getBalance/withdraw/deposit)
-            // attach an .exceptionally() of their own, so without this the failure was otherwise
-            // invisible: the returned future just dies silently with nothing in the console.
             plugin.getLogger().log(Level.WARNING, "Failed to load balance for " + uuid, ex);
             throw new RuntimeException("Failed to load balance for " + uuid, ex);
         }
@@ -171,7 +160,6 @@ public final class EconomyManager {
         });
     }
 
-    /** Resolves an offline player's UUID/name by looking up the accounts table (does not hit Mojang). */
     public CompletableFuture<UUID> resolveUuidByName(String name) {
         return plugin.scheduler().supplyAsync(() -> {
             try (Connection connection = database.getConnection();

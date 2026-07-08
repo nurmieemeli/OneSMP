@@ -6,10 +6,6 @@ import org.bukkit.WorldType;
 
 import java.util.concurrent.ThreadLocalRandom;
 
-/**
- * Mutable settings for a single world - doubles as both the persisted record of an existing
- * managed world and the live "pending creation" session an admin edits through the creation GUI.
- */
 public final class WorldSettings {
 
     public enum GeneratorMode { VANILLA, VOID }

@@ -1,4 +1,4 @@
-package gg.nurmi.chat;
+package gg.nurmi.message;
 
 import gg.nurmi.CanvasSuitePlugin;
 import gg.nurmi.guild.Guild;
@@ -13,11 +13,6 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 
-/**
- * Renders every chat message through MiniMessage + MiniPlaceholders. Untrusted player-typed text
- * is inserted as a plain Component (never reparsed as MiniMessage) unless the sender holds
- * canvassuite.chat.format, so players can't inject <click>/<hover>/color tags into chat.
- */
 public final class ChatFormatListener implements Listener {
 
     private final CanvasSuitePlugin plugin;
@@ -38,8 +33,6 @@ public final class ChatFormatListener implements Listener {
         Component messageComponent = renderMessageContent(event, sender);
         String format = resolveFormat();
 
-        // AsyncChatEvent runs off the region thread specifically so plugins can do blocking work
-        // like this DB lookup; safe here in a way it would not be on a region/entity thread.
         Guild guild = plugin.guilds().getGuildByMember(sender.getUniqueId()).join().orElse(null);
         Component guildSegment = buildGuildSegment(sender, guild);
 

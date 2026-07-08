@@ -1,5 +1,6 @@
 package gg.nurmi.message;
 
+import gg.nurmi.config.ConfigMigrator;
 import io.github.miniplaceholders.api.MiniPlaceholders;
 import io.github.miniplaceholders.api.types.RelationalAudience;
 import net.kyori.adventure.audience.Audience;
@@ -17,11 +18,6 @@ import java.io.InputStreamReader;
 import java.io.Reader;
 import java.nio.charset.StandardCharsets;
 
-/**
- * Renders every player-facing string in the plugin. All templates live in messages.yml as
- * MiniMessage and are resolved with MiniPlaceholders (global + audience, or relational for
- * two-party messages) plus whatever call-specific TagResolvers a module supplies.
- */
 public final class MessageService {
 
     private final Plugin plugin;
@@ -35,10 +31,8 @@ public final class MessageService {
     }
 
     public void reload() {
+        ConfigMigrator.migrate(plugin, "messages.yml");
         File file = new File(plugin.getDataFolder(), "messages.yml");
-        if (!file.exists()) {
-            plugin.saveResource("messages.yml", false);
-        }
         this.messages = YamlConfiguration.loadConfiguration(file);
 
         try (Reader defaultReader = new InputStreamReader(plugin.getResource("messages.yml"), StandardCharsets.UTF_8)) {
@@ -58,7 +52,6 @@ public final class MessageService {
         return TagResolver.resolver("prefix", Tag.inserting(prefixComponent));
     }
 
-    /** Renders a message for a single audience (player or console), with MiniPlaceholders audience+global tags. */
     public Component render(Pointered audience, String path, TagResolver... extra) {
         TagResolver resolver = TagResolver.resolver(
                 prefixResolver(),
@@ -68,7 +61,6 @@ public final class MessageService {
         return miniMessage.deserialize(raw(path), audience, resolver);
     }
 
-    /** Renders a message describing a relationship between two audiences (e.g. "X invited you"). */
     public Component renderRelational(Audience viewer, Audience other, String path, TagResolver... extra) {
         RelationalAudience<Audience> relational = RelationalAudience.from(viewer, other);
         TagResolver resolver = TagResolver.resolver(
@@ -79,7 +71,6 @@ public final class MessageService {
         return miniMessage.deserialize(raw(path), relational, resolver);
     }
 
-    /** Renders a raw (non-messages.yml) MiniMessage template with relational MiniPlaceholders — used for chat formats. */
     public Component renderRelationalRaw(Audience viewer, Audience other, String rawTemplate, TagResolver... extra) {
         RelationalAudience<Audience> relational = RelationalAudience.from(viewer, other);
         TagResolver resolver = TagResolver.resolver(MiniPlaceholders.relationalGlobalPlaceholders(), TagResolver.resolver(extra));
@@ -103,7 +94,6 @@ public final class MessageService {
         return miniMessage.deserialize(rawInput, audience, TagResolver.resolver(resolvers));
     }
 
-    /** Escapes any MiniMessage tags in untrusted input (chat messages) so players can't inject formatting/click/hover. */
     public String escape(String untrusted) {
         return miniMessage.escapeTags(untrusted);
     }

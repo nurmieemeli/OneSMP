@@ -42,7 +42,7 @@ public final class WorldDetailGui extends AbstractGui {
                 World world = Bukkit.getWorld(worldName);
                 if (world != null) {
                     player.closeInventory();
-                    plugin.teleportExecutor().executeSafely(player, world.getSpawnLocation(), true);
+                    plugin.teleportExecutor().executeSafely(player, world.getSpawnLocation());
                 }
             }
         });

@@ -21,6 +21,7 @@ import gg.nurmi.CanvasSuitePlugin;
 import gg.nurmi.guild.Guild;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.TextColor;
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -35,51 +36,10 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.logging.Level;
 
-/**
- * Overhead nametags, entirely packet-driven (no real Bukkit Scoreboard/Team or entity is ever
- * registered):
- * <ul>
- *   <li>Line 1 (the prefix in front of the player's real name) is a per-player scoreboard team
- *   packet, same as before.</li>
- *   <li>Line 2 (the guild tag, only present while the player is in a guild) is a fake TEXT_DISPLAY
- *   entity mounted as a passenger of the player - the same technique plugins like
- *   <a href="https://github.com/alexdev03/UnlimitedNametags">UnlimitedNametags</a> use, since
- *   vanilla team prefixes/suffixes can only add text to the *same* line as a player's name, never
- *   a second stacked line. Riding as a passenger means the client keeps it positioned correctly on
- *   its own with zero ongoing position-packet traffic.</li>
- * </ul>
- *
- * <p><b>Why the mount kept appearing to "fail" for other viewers:</b> {@code SetPassengers}
- * replaces an entity's <i>entire</i> passenger list rather than adding to it, and the real server
- * sends its own {@code SetPassengers} packet for the subject whenever they become newly visible to
- * a viewer (ordinary entity-tracking, e.g. on join) - reflecting the subject's real (empty, since
- * our fake entity was never a real passenger) passenger list. That packet can race ours and
- * silently clear the mount right after we set it. Continuously re-teleporting the entity's
- * position works around this but is expensive; instead, {@link #reassertMounts()} periodically
- * re-sends just the (tiny) mount packet to win back any mount vanilla cleared - a fraction of the
- * cost of tracking position, since the client still does the actual per-frame following for free
- * once the mount sticks.</p>
- *
- * <p>There's no LuckPerms hook available here (prefixes are resolved purely through the
- * MiniPlaceholders-LuckPerms expansion, never the LuckPerms API directly), so permission-group
- * changes can only be picked up by periodically re-rendering every online player's prefix — see
- * {@link #refreshAll()}, wired to a repeating task. The same refresh cycle also re-checks guild
- * membership.</p>
- */
 public final class NametagManager {
 
     private final CanvasSuitePlugin plugin;
     private final Map<UUID, Component> lastSent = new ConcurrentHashMap<>();
-    /**
-     * Entity id + display UUID + last-rendered tag + the world it was last spawned into, for a
-     * player's guild-tag entity, kept as one unit so readers (handleJoin, reassertMounts) always
-     * see a consistent state - splitting these across separate maps let a viewer be introduced to
-     * an entity id that a concurrent handleQuit/handleWorldChange had already destroyed. The world
-     * is tracked so the periodic refresh cycle (applyGuildTag) can self-heal a world change even if
-     * handleWorldChange's own dedicated, immediate respawn didn't stick for whatever reason -
-     * without it, "same tag text as before" alone would wrongly look like nothing needs to be
-     * resent, even though the entity was actually left behind in the old world.
-     */
     private record GuildTagState(int entityId, UUID displayUuid, Component tag, String world) {}
 
     private final Map<UUID, GuildTagState> guildTagState = new ConcurrentHashMap<>();
@@ -105,7 +65,6 @@ public final class NametagManager {
 
             GuildTagState state = guildTagState.get(other.getUniqueId());
             if (state != null) {
-                // Reading another player's live location/entity id must happen on their own entity thread.
                 plugin.scheduler().runAtEntity(other,
                         () -> introduceGuildTagEntity(joined, state.entityId(), state.displayUuid(), other.getLocation(),
                                 other.getEntityId(), state.tag()),
@@ -132,12 +91,6 @@ public final class NametagManager {
         }
     }
 
-    /**
-     * A world change fully destroys and recreates the real player entity client-side for viewers
-     * (a different world is effectively a different set of regions/viewers entirely) - our fake
-     * entity is never told about that, so it's left behind in the old world. Destroy it and spawn
-     * a fresh one (new entity ID/UUID, same as any other respawn) at the player's new location.
-     */
     public void handleWorldChange(Player player) {
         if (!plugin.packetEvents().available()) {
             return;
@@ -148,10 +101,6 @@ public final class NametagManager {
             return;
         }
 
-        // Destroying the old entity and swapping in the new one both happen inside the hop, so if
-        // the entity retires before this task runs (ifRetired, a no-op) the map is left untouched -
-        // still pointing at the old (never-destroyed) entity - instead of a stale id for one we'd
-        // already told every viewer to scrap.
         plugin.scheduler().runAtEntity(player, () -> {
             destroyGuildTagEntity(old.entityId());
             int newId = fakeEntityIdCounter.decrementAndGet();
@@ -160,15 +109,10 @@ public final class NametagManager {
             guildTagState.put(uuid, new GuildTagState(newId, displayUuid, old.tag(), location.getWorld().getName()));
             spawnGuildTagEntity(newId, displayUuid, player, location, old.tag());
 
-            // Every viewer in the new world experiences this as a fresh "entity became visible"
-            // tracking event for the player, so vanilla's own SetPassengers (see class doc) races
-            // ours far more reliably here than during ordinary play. Win that race deterministically
-            // with a quick follow-up instead of waiting for the next periodic reassertMounts() tick.
             plugin.scheduler().runAtEntityDelayed(player, () -> sendMount(player, newId), () -> {}, 5L);
         }, () -> {});
     }
 
-    /** Re-renders one player's prefix/guild tag and broadcasts either only if actually changed since last sent. */
     public void refresh(Player player) {
         if (!plugin.packetEvents().available()) {
             return;
@@ -186,9 +130,6 @@ public final class NametagManager {
 
             plugin.guilds().getGuildByMember(player.getUniqueId()).thenAccept(optionalGuild -> {
                 String tag = optionalGuild.map(Guild::tag).orElse(null);
-                // Re-hop rather than trust a Location captured before this async guild lookup
-                // started - by the time it completes the player may have changed worlds, and
-                // applyGuildTag needs their *current* world to notice that.
                 plugin.scheduler().runAtEntity(player, () -> applyGuildTag(player, tag), () -> {});
             });
         }, () -> {});
@@ -203,12 +144,6 @@ public final class NametagManager {
         }
     }
 
-    /**
-     * Re-sends just the (tiny) mount packet for every active guild-tag entity, to win back any
-     * mount the real server's own entity-tracking silently cleared - see the class doc for why
-     * that happens. Meant to run on a low-frequency repeating task (a couple of times a minute is
-     * plenty); this is not a position sync, so it costs nothing proportional to player movement.
-     */
     public void reassertMounts() {
         if (!plugin.packetEvents().available() || guildTagState.isEmpty()) {
             return;
@@ -220,11 +155,6 @@ public final class NametagManager {
                     sendMount(owner, entry.getValue().entityId());
                 }
             } catch (Exception ex) {
-                // One bad entry must not take down this whole repeating task: Folia's fixed-rate
-                // global scheduler does not reschedule a task that threw, so an uncaught exception
-                // here would silently and permanently disable the only mechanism that wins guild-tag
-                // mounts back from vanilla's own entity-tracking (see class doc) for every player,
-                // for the rest of the server's uptime - not just the one entry that failed.
                 plugin.getLogger().log(Level.WARNING, "Failed to reassert guild-tag mount for " + entry.getKey(), ex);
             }
         }
@@ -255,10 +185,6 @@ public final class NametagManager {
 
         GuildTagState existing = guildTagState.get(uuid);
         if (existing == null || !existing.world().equals(currentWorld)) {
-            // No entity yet, OR the one we think is alive was actually left behind in a different
-            // world - e.g. handleWorldChange's own dedicated respawn didn't stick. Respawn fresh
-            // rather than trusting a stale reference no client in this world has ever seen; this is
-            // what makes recovery self-healing within one refresh cycle even if that fast path fails.
             if (existing != null) {
                 destroyGuildTagEntity(existing.entityId());
             }
@@ -288,7 +214,6 @@ public final class NametagManager {
         }
     }
 
-    /** Spawns+mounts the entity for a single newly-joined viewer, who has never seen it before. */
     private void introduceGuildTagEntity(Player viewer, int entityId, UUID displayUuid, Location location,
                                           int ownerEntityId, Component text) {
         PlayerManager playerManager = PacketEvents.getAPI().getPlayerManager();
@@ -303,16 +228,13 @@ public final class NametagManager {
                 EntityTypes.TEXT_DISPLAY, position, 0f, 0f, 0f, 0, Optional.empty());
     }
 
-    /** Index table per the vanilla Display/TextDisplay entity metadata layout - see Minecraft's protocol docs. */
     private List<EntityData<?>> buildMetadata(Component text) {
         List<EntityData<?>> list = new ArrayList<>();
-        list.add(new EntityData<>(5, EntityDataTypes.BOOLEAN, true)); // no gravity
-        // While riding, the passenger has no defined seat height (unlike a horse/boat) - this
-        // translation is the only thing controlling how far above the mount point it floats.
+        list.add(new EntityData<>(5, EntityDataTypes.BOOLEAN, true));
         float yOffset = (float) plugin.getConfig().getDouble("nametag.guild-tag.y-offset", 0.55);
-        list.add(new EntityData<>(11, EntityDataTypes.VECTOR3F, new Vector3f(0f, yOffset, 0f))); // translation
-        list.add(new EntityData<>(15, EntityDataTypes.BYTE, (byte) 3)); // billboard: CENTER (always faces viewer)
-        list.add(new EntityData<>(23, EntityDataTypes.ADV_COMPONENT, text)); // text
+        list.add(new EntityData<>(11, EntityDataTypes.VECTOR3F, new Vector3f(0f, yOffset, 0f)));
+        list.add(new EntityData<>(15, EntityDataTypes.BYTE, (byte) 3));
+        list.add(new EntityData<>(23, EntityDataTypes.ADV_COMPONENT, text));
         return list;
     }
 
@@ -336,9 +258,24 @@ public final class NametagManager {
 
     private WrapperPlayServerTeams buildPacket(Player subject, Component prefix, TeamMode mode) {
         ScoreBoardTeamInfo info = new ScoreBoardTeamInfo(Component.empty(), prefix, Component.empty(),
-                NameTagVisibility.ALWAYS, CollisionRule.ALWAYS, NamedTextColor.WHITE, OptionData.NONE);
+                NameTagVisibility.ALWAYS, CollisionRule.ALWAYS, trailingColor(prefix, NamedTextColor.WHITE), OptionData.NONE);
         List<String> members = mode == TeamMode.CREATE ? List.of(subject.getName()) : List.of();
         return new WrapperPlayServerTeams(teamName(subject), mode, info, members);
+    }
+
+    /**
+     * The vanilla team system renders "prefix + real name + suffix", but the name portion is only
+     * ever colorable via this single legacy team color field - never full Component styling. To
+     * make a prefix's color still carry onto the name (matching how nesting Components normally
+     * cascades), this walks down the prefix's last child at each level to find whatever color
+     * would be "active" right after the prefix ends, the same as if the name were appended as a
+     * nested child instead of being a separate field.
+     */
+    private NamedTextColor trailingColor(Component component, NamedTextColor inherited) {
+        TextColor own = component.color();
+        NamedTextColor current = own != null ? NamedTextColor.nearestTo(own) : inherited;
+        List<Component> children = component.children();
+        return children.isEmpty() ? current : trailingColor(children.get(children.size() - 1), current);
     }
 
     private void sendPacketTo(Player viewer, WrapperPlayServerTeams packet) {
@@ -346,7 +283,6 @@ public final class NametagManager {
     }
 
     private String teamName(Player player) {
-        // Team name cap is only 16 chars pre-1.18; stay conservative for older clients.
         return "csnt_" + player.getUniqueId().toString().replace("-", "").substring(0, 11);
     }
 }

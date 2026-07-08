@@ -26,11 +26,6 @@ import java.util.function.Consumer;
 import java.util.logging.Level;
 import java.util.regex.Pattern;
 
-/**
- * Owns every world CanvasSuite has created: persists their generation settings to worlds.yml (its
- * own file, since this doesn't fit config.yml's per-feature-defaults shape), (re)loads them with
- * matching settings on every enable, and tracks in-progress admin creation sessions for the GUI.
- */
 public final class WorldManager {
 
     private static final Pattern NAME_PATTERN = Pattern.compile("^[A-Za-z0-9_-]{3,32}$");
@@ -43,7 +38,6 @@ public final class WorldManager {
         this.plugin = plugin;
     }
 
-    /** Reads worlds.yml and (re)loads every managed world with its persisted settings. Call once on enable. */
     public void loadWorlds() {
         load();
         if (managed.isEmpty()) {
@@ -67,7 +61,6 @@ public final class WorldManager {
         });
     }
 
-    /** Unloads the world and stops tracking it; the folder is left on disk unless {@code wipeFiles} is true. */
     public void deleteWorld(String name, boolean wipeFiles, Consumer<Boolean> onDone) {
         plugin.scheduler().runGlobal(() -> {
             World world = Bukkit.getWorld(name);
@@ -111,8 +104,6 @@ public final class WorldManager {
             world = creator.createWorld();
         }
         if (world != null) {
-            // Not WorldCreator fields - these are runtime World properties, reapplied every load
-            // so worlds.yml stays authoritative even if changed out-of-band (e.g. via /difficulty).
             world.setDifficulty(settings.difficulty());
             world.setPVP(settings.pvp());
         }
@@ -228,7 +219,9 @@ public final class WorldManager {
                     key,
                     parseEnvironment(section.getString("environment", "NORMAL")),
                     parseType(section.getString("type", "NORMAL")),
-                    "VOID".equalsIgnoreCase(section.getString("generator", "VANILLA")) ? GeneratorMode.VOID : GeneratorMode.VANILLA,
+                    "VOID".equalsIgnoreCase(section.getString("generator", "VANILLA"))
+                            ? GeneratorMode.VOID
+                            : GeneratorMode.VANILLA,
                     section.getLong("seed", 0L),
                     section.getBoolean("generate-structures", true),
                     section.getBoolean("hardcore", false),

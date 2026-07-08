@@ -48,7 +48,7 @@ public final class WarpCommand implements CommandExecutor {
                 plugin.messages().send(player, "teleport.warp-not-found", Placeholder.unparsed("name", name));
                 return;
             }
-            teleportExecutor.executeSafely(player, optionalWarp.get().toLocation(), true);
+            teleportExecutor.executeSafely(player, optionalWarp.get().toLocation());
         });
         return true;
     }

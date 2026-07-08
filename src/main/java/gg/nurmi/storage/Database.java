@@ -11,11 +11,6 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.logging.Level;
 
-/**
- * MySQL-first storage with an automatic local SQLite fallback if MySQL is configured
- * but unreachable at startup. All JDBC calls made through this class must happen off
- * a region thread (see SchedulerUtil#runAsync) since they block on I/O.
- */
 public final class Database {
 
     private final Plugin plugin;
@@ -80,8 +75,6 @@ public final class Database {
 
         HikariConfig hikari = new HikariConfig();
         hikari.setJdbcUrl("jdbc:sqlite:" + file.getAbsolutePath());
-        // SQLite only tolerates a single writer at a time; keep the pool at 1 to avoid
-        // "database is locked" errors from concurrent region-thread async calls.
         hikari.setMaximumPoolSize(1);
         hikari.setPoolName("CanvasSuite-SQLite");
         this.dataSource = new HikariDataSource(hikari);

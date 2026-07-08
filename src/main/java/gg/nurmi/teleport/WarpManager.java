@@ -33,9 +33,15 @@ public final class WarpManager {
                 try (ResultSet resultSet = statement.executeQuery()) {
                     while (resultSet.next()) {
                         warps.add(new Warp(
-                                resultSet.getString("name"), resultSet.getString("world"),
-                                resultSet.getDouble("x"), resultSet.getDouble("y"), resultSet.getDouble("z"),
-                                resultSet.getFloat("yaw"), resultSet.getFloat("pitch"), resultSet.getString("created_by")));
+                                resultSet.getString("name"),
+                                resultSet.getString("world"),
+                                resultSet.getDouble("x"),
+                                resultSet.getDouble("y"),
+                                resultSet.getDouble("z"),
+                                resultSet.getFloat("yaw"),
+                                resultSet.getFloat("pitch"),
+                                resultSet.getString("created_by")
+                        ));
                     }
                 }
             } catch (SQLException ex) {

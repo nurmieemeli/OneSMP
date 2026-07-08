@@ -43,7 +43,6 @@ public final class HomeManager {
             try {
                 limit = Math.max(limit, Integer.parseInt(info.getPermission().substring(prefix.length())));
             } catch (NumberFormatException ignored) {
-                // not a numeric limit node, skip
             }
         }
         return limit;

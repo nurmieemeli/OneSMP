@@ -18,12 +18,6 @@ import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Level;
 
-/**
- * Core of the private messaging system: online players' ignore lists live in an in-memory cache
- * (populated on join, dropped on quit) write-through persisted to the database, mirroring how
- * EconomyManager caches balances. lastConversant and the anti-spam cooldown are purely in-memory
- * (ephemeral, like TpaManager's pending requests) since they're just runtime conveniences.
- */
 public final class PrivateMessageManager {
 
     private final CanvasSuitePlugin plugin;
@@ -66,7 +60,6 @@ public final class PrivateMessageManager {
         return ignored != null && ignored.contains(target);
     }
 
-    /** Toggles {@code owner}'s ignore status for {@code target}; returns the new state (true = now ignoring). */
     public boolean toggleIgnore(UUID owner, UUID target) {
         Set<UUID> ignored = ignoreCache.computeIfAbsent(owner, id -> ConcurrentHashMap.newKeySet());
         boolean nowIgnoring = ignored.add(target);
@@ -97,7 +90,6 @@ public final class PrivateMessageManager {
         return lastConversant.get(uuid);
     }
 
-    /** Validates, delivers, and records a private message; sends its own feedback to the sender on failure. */
     public void sendMessage(Player sender, Player target, String rawMessage) {
         if (sender.getUniqueId().equals(target.getUniqueId())) {
             plugin.messages().send(sender, "msg.self");
@@ -116,8 +108,6 @@ public final class PrivateMessageManager {
             return;
         }
 
-        // Same injection-safety rule as public chat: untrusted text stays plain unless the sender
-        // holds canvassuite.chat.format, so players can't inject <click>/<hover>/color tags via DM.
         Component messageComponent = sender.hasPermission("canvassuite.chat.format")
                 ? plugin.messages().parse(rawMessage)
                 : Component.text(rawMessage);

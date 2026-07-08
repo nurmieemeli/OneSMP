@@ -33,7 +33,7 @@ public final class WarpsGui extends AbstractGui {
                     .build();
             setButton(slot++, icon, event -> {
                 if (event.getWhoClicked() instanceof Player player) {
-                    teleportExecutor.executeSafely(player, warp.toLocation(), true);
+                    teleportExecutor.executeSafely(player, warp.toLocation());
                 }
             });
         }

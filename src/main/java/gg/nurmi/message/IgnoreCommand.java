@@ -35,7 +35,6 @@ public final class IgnoreCommand implements CommandExecutor {
         }
 
         Player online = Bukkit.getPlayerExact(args[0]);
-        // Non-blocking: only resolves players CanvasSuite already knows about, never a Mojang lookup.
         OfflinePlayer target = online != null ? online : Bukkit.getOfflinePlayerIfCached(args[0]);
         if (target == null) {
             plugin.messages().send(player, "general.player-not-found", Placeholder.unparsed("target", args[0]));
