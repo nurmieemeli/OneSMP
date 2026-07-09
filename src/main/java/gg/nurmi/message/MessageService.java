@@ -58,8 +58,7 @@ public final class MessageService {
         return renderRaw(audience, raw(path), extra);
     }
 
-    // For MiniMessage templates authored outside messages.yml (e.g. another module's own config file)
-    // that still want the shared <prefix>/MiniPlaceholders resolution.
+    // For MiniMessage templates from outside messages.yml that still want the shared <prefix>/MiniPlaceholders resolution.
     public Component renderRaw(Pointered audience, String template, TagResolver... extra) {
         TagResolver resolver = TagResolver.resolver(
                 prefixResolver(),

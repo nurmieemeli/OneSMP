@@ -1,8 +1,6 @@
 package gg.nurmi.world;
 
-// Bukkit treats a WorldCreator name containing '/' as a nested path relative to the world container, and
-// uses that same string as the world's identifier (Bukkit.getWorld(name)) - so a configurable container
-// prefix just needs to be folded into the name consistently everywhere a world is created or looked up.
+// Bukkit treats a '/'-containing WorldCreator name as both a nested path and the world's identifier, so a container prefix just needs folding into the name consistently.
 public final class WorldPaths {
 
     private WorldPaths() {}

@@ -13,8 +13,7 @@ import org.bukkit.entity.Player;
 
 import java.util.List;
 
-// The player-facing search prompt, built with Paper's native Dialog API
-// (https://docs.papermc.io/paper/dev/dialogs/) instead of a chat- or anvil-based text-input workaround.
+// The search prompt, built with Paper's Dialog API (https://docs.papermc.io/paper/dev/dialogs/) instead of a chat/anvil text-input workaround.
 public final class MarketSearchDialog {
 
     private static final String QUERY_KEY = "query";

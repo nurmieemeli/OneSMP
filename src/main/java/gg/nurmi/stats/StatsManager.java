@@ -312,8 +312,7 @@ public final class StatsManager {
     private record KillsDeaths(UUID uuid, String name, int kills, int deaths) {
     }
 
-    // Ratio isn't a stored column, so this pulls every kill-having player's raw counts and sorts in Java
-    // rather than trying to express the ratio portably across SQLite and MySQL.
+    // Ratio isn't a stored column, so this pulls raw kill/death counts and sorts in Java rather than expressing it portably across SQLite and MySQL.
     private CompletableFuture<List<TopEntry>> topKd(int limit) {
         return plugin.scheduler().supplyAsync(() -> {
             List<KillsDeaths> rows = new ArrayList<>();

@@ -14,9 +14,7 @@ import org.bukkit.entity.Player;
 
 import java.util.List;
 
-// Category -> article navigation built entirely with Paper's Dialog API
-// (https://docs.papermc.io/paper/dev/dialogs/) - each button's click callback runs server-side and swaps
-// in the next dialog, so the whole nested menu never touches an inventory GUI or chat.
+// Category -> article navigation via Paper's Dialog API (https://docs.papermc.io/paper/dev/dialogs/); each click swaps in the next dialog server-side.
 public final class HelpDialogs {
 
     private static final int COLUMNS = 2;

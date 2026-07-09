@@ -7,11 +7,7 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.AsyncPlayerPreLoginEvent;
 
-// Bukkit presets AsyncPlayerPreLoginEvent's result to KICK_WHITELIST before any listener runs if the
-// server's whitelist is enabled and the connecting UUID isn't whitelisted/op - this only needs to grant
-// bypass holders an exception and swap in our own kick message. Rejecting here (rather than at
-// PlayerLoginEvent) turns away maintenance-blocked connections off the main thread, before a Player object
-// is ever constructed for them.
+// Bukkit already presets KICK_WHITELIST here if the whitelist is on and the UUID isn't allowed; this just grants bypass holders an exception and swaps in our own kick message, before a Player object is even constructed.
 public final class MaintenanceListener implements Listener {
 
     private final OneSMPPlugin plugin;

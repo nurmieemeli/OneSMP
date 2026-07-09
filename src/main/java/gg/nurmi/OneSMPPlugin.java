@@ -162,8 +162,7 @@ public final class OneSMPPlugin extends JavaPlugin {
         Objects.requireNonNull(getCommand("onesmp")).setExecutor(new OneSMPCommand(this));
     }
 
-    // aliases.yml is intentionally excluded - its command aliases are registered into Bukkit's
-    // command map once at enable and can't be cleanly re-registered at runtime.
+    // aliases.yml is excluded - its aliases are registered into Bukkit's command map once at enable and can't be re-registered at runtime.
     public void reloadAll() {
         ConfigMigrator.migrate(this, "config.yml", Set.of("rtp.worlds"));
         reloadConfig();

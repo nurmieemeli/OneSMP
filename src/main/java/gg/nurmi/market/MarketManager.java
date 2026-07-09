@@ -210,8 +210,7 @@ public final class MarketManager {
         });
     }
 
-    // Atomically claims a listing so a concurrent buy/cancel can't act on the same row twice - only the
-    // caller whose DELETE actually removes a row proceeds with paying out/returning the item.
+    // Atomically claims a listing via DELETE + affected-row check, so a concurrent buy/cancel can't act on the same row twice.
     private CompletableFuture<Boolean> claim(int listingId) {
         return plugin.scheduler().supplyAsync(() -> {
             try (Connection connection = database.getConnection();

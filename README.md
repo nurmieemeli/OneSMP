@@ -9,22 +9,21 @@
   <img alt="Build with Maven" src="https://img.shields.io/badge/build-Maven-818cf8?style=for-the-badge&logo=apachemaven&logoColor=white">
 </p>
 
+<p align="center"><b>Seek no more, you've found it.</b></p>
+
 <p align="center">
-<b>Seek no more, you've found it.</b>
+A single-jar SMP plugin for <a href="https://forums.papermc.io/forums/folia.107/">Folia</a> servers: economy, a player-to-player market, an admin shop, crates, teleportation (homes/warps/TPA/RTP), guilds, world creation, a void spawn world, chat formatting, nametags/tablist/scoreboard, player stats with leaderboard holograms, moderator tools, private messaging, and native-dialog help articles — built entirely against Folia's region/entity schedulers, with chest GUIs and Paper dialogs wherever they make sense.
 </p>
 
 <p align="center">
-An all-in-one SMP plugin for <a href="https://forums.papermc.io/forums/folia.107/">Folia</a> servers — economy, shops, crates, teleportation, random teleport, guilds, chat formatting, world creation, a void spawn world, moderator tools, private messaging, packet-driven nametags/tablist, a sidebar scoreboard, player stats with leaderboard holograms, and world protection, all in a single jar with a chest-GUI front end wherever one makes sense.
-</p>
-
-<p align="center">
-  <a href="#-features">Features</a> •
-  <a href="#-commands">Commands</a> •
-  <a href="#-permissions">Permissions</a> •
-  <a href="#-configuration">Configuration</a> •
-  <a href="#-installation">Installation</a> •
-  <a href="#-building-from-source">Building</a> •
-  <a href="#-notes--limitations">Notes & Limitations</a>
+  <a href="#requirements">Requirements</a> •
+  <a href="#features">Features</a> •
+  <a href="#commands">Commands</a> •
+  <a href="#permissions">Permissions</a> •
+  <a href="#configuration">Configuration</a> •
+  <a href="#installation">Installation</a> •
+  <a href="#building-from-source">Building</a> •
+  <a href="#notes--limitations">Notes & Limitations</a>
 </p>
 
 ---
@@ -35,147 +34,83 @@ An all-in-one SMP plugin for <a href="https://forums.papermc.io/forums/folia.107
 |---|---|---|
 | Folia 1.21.8+ | ✅ | Or a Folia-based fork (e.g. CanvasMC) on an equivalent version |
 | Java 25 | ✅ | |
-| [MiniPlaceholders](https://modrinth.com/plugin/miniplaceholders) | ✅ | Hard dependency — the plugin will not load without it |
-| [PacketEvents](https://www.spigotmc.org/resources/packetevents.80279/) | ➖ | Optional, installed as its own plugin — powers overhead nametags, moderator `/spectate`, and the tablist's reserved-slot filler. See [Notes & Limitations](#-notes--limitations) for what degrades without it |
-| [MiniPlaceholders-LuckPerms expansion](https://github.com/MiniPlaceholders/MiniPlaceholders) | ➖ | Optional — install alongside MiniPlaceholders if you want `<luckperms_prefix>`/`<luckperms_suffix>` to resolve in chat, nametags, and the scoreboard |
-| [LuckPerms](https://luckperms.net/) | ➖ | Optional, soft-depended directly (not just through MiniPlaceholders) — used to sort the tablist by each player's effective group weight, highest first |
-| [Vault](https://www.spigotmc.org/resources/vault.34315/) | ➖ | Optional — if present, OneSMP registers itself as the Vault economy provider so other plugins can use its currency |
-| [FancyHolograms](https://modrinth.com/plugin/fancyholograms) | ➖ | Optional, soft-depended — powers `/statshologram` leaderboard holograms and the name hologram `/crate create` drops above a bound crate. Both degrade gracefully (a clear message / silent skip) if it's not installed |
-| MySQL server | ➖ | Optional — falls back to a local SQLite file automatically |
+| [MiniPlaceholders](https://modrinth.com/plugin/miniplaceholders) | ✅ | Hard dependency — the plugin won't load without it |
+| [PacketEvents](https://www.spigotmc.org/resources/packetevents.80279/) | Optional | Powers overhead nametags, `/spectate`, and the tablist's reserved-slot filler |
+| [LuckPerms](https://luckperms.net/) | Optional | Sorts the tablist by each player's effective group weight |
+| [MiniPlaceholders-LuckPerms expansion](https://github.com/MiniPlaceholders/MiniPlaceholders) | Optional | Resolves `<luckperms_prefix>`/`<luckperms_suffix>` in chat, nametags, and the scoreboard |
+| [Vault](https://www.spigotmc.org/resources/vault.34315/) | Optional | If present, OneSMP registers itself as the Vault economy provider |
+| [FancyHolograms](https://modrinth.com/plugin/fancyholograms) | Optional | Powers `/statshologram` and the name hologram above a bound crate |
+| MySQL server | Optional | Falls back to a local SQLite file automatically |
 
-All player-facing text is rendered with [Adventure MiniMessage](https://docs.advntr.dev/minimessage/format.html) and supports [MiniPlaceholders](https://github.com/MiniPlaceholders/MiniPlaceholders) tags (global, audience, and relational placeholders) in every configurable message and chat format.
+Every optional dependency degrades gracefully when missing — see [Notes & Limitations](#notes--limitations). All player-facing text renders through [Adventure MiniMessage](https://docs.advntr.dev/minimessage/format.html) with [MiniPlaceholders](https://github.com/MiniPlaceholders/MiniPlaceholders) support (global, audience, and relational placeholders).
 
-## ✨ Features
+## Features
 
-### 💰 Economy
-- Vault-compatible currency with configurable symbol/name, starting balance, and a max-balance cap.
-- `/balance`, `/pay`, `/baltop` (paginated GUI), and admin-only `/eco give|take|set`.
-- Automatically registers as the server's Vault economy provider when Vault is installed, so any other Vault-aware plugin can use OneSMP's currency without extra setup.
+### Economy
+Vault-compatible currency with a configurable symbol/name, starting balance, and max-balance cap. `/balance`, `/pay`, `/baltop` (paginated GUI), and admin-only `/eco give|take|set`. Registers as the server's Vault economy provider automatically when Vault is installed.
 
-### 🛒 Shop
-- `/sell` opens an empty inventory to drop items into; it shows a running sell value as you fill it and pays out on confirm.
-- Per-item sell prices live in `shop.yml`; a global `shop.sell-price-multiplier` in `config.yml` scales every sell price at once (e.g. `0.75` = sell for 75% of list price).
-- Overflow-safe: closing `/sell` with unsold items in it drops any that don't fit back in your inventory.
+### Market
+A player-to-player marketplace backed by the database, so listings survive restarts and sell while the seller is offline. `/market sell <price>` lists the item in your hand for a set total price; `/market` opens a paginated GUI of active listings to buy from. `/market search <query>` filters that GUI — run it with no query, or click the compass button in the browse GUI, to search through a native Paper [dialog](https://docs.papermc.io/paper/dev/dialogs/) text prompt instead of typing the query as a command argument. `/market mine` lists your own active listings, cancellable to reclaim the item. `market.max-listings-per-player` in `config.yml` caps how many listings one player can have active. Overflow-safe throughout: if a buyer's or canceller's inventory is full, the item drops at their feet instead of being lost.
 
-### 🏪 Market
-- Player-to-player marketplace, backed by the database so listings survive restarts and sell while the seller is offline.
-- `/market sell <price>` lists the item in your hand for a set total price; `/market` opens a paginated GUI of active listings — click one to buy it instantly.
-- `/market search <query>` filters that GUI to listings whose item name matches. Run it with no query (or click the compass in the browse GUI) to search via a native Paper [dialog](https://docs.papermc.io/paper/dev/dialogs/) text prompt instead of typing the query as a command argument.
-- `/market mine` shows your own active listings; click one to cancel it and reclaim the item.
-- `market.max-listings-per-player` in `config.yml` caps how many listings a single player can have active at once.
-- Overflow-safe: if a buyer's or canceller's inventory is full, the item drops at their feet instead of being lost.
+### Shop
+`/sell` opens an empty inventory to drop items into, showing a running payout as you fill it and paying out on confirm. Per-item prices live in `shop.yml`; `shop.sell-price-multiplier` in `config.yml` scales every price at once. Unsold items left in the menu when it's closed drop back into your inventory.
 
-### 🎁 Crates
-- Crate types (key appearance and a weighted reward pool of items/money/console commands) are defined entirely in `crates.yml`; each reward's reel/preview icon defaults to its first item (or a generic gold/star icon for money/command-only rewards) but can be overridden with `display-item`.
-- `/crate create <type>` binds the block an admin is looking at as a crate of that type; `/crate remove` unbinds it. A crate block otherwise behaves like any other block until it's bound.
-- `/crate key <type> <player> [amount]` gives an online player key items — ordinary items tagged with a hidden marker for that crate type, so they can't be duplicated by grabbing an item of the same material from elsewhere.
-- Right-clicking a bound crate block with a matching key consumes one key and rolls a weighted-random reward from that crate's pool, then opens a chest GUI with a slot-machine-style reel that spins through the crate's possible rewards before landing on the one already rolled; rewards can optionally broadcast the win to the whole server. The reward is granted the moment the reel stops (or immediately if the player closes the menu early) - the animation is purely cosmetic and never re-rolls.
-- If [FancyHolograms](https://modrinth.com/plugin/fancyholograms) is installed, `/crate create` also drops a floating text hologram above the block showing that crate type's display name (removed again by `/crate remove`); skipped silently if FancyHolograms isn't installed.
-- Left-clicking a bound crate opens a read-only preview GUI listing every reward in that crate's pool along with its exact drop chance, computed live from the configured weights - right-clicking is reserved for actually using a key.
+### Crates
+Crate types — key appearance and a weighted reward pool of items, money, and console commands — are defined entirely in `crates.yml`. `/crate create <type>` binds the block an admin is looking at; `/crate remove` unbinds it. `/crate key <type> <player> [amount]` gives key items tagged with a hidden marker for that crate type, so they can't be duplicated from an ordinary item of the same material. Right-clicking a bound crate with a matching key consumes it, rolls a weighted-random reward, and plays a slot-machine-style reel that always lands on the reward already rolled — purely cosmetic, and the reward is granted the moment the reel stops (or immediately if the menu is closed early). Left-clicking opens a read-only preview of every reward in the pool with its exact drop chance. With FancyHolograms installed, `/crate create` also drops a floating name hologram above the block, removed again by `/crate remove`.
 
-### 🏠 Teleportation
-- **Homes** — `/sethome [name]`, `/home [name]`, `/delhome <name>`. Multiple named homes with per-rank limits via permission nodes (`onesmp.home.limit.<n>`, or `onesmp.home.unlimited`). Running `/home` with no arguments opens a GUI of all your homes (click to teleport, shift-click to delete).
-- **Warps** — admin-defined server warps (`/setwarp`, `/delwarp`); `/warp` with no arguments opens a warp-browser GUI for everyone.
-- **TPA** — `/tpa <player>` and `/tpahere <player>` requests with clickable **[Accept]/[Deny]** buttons in chat, automatic expiry, `/tpaccept`, `/tpdeny`.
-- Configurable **teleport warmup** ("teleporting in 3s, don't move…") with cancel-on-move, applied consistently to homes, warps, and TPA.
+### Teleportation
+**Homes** — `/sethome [name]`, `/home [name]`, `/delhome <name>`, with per-rank limits via `onesmp.home.limit.<n>`/`onesmp.home.unlimited`. Running `/home` with no name opens a GUI of all your homes. **Warps** — admin-defined via `/setwarp`/`/delwarp`; `/warp` with no name opens a browser GUI. **TPA** — `/tpa <player>`/`/tpahere <player>` with clickable Accept/Deny buttons in chat, automatic expiry, `/tpaccept`/`/tpdeny`. All three share the same configurable teleport warmup, cancelled on movement.
 
-### 🌐 Spawn & Void World
-- A dedicated void world is created automatically on first enable (custom `ChunkGenerator`, no terrain, no bedrock/caves/structures/mobs) with a small starter platform so players never land in the void before an admin configures anything.
-- `/setspawn` (admin) sets the server spawn point; `/spawn` teleports there through the same warmup as homes/warps.
-- First-time joiners are teleported to spawn automatically.
-- Dying with no valid bed/respawn-anchor spawn sends the player back to spawn instead of the vanilla world spawn.
-- Inside the void world, non-creative players can't interact with any block except doors, can't trample farmland, and take no damage or food loss — creative-mode players bypass every restriction. Falling out of the world (real void damage, not a fixed Y check) teleports the player straight back to spawn.
+### Spawn & Void World
+A dedicated void world is created automatically on first enable — a custom `ChunkGenerator` with no terrain, bedrock, caves, structures, or mobs — with a small starter platform so nobody spawns into open air. `/setspawn` (admin) sets the server spawn point; `/spawn` teleports there through the same warmup as homes/warps. First-time joiners land there automatically, as does anyone who dies with no valid bed/anchor. Inside the void world, non-creative players can't break/place blocks (except doors), trample farmland, take damage, or lose food — falling out (real void damage, not a Y-check) teleports straight back to spawn.
 
-### 🌍 World Creation
-- `/world create <name> [seed]` opens a GUI to configure a brand-new world before creating it: environment (Overworld/Nether/End), world type (Normal/Flat/Large Biomes/Amplified), generator (vanilla or the same void generator spawn uses), seed (typed up front or rerolled live in the GUI), structure generation, hardcore, difficulty, and PvP — each a one-click toggle/cycle, with a Create/Cancel step.
-- `/world list` opens a paginated browser of every OneSMP-managed world; clicking one opens a detail view with teleport/delete actions.
-- `/world teleport <name>` (alias `tp`) teleports to a world's spawn, going through the same warmup path as `/spawn`.
-- `/world delete <name>` unloads the world and stops tracking it but **leaves the folder on disk** (recoverable); only `/world delete <name> wipe` permanently deletes the files — a deliberate extra step so a single misclick can't destroy a world.
-- Every managed world's settings persist in `worlds.yml` and are reapplied consistently on every restart, so a void world stays void as new chunks generate.
+### World Creation
+`/world create <name> [seed]` opens a GUI to configure a new world — environment, world type, generator (vanilla or the void generator spawn uses), seed, structures, hardcore, difficulty, PvP — before creating it. `/world list` browses every managed world with a detail/teleport/delete view; `/world teleport <name>` goes through the same warmup as `/spawn`. `/world delete <name>` unloads and stops tracking a world but leaves its folder on disk; only `/world delete <name> wipe` permanently deletes the files. Settings persist in `worlds.yml` and reapply identically on every restart.
 
-### 🎲 Random Teleport
-- `/rtp [world]` (aliases `/wild`, `/randomtp`) teleports you to a random safe spot within a configurable min/max radius. Running `/rtp` with no arguments opens a GUI listing every RTP-enabled world with its fee (or "Free").
-- Random teleport is opt-in per world with configurable cost per use.
-- A background precache keeps a small pool of already-verified safe locations per world, topped off only while the server's TPS can handle it, so `/rtp` usually finds a destination instantly instead of searching live.
-- Once a destination is found, the same teleport warmup used by homes/warps/TPA applies (`teleport.teleport-warmup-seconds`/`cancel-warmup-on-move` in `config.yml`) before you're actually moved.
-- A configurable cooldown applies per player; `onesmp.rtp.admin` bypasses it.
-- Configurable biome avoid-list (oceans, rivers, the void, etc.) so you never land somewhere unusable.
+### Random Teleport
+`/rtp [world]` teleports to a random safe spot within a configurable radius; with no world given it opens a GUI listing every RTP-enabled world and its fee. Enabled per world with a configurable cost, cooldown (bypassable via `onesmp.rtp.admin`), and biome avoid-list. A background precache keeps a small pool of pre-verified safe locations per world, topped off only while TPS allows, so `/rtp` usually resolves instantly instead of searching live.
 
-### 🛡️ Guilds
-- `/guild create <name> <tag>` (optional creation cost), `/guild disband`, `/guild invite`/`accept`, `/guild kick`, `/guild promote`/`demote` (Member/Officer/Owner roles), `/guild info`, `/guild list`, `/guild leave`.
-- `/guild sethome`/`/guild home` for a shared guild teleport point.
-- `/guild chat` toggles a guild-only chat channel; the guild tag renders on a genuine second nametag line in-world (see Nametags below).
-- `/guild gui` (or just `/guild` with no arguments) opens a full management GUI — members list, roles, invites, home, chat toggle — everything the commands do, click-driven.
-- Configurable name/tag length limits, member limit, and creation cost.
+### Guilds
+`/guild create <name> <tag>` (optional cost), `/guild disband`, `/guild invite`/`accept`, `/guild kick`, `/guild promote`/`demote` across Member/Officer/Owner roles, `/guild info`, `/guild list`, `/guild leave`, `/guild sethome`/`home`, and `/guild chat` for a guild-only channel. `/guild gui` (or bare `/guild`) opens a full management GUI covering everything the commands do. The guild tag renders on a genuine second nametag line in-world. Configurable name/tag length limits, member limit, and creation cost.
 
-### 💬 Chat Formatting
-- Every chat message is rendered through MiniMessage with full MiniPlaceholders support (e.g. `<player_name>`, plus relational placeholders between sender and each viewer).
-- One format for everyone, configurable in `config.yml`. `<player_name>` isn't reset/re-colored after `<luckperms_prefix>` by default, so a prefix that doesn't close its own color tag (e.g. `<red>[Admin] `) intentionally carries that color onto the name too — add your own `<reset>` before `<player_name>` if you don't want that.
-- `<guild_segment>` placeholder built in — renders to nothing for players with no guild, so there's never a stray empty `[]`.
-- **Injection-safe**: player-typed message content is inserted as plain text, so players can't smuggle `<click>`, `<hover>`, or color tags into chat — unless they hold `onesmp.chat.format`, which unlocks MiniMessage styling in their messages. The same rule applies to private messages.
-- **Join/leave messages** are MiniMessage/MiniPlaceholders templates too (`join-leave.join`/`join-leave.leave` in `messages.yml`), and can each be turned off independently via `join-leave.join-enabled`/`leave-enabled` in `config.yml` — disabled means no message at all, not just a blank one, replacing vanilla's default line either way.
+### Chat Formatting
+One MiniMessage-rendered chat format for everyone, with full MiniPlaceholders and relational placeholder support, configurable in `config.yml`. A built-in `<guild_segment>` placeholder renders to nothing for guildless players. Player-typed message content is always inserted as plain text — players can't smuggle click/hover/color tags into chat unless granted `onesmp.chat.format`, which applies to DMs too. Join/leave messages are MiniMessage templates, each independently toggleable (off means no message at all, not a blank one, replacing vanilla's line either way).
 
-### 🏷️ Nametags & Tablist
-- Overhead nametag prefixes (e.g. from `<luckperms_prefix>`) are sent as per-player scoreboard **team packets only** — no real Bukkit `Scoreboard`/`Team` is ever registered. Vanilla's team system only lets the player's own name be colored via a single legacy `NamedTextColor` field (never full Component styling), so that field is derived from whatever color is still "active" at the end of the rendered prefix, rather than hardcoded — a prefix that doesn't close its own color tag carries that color onto the name here too, same as the tablist and chat format.
-- Guild members get their guild tag on a genuine **second line** above their name — vanilla team prefixes/suffixes can only add text to the *same* line as a player's name, so this is rendered via an invisible `TEXT_DISPLAY` entity mounted as a passenger on the player, configurable via `nametag.guild-tag.format`/`y-offset`.
-- The tablist stays **full-size at all times**: unused slots are filled with blank filler entries instead of the grid shrinking to fit the online player count, each showing a gray placeholder skin (`tablist.reserved-slot-skin` in `config.yml` — a Mojang-signed texture/signature pair from [mineskin.org](https://mineskin.org), swappable for any other skin the same way).
-- Real players (sorted by LuckPerms group weight, highest first, then alphabetically within the same weight — weight is `0` for everyone if LuckPerms isn't installed, which just falls back to alphabetical) always occupy the grid starting from the top-left slot, reading left-to-right then wrapping to the next row, with filler entries pushed to fill whatever's left. Vanilla's own real-player tab entries don't reliably respond to a plugin's after-the-fact reordering, so this works by hiding them entirely and mirroring every online player's name/skin/ping/gamemode onto the plugin's own pre-allocated synthetic entries instead, the same technique the TAB plugin's "Layout" feature uses.
-- With more real players online than the grid has room for (more than 80, at the default `tablist.rows: 20`), the last slot becomes a `+N more players` summary (`tablist.overflow` in `messages.yml`) instead of individually mirroring one more player and leaving everyone past that shown natively and unbounded.
-- Each mirror's displayed name is rendered from `tablist.name-format` (`messages.yml`, defaults to `<luckperms_prefix><player_name>`) as a single MiniMessage parse rather than gluing a prefix Component and a plain name Component together, so a prefix that doesn't explicitly close its color/formatting tag carries through onto the name too instead of the name rendering as a separate, unstyled sibling.
-- Header/footer are configurable MiniMessage templates.
-- All of the above requires the PacketEvents plugin; without it, nametags/reserved-slot filling are silently disabled (tablist header/footer still work — they use native Paper API, not packets).
-- Prefixes/suffixes resolve purely through the MiniPlaceholders-LuckPerms expansion, so permission-group changes there are picked up on a periodic refresh, not instantly. The tablist's weight-based sorting is the one place OneSMP talks to the LuckPerms API directly (soft-depended, via `LuckPermsProvider`) — that's a live lookup on every join/quit, not cached.
+### Nametags & Tablist
+Overhead nametag prefixes are sent as per-player scoreboard team packets only — no real `Scoreboard`/`Team` is ever registered. Guild members additionally get their tag on a genuine second line via an invisible `TEXT_DISPLAY` entity mounted as a passenger, since vanilla team prefixes can't add a second line. The tablist stays full-size at all times: real players are mirrored (sorted by LuckPerms weight, then alphabetically) onto pre-allocated synthetic entries, with unused slots filled by a configurable placeholder skin instead of the grid shrinking — with more players online than the grid holds, the last slot becomes a "+N more" summary. Requires PacketEvents; without it, nametags and the reserved-slot filler are silently disabled while tablist header/footer (native Paper API) keep working.
 
-### 📈 Player Stats
-- Tracks kills, deaths, current & best killstreak, and playtime per player, persisted to the same storage backend as everything else.
-- `/stats [player]` — kills, deaths, K/D ratio, current & best killstreak, and playtime for yourself or another player (online or offline).
-- `/statstop <kills|deaths|killstreak|playtime>` opens a paginated leaderboard GUI for any of the four tracked stats.
-- Reaching a configurable killstreak milestone (`stats.killstreak-broadcast-milestones` in `config.yml`, default `5, 10, 25, 50, 100`) triggers a server-wide broadcast.
-- Playtime accrues live per session and is flushed to storage periodically (`stats.playtime-autosave-interval-seconds`) plus on quit and server shutdown, so a crash loses at most one autosave interval.
-- Exposed as MiniPlaceholders tags usable anywhere MiniMessage is rendered — chat, tablist, nametags, the scoreboard below: `<stats_kills>`, `<stats_deaths>`, `<stats_kd>`, `<stats_killstreak>`, `<stats_best_killstreak>`, `<stats_playtime>`.
+### Player Stats
+Tracks kills, deaths, current/best killstreak, and playtime per player. `/stats [player]` shows a summary for yourself or anyone else, online or offline; `/statstop <kills|deaths|killstreak|playtime|kd>` opens a paginated leaderboard GUI. Hitting a configurable killstreak milestone broadcasts server-wide. Playtime accrues live and flushes periodically, on quit, and on shutdown, so a crash loses at most one autosave interval. Exposed as MiniPlaceholders tags (`<stats_kills>`, `<stats_deaths>`, `<stats_kd>`, `<stats_killstreak>`, `<stats_best_killstreak>`, `<stats_playtime>`) usable anywhere.
 
-### 🏆 Leaderboard Holograms
-- Optional integration with [FancyHolograms](https://modrinth.com/plugin/fancyholograms): `/statshologram create <kills|deaths|killstreak|playtime> <name> [limit]` drops a text hologram at your current location that's periodically repopulated with the live leaderboard for that stat (`limit` caps how many entries show, default 10, max 45).
-- `/statshologram remove <name>` and `/statshologram list` manage existing leaderboard holograms.
-- FancyHolograms owns the hologram entity itself — its location and persistence across restarts are handled entirely by FancyHolograms' own storage; OneSMP only remembers which stat each hologram displays and refreshes its text on an interval (`hologram.refresh-interval-seconds`, default 30s).
-- Fully optional and soft-depended: if FancyHolograms isn't installed, `/statshologram` replies with a clear "not installed" message instead of erroring, and the rest of the plugin is unaffected.
+### Leaderboard Holograms
+With FancyHolograms installed, `/statshologram create <stat> <name> [limit]` drops a text hologram that's periodically repopulated with a live leaderboard for kills, deaths, killstreak, playtime, or K/D. `/statshologram remove`/`list` manage existing ones. FancyHolograms owns the hologram entity and its persistence; OneSMP only tracks which stat each one shows and refreshes its text on an interval. Without FancyHolograms, `/statshologram` replies with a clear "not installed" message instead of erroring.
 
-### 📊 Scoreboard
-- A fully MiniMessage/MiniPlaceholders-driven sidebar scoreboard, configurable title and lines, refreshed on an interval and rendered **relationally per viewer** (so relational placeholders resolve correctly for each viewer looking at each player).
-- Toggleable entirely via `scoreboard.enabled`.
-- In addition to MiniPlaceholders tags (`<player_name>`, `<luckperms_prefix>`, ...), three of OneSMP's own modules expose live per-viewer tags usable in any scoreboard line (or anywhere else MiniMessage is rendered): stats' `<stats_kills>`/`<stats_deaths>`/`<stats_kd>`/`<stats_killstreak>`/`<stats_best_killstreak>`/`<stats_playtime>` (see [Player Stats](#-player-stats) above), economy's `<economy_balance>`, and guilds' `<guild_own_name>`/`<guild_own_tag>` (render to a configurable `guild.no-guild-placeholder` string, default `"No Guild"`, for players not in a guild). These are deliberately separate from the `<guild_name>`/`<guild_tag>` placeholders used elsewhere for a *queried* guild (e.g. `/guild info <name>`), which refer to the guild being looked up rather than the viewer's own.
+### Scoreboard
+A MiniMessage/MiniPlaceholders-driven sidebar scoreboard with a configurable title and lines, refreshed on an interval and rendered relationally per viewer. Toggleable entirely via `scoreboard.enabled`.
 
-### 🕵️ Moderator Spectate
-- `/spectate <player>` toggles a packet-driven vanish + spectator view of the target for moderators — the target never sees the moderator, and the moderator can freely fly through blocks to observe.
-- Requires PacketEvents; refuses to run at all without it, rather than offering a false sense of invisibility.
+### Moderator Spectate
+`/spectate <player>` toggles a packet-driven vanish + spectator view of the target — the target never sees the moderator, who can fly through blocks to observe. Requires PacketEvents; refuses to run without it rather than offer a false sense of invisibility.
 
-### ❓ Help
-- `/help` opens a native Paper [dialog](https://docs.papermc.io/paper/dev/dialogs/) listing help categories; clicking one shows its articles, and clicking an article shows its content — all server-side, no inventory GUI or chat involved.
-- `/help <category>` and `/help <category> <article>` jump straight to a category or article without clicking through.
-- Categories and their articles (title, MiniMessage-formatted body, icon, description) are entirely defined in `help.yml`.
+### Help
+`/help` opens a native Paper [dialog](https://docs.papermc.io/paper/dev/dialogs/) listing categories; clicking one shows its articles, and clicking an article shows its content — server-side navigation, no inventory GUI or chat involved. `/help <category>` and `/help <category> <article>` jump straight in. Categories and articles (title, description, icon, MiniMessage body) are entirely defined in `help.yml`.
 
-### ✉️ Private Messaging
-- `/msg`/`/tell`/`/w`/`/pm`, `/reply`, `/ignore`, and `/socialspy` (mirrors everyone's DMs to whoever has it enabled).
-- Configurable cooldown between messages from the same sender.
+### Private Messaging
+`/msg`/`/tell`/`/w`/`/pm`, `/reply`, `/ignore`, and `/socialspy` (mirrors every DM to whoever has it enabled), with a configurable per-sender cooldown.
 
-### ✨ Feedback & Effects
-- Every command reply is automatically paired with a sound: messages.yml's own `<green>`/`<red>` color convention (success vs. denial/error) picks the sound, so this works for every command without per-command wiring.
-- Teleporting (`/home`, `/warp`, `/tpa`, `/rtp`, `/world teleport`, `/spawn`) plays a particle/sound burst at both the origin and destination.
-- Every chest-GUI menu (shop, sell, homes, warps, guild, world list, baltop, stats leaderboards, RTP world select, ...) plays a soft click on open.
-- Joining plays a short chime and particle burst for the joining player.
-- Each of the four categories above (and cosmetic effects as a whole) can be toggled independently under `effects` in `config.yml` - purely cosmetic, never affects whether an action actually succeeds.
+### Feedback & Effects
+Every command reply is automatically paired with a sound — `messages.yml`'s own `<green>`/`<red>` color convention picks success or denial, so this works for every command without per-command wiring. Teleporting plays a particle/sound burst at both ends; every chest-GUI menu plays a soft click on open; joining plays a short chime. Each category (and cosmetic effects as a whole) is independently toggleable under `effects` in `config.yml` — purely cosmetic, never affects whether an action succeeds.
 
-## 🕹️ Commands
+## Commands
 
 | Command | Description | Permission |
 |---|---|---|
-| `/onesmp reload` (`/cs`) | Reload `config.yml`, `messages.yml`, `shop.yml`, `crates.yml`, `help.yml`, and `subcommand-aliases.yml` without restarting | `onesmp.admin` |
+| `/onesmp reload` (`/cs`) | Reload `config.yml`, `messages.yml`, `shop.yml`, `crates.yml`, `help.yml`, `subcommand-aliases.yml` | `onesmp.admin` |
 | `/balance [player]` (`/bal`, `/money`) | Check a balance | `onesmp.economy.use` |
 | `/pay <player> <amount>` | Send money | `onesmp.economy.use` |
 | `/baltop` (`/bt`) | Rich-list GUI | `onesmp.economy.use` |
 | `/eco <give\|take\|set> <player> <amount>` | Admin economy control | `onesmp.economy.admin` |
 | `/sell` | Open the sell GUI | `onesmp.shop.sell` |
-| `/market [sell <price>\|search <query>\|mine\|cancel <id>]` | Browse, search, list, and cancel player market listings | `onesmp.market.use` |
+| `/market [sell <price>\|search <query>\|mine\|cancel <id>]` | Browse, search, list, and cancel market listings | `onesmp.market.use` |
 | `/crate <create\|remove\|key> ...` | Bind/unbind crate blocks, give keys (admin) | `onesmp.crate.admin` |
 | `/sethome [name]` / `/home [name]` (`/homes`) / `/delhome <name>` | Manage & use homes | `onesmp.home.use` |
 | `/setwarp <name>` / `/delwarp <name>` | Manage warps | `onesmp.warp.admin` |
@@ -183,7 +118,7 @@ All player-facing text is rendered with [Adventure MiniMessage](https://docs.adv
 | `/tpa <player>` / `/tpahere <player>` | Teleport requests | `onesmp.tpa.use` |
 | `/tpaccept` / `/tpdeny` | Answer a request | `onesmp.tpa.use` |
 | `/rtp [world]` (`/wild`, `/wilderness`, `/randomtp`) | Random teleport, or open the world-select GUI | `onesmp.rtp.use` |
-| `/guild <sub>` (`/g`, `/clan`, `/team`, `/faction`) | Guild management (`create`, `disband`, `invite`, `accept`, `kick`, `promote`, `demote`, `sethome`, `home`, `info`, `list`, `chat`, `leave`, `gui`) | `onesmp.guild.use` |
+| `/guild <sub>` (`/g`, `/clan`, `/team`, `/faction`) | Guild management (create/disband/invite/accept/kick/promote/demote/sethome/home/info/list/chat/leave/gui) | `onesmp.guild.use` |
 | `/setspawn` | Set the server spawn point | `onesmp.spawn.admin` |
 | `/spawn` | Teleport to spawn | `onesmp.spawn.use` |
 | `/world <create\|list\|delete\|teleport> ...` (`/worlds`) | Create and manage worlds | `onesmp.world.admin` |
@@ -192,14 +127,15 @@ All player-facing text is rendered with [Adventure MiniMessage](https://docs.adv
 | `/reply <message>` (`/r`) | Reply to your last DM | `onesmp.msg.use` |
 | `/ignore <player>` | Toggle ignoring a player's DMs | `onesmp.msg.use` |
 | `/socialspy` | Toggle mirroring all DMs to yourself | `onesmp.msg.socialspy` |
-| `/stats [player]` | View kill/death/killstreak/playtime stats | `onesmp.stats.use` |
-| `/statstop <kills\|deaths\|killstreak\|playtime>` | Leaderboard GUI for a stat | `onesmp.stats.use` |
+| `/stats [player]` | View kill/death/killstreak/playtime/K-D stats | `onesmp.stats.use` |
+| `/statstop <kills\|deaths\|killstreak\|playtime\|kd>` | Leaderboard GUI for a stat | `onesmp.stats.use` |
 | `/statshologram <create\|remove\|list> ...` | Manage leaderboard holograms (requires FancyHolograms) | `onesmp.stats.hologram.admin` |
 | `/help [category] [article]` | Browse help articles via a native dialog | `onesmp.help.use` |
+| `/maintenance <on\|off\|status>` | Toggle maintenance mode (backed by the server whitelist) | `onesmp.maintenance.admin` |
 
-Every command's *own* name always works no matter what's configured — the aliases above are just the shipped defaults, and both they and each command's **subcommand** aliases (e.g. `/world tp` for `/world teleport`) are fully editable via `aliases.yml`/`subcommand-aliases.yml`. `subcommand-aliases.yml` changes are picked up by `/onesmp reload`; `aliases.yml` still needs a restart, since those aliases are registered into Bukkit's command map once at enable — see [Configuration](#-configuration).
+Every command's own name always works regardless of configuration — the aliases above are just the shipped defaults. Both command aliases and per-subcommand aliases (e.g. `/world tp` for `/world teleport`) are editable via `aliases.yml`/`subcommand-aliases.yml`; `subcommand-aliases.yml` changes apply on `/onesmp reload`, while `aliases.yml` needs a restart since those aliases are registered into Bukkit's command map once at enable.
 
-## 🔐 Permissions
+## Permissions
 
 <details>
 <summary>Full permission node table</summary>
@@ -209,11 +145,11 @@ Every command's *own* name always works no matter what's configured — the alia
 | `onesmp.admin` | op | Grants every admin node below |
 | `onesmp.economy.use` / `.admin` | true / op | Economy commands / `/eco` |
 | `onesmp.shop.sell` | true | Sell menu access |
-| `onesmp.market.use` | true | Browse, search, list, and buy on the player market |
+| `onesmp.market.use` | true | Browse, search, list, and buy on the market |
 | `onesmp.crate.use` | true | Open a bound crate with a matching key |
 | `onesmp.crate.admin` | op | `/crate` (create/remove/key) |
 | `onesmp.home.use` | true | Homes |
-| `onesmp.home.limit.<n>` | — | Raises that player's home limit to `n` (default limit set in config) |
+| `onesmp.home.limit.<n>` | — | Raises that player's home limit to `n` |
 | `onesmp.home.unlimited` | false | No home limit |
 | `onesmp.warp.use` / `.admin` | true / op | Warp use / management |
 | `onesmp.tpa.use` | true | TPA |
@@ -223,6 +159,8 @@ Every command's *own* name always works no matter what's configured — the alia
 | `onesmp.spawn.use` / `.admin` | true / op | `/spawn` / `/setspawn` |
 | `onesmp.world.admin` | op | `/world` (create/list/delete/teleport) |
 | `onesmp.moderation.spectate` | op | `/spectate` |
+| `onesmp.maintenance.admin` | op | `/maintenance` |
+| `onesmp.maintenance.bypass` | op | Join during maintenance without being whitelisted |
 | `onesmp.msg.use` | true | Private messaging (`/msg`, `/reply`, `/ignore`) |
 | `onesmp.msg.socialspy` | op | `/socialspy` |
 | `onesmp.stats.use` | true | `/stats`, `/statstop` |
@@ -231,35 +169,35 @@ Every command's *own* name always works no matter what's configured — the alia
 
 </details>
 
-## ⚙️ Configuration
+## Configuration
 
 Six files are created in `plugins/OneSMP/` on first start, plus `worlds.yml` once you first use `/world create`:
 
-- **`config.yml`** — storage backend (MySQL credentials with automatic SQLite fallback), economy settings, teleport warmup/TPA timeouts, home limits, RTP radius/cooldown/per-world enable+fee/precache, guild rules/costs/no-guild placeholder string, chat format, join/leave message toggles, market listing cap, spawn/void-world settings, nametag/tablist/scoreboard settings, private-message cooldown, killstreak broadcast milestones/playtime autosave interval, leaderboard hologram refresh interval, and cosmetic sound/particle effect toggles.
-- **`messages.yml`** — every message the plugin sends, in MiniMessage. Change colors, add gradients, hover/click events, or MiniPlaceholders tags freely. The shared `<prefix>` is defined once at the top.
-- **`shop.yml`** — per-item `/sell` prices. Player market listings aren't configured here — they're created in-game via `/market sell` and stored in the database.
-- **`crates.yml`** — crate types: key appearance and a weighted reward pool of items/money/console commands per type.
-- **`help.yml`** — `/help` categories and their articles (title, description, icon, MiniMessage-formatted body).
-- **`aliases.yml`** — extra aliases for every command (e.g. `/bal` for `/balance`), applied at enable by registering the same command object under each configured alias in Bukkit's command map. Edit freely; a command's own name always works regardless of what's listed here. Changes take effect on the next restart.
-- **`subcommand-aliases.yml`** — extra aliases for individual subcommands of `/world`, `/guild`, and `/eco` (e.g. `/world tp` for `/world teleport`). Unlike `aliases.yml` these aren't real Bukkit commands, just extra labels checked in code; a subcommand's own name always works regardless of what's listed here. Changes take effect on the next restart.
-- **`worlds.yml`** — one entry per world created via `/world create`, storing its generator settings so they're reapplied identically on every restart. Managed entirely by the `/world` command — hand-editing isn't necessary. Not part of the auto-migration below since it has no bundled default to compare against.
+- **`config.yml`** — storage backend, economy, teleport warmup/TPA timeouts, home limits, RTP settings, guild rules, chat format, join/leave toggles, market listing cap, maintenance mode, spawn/void-world settings, nametag/tablist/scoreboard settings, private-message cooldown, stats/hologram intervals, and cosmetic effect toggles.
+- **`messages.yml`** — every message the plugin sends, in MiniMessage. The shared `<prefix>` is defined once at the top.
+- **`shop.yml`** — per-item `/sell` prices. Market listings aren't configured here — they're created in-game and stored in the database.
+- **`crates.yml`** — crate types: key appearance and a weighted reward pool per type.
+- **`help.yml`** — `/help` categories and their articles.
+- **`aliases.yml`** — extra command aliases, registered into Bukkit's command map at enable. Changes need a restart.
+- **`subcommand-aliases.yml`** — extra aliases for individual subcommands (e.g. `/world tp`). Not real Bukkit commands, just labels checked in code; picked up by `/onesmp reload`.
+- **`worlds.yml`** — one entry per `/world create`d world, storing its generator settings. Managed entirely by `/world` — no hand-editing needed.
 
-On every startup, each of the six files above (everything except `worlds.yml`) is checked against the version bundled in the plugin jar, and any option that's missing on disk (typically after upgrading to a version that added one) is added with its default value — existing settings are never touched. Since re-saving a YAML file with Bukkit's config API drops hand-written comments, this only re-saves a file when something was actually missing, and always leaves a `<file>.bak` copy of the pre-update version alongside it first.
+On every startup, each file above except `worlds.yml` is checked against the version bundled in the jar, and any option missing on disk is added with its default value — existing settings are never touched. Since re-saving a YAML file drops hand-written comments, this only re-saves when something was actually missing, and always leaves a `<file>.bak` copy of the pre-update version first.
 
 <details>
-<summary>Example chat format from <code>config.yml</code></summary>
+<summary>Example: chat format</summary>
 
 ```yaml
 chat:
   format: "<guild_segment><luckperms_prefix><player_name><dark_gray>:</dark_gray> <gray><message>"
 ```
 
-`<player_name>` isn't reset/re-colored after `<luckperms_prefix>` by default, so a prefix that doesn't close its own color tag (e.g. `<red>[Admin] `) carries that color onto the name too — add your own `<reset>` before `<player_name>` if you don't want that.
+`<player_name>` isn't reset/re-colored after `<luckperms_prefix>` by default, so a prefix that doesn't close its own color tag (e.g. `<red>[Admin] `) carries that color onto the name too — add your own `<reset>` before `<player_name>` if that's unwanted.
 
 </details>
 
 <details>
-<summary>Example per-world RTP config from <code>config.yml</code></summary>
+<summary>Example: per-world RTP settings</summary>
 
 ```yaml
 rtp:
@@ -275,7 +213,7 @@ rtp:
 </details>
 
 <details>
-<summary>Example guild-tag nametag config from <code>config.yml</code></summary>
+<summary>Example: guild-tag nametag</summary>
 
 ```yaml
 nametag:
@@ -286,18 +224,18 @@ nametag:
 
 </details>
 
-## 📦 Installation
+## Installation
 
-1. Build the plugin (see [Building from Source](#-building-from-source)) or grab a release jar, and drop it into `plugins/`.
-2. Install [MiniPlaceholders](https://modrinth.com/plugin/miniplaceholders) (required); optionally install PacketEvents (nametags/spectate/reserved-slot tablist), LuckPerms (tablist weight sorting) with the MiniPlaceholders-LuckPerms expansion (prefix/suffix placeholders), Vault, and FancyHolograms (leaderboard holograms).
-3. Start the server once to generate the default config files under `plugins/OneSMP/`, then edit `config.yml`/`messages.yml`/`shop.yml` to taste.
-4. Set `storage.type` to `MYSQL` in `config.yml` if you want a shared database instead of the default local SQLite file — see [Storage](#storage).
+1. Build the plugin (see [Building from Source](#building-from-source)) or grab a release jar, and drop it into `plugins/`.
+2. Install [MiniPlaceholders](https://modrinth.com/plugin/miniplaceholders) (required). Optionally install PacketEvents, LuckPerms + its MiniPlaceholders expansion, Vault, and FancyHolograms.
+3. Start the server once to generate config files under `plugins/OneSMP/`, then edit them to taste.
+4. Set `storage.type` to `MYSQL` in `config.yml` for a shared database instead of the default local SQLite file — see [Storage](#storage).
 
 ### Storage
 
-Set `storage.type` to `MYSQL` or `SQLITE` in `config.yml`. With MySQL selected, connections are pooled through HikariCP; if the database is unreachable at startup, the plugin logs a warning and **falls back to a local SQLite file** (`plugins/OneSMP/data.db`) so the server still boots. The schema (accounts, homes, warps, guilds, guild members, ignored players, player stats, leaderboard hologram registry) is created automatically on either backend.
+Set `storage.type` to `MYSQL` or `SQLITE` in `config.yml`. MySQL connections pool through HikariCP; if the database is unreachable at startup, the plugin logs a warning and falls back to a local SQLite file (`plugins/OneSMP/data.db`) so the server still boots. The schema is created automatically on either backend.
 
-## 🛠️ Building from Source
+## Building from Source
 
 Requires JDK 25 and Maven. The shaded jar lands at `target/OneSMP-<version>.jar`.
 
@@ -305,16 +243,15 @@ Requires JDK 25 and Maven. The shaded jar lands at `target/OneSMP-<version>.jar`
 mvn clean package
 ```
 
-`HikariCP`, the MySQL driver, and the SQLite driver are shaded and relocated into the jar (`gg.nurmi.libs.*`) so they never collide with another plugin's copies on the same server. `folia-api`, MiniPlaceholders, VaultAPI, PacketEvents, the LuckPerms API, and FancyHolograms are all `provided` — supplied by the server/other plugins at runtime, not bundled.
+HikariCP, the MySQL driver, and the SQLite driver are shaded and relocated (`gg.nurmi.libs.*`) so they never collide with another plugin's copies. `folia-api`, MiniPlaceholders, VaultAPI, PacketEvents, the LuckPerms API, and FancyHolograms are all `provided` — supplied by the server/other plugins at runtime, not bundled.
 
-## 📝 Notes & Limitations
+## Notes & Limitations
 
-- **Without PacketEvents installed**: overhead nametags and the tablist's reserved-slot filler are silently disabled (everything else, including tablist header/footer, still works); `/spectate` refuses to run at all rather than offer a moderator a false sense of invisibility.
-- The guild-tag second nametag line rides as a passenger entity on the player; vanilla doesn't document the exact height a passenger-mounted entity renders at, so `nametag.guild-tag.y-offset` may need visual tuning in-game.
-- Random teleport is opt-in per world with configurable cost per use.
-- The Vault bridge is synchronous by contract (Vault's API returns plain doubles), so third-party plugins calling it from a region thread may block briefly on uncached (offline-player) balance lookups.
-- Kills are credited via Bukkit's `PlayerDeathEvent#getKiller()`, which is only populated for direct player-vs-player damage — environmental deaths (fall, lava, void, etc.) always count as a death but never as anyone's kill, and any death resets the victim's killstreak regardless of cause.
-- `/statshologram` and the MiniPlaceholders expansions (stats/economy/guild) were verified with a standalone SQL smoke test against a real SQLite engine and a clean `mvn package`, but not against a live FancyHolograms installation or in-game — no Folia server was available in the environment these were built in.
+- **Without PacketEvents**: overhead nametags and the tablist's reserved-slot filler are silently disabled (everything else still works); `/spectate` refuses to run at all.
+- The guild-tag nametag line rides as a passenger entity; vanilla doesn't document the exact height a passenger renders at, so `nametag.guild-tag.y-offset` may need visual tuning.
+- The Vault bridge is synchronous by contract, so third-party plugins calling it from a region thread may block briefly on uncached balance lookups.
+- Kills are credited via `PlayerDeathEvent#getKiller()`, populated only for direct player-vs-player damage — environmental deaths always count as a death but never as anyone's kill, and reset the victim's killstreak regardless of cause.
+- Player market listings are a straightforward "one listing, one buyer, all-or-nothing" design — there's no partial-quantity purchase of a bulk listing.
 
 ---
 

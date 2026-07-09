@@ -26,9 +26,7 @@ public final class SpawnWorldManager {
             return;
         }
 
-        // Tracked ourselves rather than inferred from the world folder's on-disk presence - the world
-        // being unloaded at this point (e.g. a restart) doesn't mean it's new, and guessing at Bukkit's
-        // world-folder path via getWorldContainer() isn't reliable enough to gate a one-time build on.
+        // Tracked ourselves rather than inferred from disk - an unloaded world isn't necessarily new, and getWorldContainer() isn't a reliable path to gate a one-time build on.
         boolean platformAlreadyBuilt = plugin.getConfig().getBoolean("spawn.platform-built", false);
 
         plugin.scheduler().runGlobal(() -> {

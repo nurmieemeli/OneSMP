@@ -9,9 +9,7 @@ import org.bukkit.entity.Player;
 
 import java.util.UUID;
 
-// Maintenance mode is just a thin wrapper around Bukkit's own whitelist (whitelist.json) instead of a
-// separate allow-list: enabling it flips the real server whitelist on, and onesmp.maintenance.bypass lets
-// staff through regardless of whether they're actually on that whitelist.
+// Thin wrapper around Bukkit's own whitelist: enabling maintenance flips it on, and onesmp.maintenance.bypass lets staff through regardless of whether they're actually whitelisted.
 public final class MaintenanceManager {
 
     private static final String BYPASS_PERMISSION = "onesmp.maintenance.bypass";
@@ -31,9 +29,7 @@ public final class MaintenanceManager {
         return player.hasPermission(BYPASS_PERMISSION);
     }
 
-    // Used from AsyncPlayerPreLoginEvent, where there's no Player/Permissible yet to call hasPermission on.
-    // Ops always bypass; anything beyond that needs LuckPerms to resolve the permission for a UUID that
-    // hasn't joined yet - falls back to op-only if LuckPerms isn't installed.
+    // Used from AsyncPlayerPreLoginEvent (no Player/Permissible yet); ops always bypass, otherwise this needs LuckPerms to resolve the permission for a UUID that hasn't joined, falling back to op-only without it.
     public boolean canBypass(UUID uniqueId) {
         OfflinePlayer offlinePlayer = Bukkit.getOfflinePlayer(uniqueId);
         if (offlinePlayer.isOp()) {
@@ -60,8 +56,7 @@ public final class MaintenanceManager {
         Bukkit.setWhitelist(false);
     }
 
-    // Re-applies config.yml's maintenance.enabled to the real whitelist, in case an admin hand-edited it
-    // and ran /onesmp reload rather than using /maintenance on|off.
+    // Re-applies config.yml's maintenance.enabled to the real whitelist, e.g. after a hand-edit + /onesmp reload.
     public void sync() {
         Bukkit.setWhitelist(isEnabled());
     }
