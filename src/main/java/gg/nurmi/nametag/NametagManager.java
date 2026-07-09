@@ -36,7 +36,9 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.logging.Level;
 
-// Uses raw PacketEvents packets for everything here: a fake scoreboard team gives the prefix line (no real team is ever registered), and a fake TEXT_DISPLAY entity mounted as a passenger gives the second guild-tag line, since Bukkit has no API for either.
+// Uses raw PacketEvents packets for everything here: a fake scoreboard team gives the prefix line
+// (no real team is ever registered), and a fake TEXT_DISPLAY entity mounted as a passenger gives the second
+// guild-tag line, since Bukkit has no API for either.
 public final class NametagManager {
 
     private final OneSMPPlugin plugin;

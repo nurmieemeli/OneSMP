@@ -65,6 +65,6 @@ public final class StatsCommand implements CommandExecutor {
                 Placeholder.unparsed("kd", String.format("%.2f", kd)),
                 Placeholder.unparsed("killstreak", String.valueOf(snapshot.currentKillstreak())),
                 Placeholder.unparsed("best_killstreak", String.valueOf(snapshot.bestKillstreak())),
-                Placeholder.unparsed("playtime", TextUtil.formatDuration(snapshot.playtimeSeconds())));
+                Placeholder.unparsed("playtime", TextUtil.formatDuration(plugin, snapshot.playtimeSeconds())));
     }
 }

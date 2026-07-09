@@ -27,7 +27,9 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
-// Packet-level vanish (not Bukkit's vanish API): hide()/show() immediately remove/re-add the moderator for already-connected viewers, while the packet listener keeps filtering them out of every future tablist/spawn packet for as long as they're hidden.
+// Packet-level vanish (not Bukkit's vanish API): hide()/show() immediately remove/re-add the moderator
+// for already-connected viewers, while the packet listener keeps filtering them out of
+// every future tablist/spawn packet for as long as they're hidden.
 public final class PacketVanishController {
 
     private final OneSMPPlugin plugin;

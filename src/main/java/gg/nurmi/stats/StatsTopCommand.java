@@ -39,7 +39,7 @@ public final class StatsTopCommand implements CommandExecutor {
         }
 
         statsManager.top(type, 45).thenAccept(entries -> {
-            StatsTopGui gui = new StatsTopGui(plugin, type.title(), entries, type::formatValue);
+            StatsTopGui gui = new StatsTopGui(plugin, type.title(plugin), entries, value -> type.formatValue(plugin, value));
             plugin.scheduler().runAtEntity(player, () -> gui.open(player), () -> {});
         });
         return true;

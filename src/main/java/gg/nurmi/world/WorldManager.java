@@ -2,11 +2,7 @@ package gg.nurmi.world;
 
 import gg.nurmi.OneSMPPlugin;
 import gg.nurmi.world.WorldSettings.GeneratorMode;
-import org.bukkit.Bukkit;
-import org.bukkit.Difficulty;
-import org.bukkit.World;
-import org.bukkit.WorldCreator;
-import org.bukkit.WorldType;
+import org.bukkit.*;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
 
@@ -105,7 +101,7 @@ public final class WorldManager {
         }
         if (world != null) {
             world.setDifficulty(settings.difficulty());
-            world.setPVP(settings.pvp());
+            world.setGameRule(GameRules.PVP, settings.pvp());
         }
         return world;
     }

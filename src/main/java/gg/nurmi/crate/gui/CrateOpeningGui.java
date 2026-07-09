@@ -37,15 +37,15 @@ public final class CrateOpeningGui extends AbstractGui {
     private boolean finished;
 
     public CrateOpeningGui(OneSMPPlugin plugin, CrateManager crateManager, CrateType type, CrateReward reward) {
-        super(plugin, plugin.messages().parse("<gradient:#fbbf24:#f59e0b><bold><type></bold></gradient>",
+        super(plugin, plugin.messages().text("crate.gui-opening-title",
                 Placeholder.component("type", plugin.messages().parse(type.displayName()))), ROWS);
         this.plugin = plugin;
         this.crateManager = crateManager;
         this.type = type;
         this.reward = reward;
 
-        ItemStack border = new ItemBuilder(Material.GRAY_STAINED_GLASS_PANE).name(plugin.messages().parse(" ")).build();
-        ItemStack pointer = new ItemBuilder(Material.LIME_STAINED_GLASS_PANE).name(plugin.messages().parse("<green>▼")).build();
+        ItemStack border = new ItemBuilder(Material.GRAY_STAINED_GLASS_PANE).name(plugin.messages().text("gui.filler")).build();
+        ItemStack pointer = new ItemBuilder(Material.LIME_STAINED_GLASS_PANE).name(plugin.messages().text("crate.gui-reel-pointer")).build();
         for (int i = 0; i < REEL_SIZE; i++) {
             setItem(i, i == CENTER_INDEX ? pointer : border);
             setItem(2 * ROW_START + i, i == CENTER_INDEX ? pointer : border);

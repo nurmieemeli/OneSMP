@@ -19,23 +19,23 @@ public final class WorldDetailGui extends AbstractGui {
     private static final int CLOSE_SLOT = 49;
 
     public WorldDetailGui(OneSMPPlugin plugin, WorldManager worldManager, String worldName) {
-        super(plugin, plugin.messages().parse("<white><name>", Placeholder.unparsed("name", worldName)), 6);
+        super(plugin, plugin.messages().text("gui.name-format", Placeholder.unparsed("name", worldName)), 6);
 
         WorldSettings settings = worldManager.getSettings(worldName);
 
         setItem(INFO_SLOT, new ItemBuilder(Material.NAME_TAG)
-                .name(plugin.messages().parse("<white><name>", Placeholder.unparsed("name", worldName)))
+                .name(plugin.messages().text("gui.name-format", Placeholder.unparsed("name", worldName)))
                 .lore(
-                        plugin.messages().parse("<gray>Environment: <white><value>", Placeholder.unparsed("value", settings.environment().name())),
-                        plugin.messages().parse("<gray>Type: <white><value>", Placeholder.unparsed("value", settings.type().name())),
-                        plugin.messages().parse("<gray>Generator: <white><value>", Placeholder.unparsed("value", settings.generatorMode().name())),
-                        plugin.messages().parse("<gray>Seed: <white><value>", Placeholder.unparsed("value", String.valueOf(settings.seed()))),
-                        plugin.messages().parse("<gray>Difficulty: <white><value>", Placeholder.unparsed("value", settings.difficulty().name())),
-                        plugin.messages().parse("<gray>PVP: <white><value>", Placeholder.unparsed("value", String.valueOf(settings.pvp()))))
+                        plugin.messages().text("world.gui-environment-lore", Placeholder.unparsed("value", settings.environment().name())),
+                        plugin.messages().text("world.gui-type-lore", Placeholder.unparsed("value", settings.type().name())),
+                        plugin.messages().text("world.gui-generator-lore", Placeholder.unparsed("value", settings.generatorMode().name())),
+                        plugin.messages().text("world.gui-seed-lore", Placeholder.unparsed("value", String.valueOf(settings.seed()))),
+                        plugin.messages().text("world.gui-difficulty-lore", Placeholder.unparsed("value", settings.difficulty().name())),
+                        plugin.messages().text("world.gui-pvp-lore", Placeholder.unparsed("value", String.valueOf(settings.pvp()))))
                 .build());
 
         setButton(TELEPORT_SLOT, new ItemBuilder(Material.ENDER_PEARL)
-                .name(plugin.messages().parse("<white>Teleport Here"))
+                .name(plugin.messages().text("world.gui-teleport-here"))
                 .build(), event -> {
             if (event.getWhoClicked() instanceof Player player) {
                 World world = worldManager.getWorld(worldName);
@@ -47,8 +47,8 @@ public final class WorldDetailGui extends AbstractGui {
         });
 
         setButton(DELETE_SLOT, new ItemBuilder(Material.TNT)
-                .name(plugin.messages().parse("<red>Delete (unload + stop tracking)"))
-                .lore(plugin.messages().parse("<dark_gray>Folder stays on disk - use /world delete <name> wipe to permanently remove it"))
+                .name(plugin.messages().text("world.gui-delete-button"))
+                .lore(plugin.messages().text("world.gui-delete-lore"))
                 .build(), event -> {
             if (event.getWhoClicked() instanceof Player player) {
                 player.closeInventory();
@@ -61,7 +61,7 @@ public final class WorldDetailGui extends AbstractGui {
         });
 
         setButton(BACK_SLOT, new ItemBuilder(Material.ARROW)
-                .name(plugin.messages().parse("<gray>« Back"))
+                .name(plugin.messages().text("gui.back"))
                 .build(), event -> {
             if (event.getWhoClicked() instanceof Player player) {
                 new WorldListGui(plugin, worldManager, 0).open(player);
@@ -69,7 +69,7 @@ public final class WorldDetailGui extends AbstractGui {
         });
 
         setButton(CLOSE_SLOT, new ItemBuilder(Material.BARRIER)
-                .name(plugin.messages().parse("<red>Close"))
+                .name(plugin.messages().text("gui.close"))
                 .build(), event -> event.getWhoClicked().closeInventory());
     }
 }

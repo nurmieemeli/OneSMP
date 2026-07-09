@@ -21,7 +21,8 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Level;
 
-// FancyHolograms owns each hologram's entity/location/persistence; this only tracks which stat leaderboard each one shows and refreshes its text.
+// FancyHolograms owns each hologram's entity/location/persistence; this only tracks which stat leaderboard
+// each one shows and refreshes its text.
 public final class LeaderboardHologramManager {
 
     private static final String NAME_PREFIX = "cs_leaderboard_";
@@ -69,7 +70,7 @@ public final class LeaderboardHologramManager {
         }
 
         TextHologramData data = new TextHologramData(fancyName, location);
-        data.setText(new ArrayList<>(List.of("<gray>Loading...")));
+        data.setText(new ArrayList<>(List.of(plugin.messages().raw("stats.hologram-loading"))));
         data.setBackground(Hologram.TRANSPARENT);
         data.setBillboard(Display.Billboard.VERTICAL);
         Hologram hologram = manager.create(data);
@@ -123,15 +124,21 @@ public final class LeaderboardHologramManager {
     // Always renders exactly `limit` lines, padding unfilled ranks with N/A so the hologram doesn't visually shrink over time.
     private List<String> buildLines(StatsManager.StatType statType, List<StatsManager.TopEntry> entries, int limit) {
         List<String> lines = new ArrayList<>();
-        lines.add(statType.title());
+        lines.add(statType.title(plugin));
         for (int i = 0; i < limit; i++) {
             if (i < entries.size()) {
                 StatsManager.TopEntry entry = entries.get(i);
-                String name = entry.name() == null ? "?" : entry.name();
-                lines.add("<gray>#" + (i + 1) + " <white>" + name + "</white> <dark_gray>-</dark_gray> <green>"
-                        + statType.formatValue(entry.value()));
+                String name = entry.name() == null ? plugin.messages().raw("general.unknown-name") : entry.name();
+                lines.add(plugin.messages().raw("stats.hologram-line")
+                        .replace("<rank>", String.valueOf(i + 1))
+                        .replace("<name>", name)
+                        .replace("<value>", statType.formatValue(plugin, entry.value())));
             } else {
-                lines.add("<gray>#" + (i + 1) + " <white>N/A</white> <dark_gray>-</dark_gray> <green>N/A");
+                String naLabel = plugin.messages().raw("stats.hologram-empty-label");
+                lines.add(plugin.messages().raw("stats.hologram-line")
+                        .replace("<rank>", String.valueOf(i + 1))
+                        .replace("<name>", naLabel)
+                        .replace("<value>", naLabel));
             }
         }
         return lines;

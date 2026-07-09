@@ -156,6 +156,7 @@ public final class OneSMPPlugin extends JavaPlugin {
         registerStats();
         registerHolograms();
         registerHelp();
+        registerLinks();
 
         new AliasManager(this).applyAliases();
 
@@ -184,7 +185,7 @@ public final class OneSMPPlugin extends JavaPlugin {
         int periodSeconds = Math.max(5, getConfig().getInt("stats.playtime-autosave-interval-seconds", 60));
         schedulerUtil.runGlobalRepeating(statsManager::flushOnline, periodSeconds * 20L, periodSeconds * 20L);
 
-        this.statsPlaceholderExpansion = StatsPlaceholderExpansion.register(statsManager);
+        this.statsPlaceholderExpansion = StatsPlaceholderExpansion.register(this, statsManager);
     }
 
     private void registerHolograms() {
@@ -343,6 +344,13 @@ public final class OneSMPPlugin extends JavaPlugin {
         HelpCommand helpCommand = new HelpCommand(this, helpManager);
         Objects.requireNonNull(getCommand("help")).setExecutor(helpCommand);
         Objects.requireNonNull(getCommand("help")).setTabCompleter(helpCommand);
+    }
+
+    private void registerLinks() {
+        Objects.requireNonNull(getCommand("discord")).setExecutor(
+                new LinkCommand(this, "links.discord-url", "links.discord", "onesmp.discord.use"));
+        Objects.requireNonNull(getCommand("store")).setExecutor(
+                new LinkCommand(this, "links.store-url", "links.store", "onesmp.store.use"));
     }
 
     private void registerCrates() {

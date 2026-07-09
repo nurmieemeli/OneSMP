@@ -28,7 +28,7 @@ public final class GuildMembersGui extends AbstractGui {
     }
 
     public GuildMembersGui(OneSMPPlugin plugin, GuildManager guildManager, Guild guild, UUID viewerUuid, int page) {
-        super(plugin, plugin.messages().parse("<white>Members of <guild_name>", Placeholder.unparsed("guild_name", guild.name())), 6);
+        super(plugin, plugin.messages().text("guild.gui-members-title", Placeholder.unparsed("guild_name", guild.name())), 6);
 
         GuildRole viewerRole = guild.member(viewerUuid).map(GuildMember::role).orElse(GuildRole.MEMBER);
         Pagination<GuildMember> pagination = new Pagination<>(guild.members(), PAGE_SIZE);
@@ -40,11 +40,12 @@ public final class GuildMembersGui extends AbstractGui {
             String name = offlinePlayer.getName() != null ? offlinePlayer.getName() : member.uuid().toString();
 
             ItemStack icon = new ItemBuilder(Material.PLAYER_HEAD)
-                    .name(plugin.messages().parse("<white>" + name + " <gray>(" + member.role().name() + ")"))
+                    .name(plugin.messages().text("guild.gui-member-name",
+                            Placeholder.unparsed("name", name), Placeholder.unparsed("role", member.role().name())))
                     .lore(viewerRole.canManageMembers() && !guild.isOwner(member.uuid()) && !member.uuid().equals(viewerUuid)
                             ? List.of(
-                                    plugin.messages().parse("<gray>Click to kick"),
-                                    plugin.messages().parse("<dark_gray>Shift-click to promote/demote (owner only)"))
+                                    plugin.messages().text("guild.gui-click-to-kick"),
+                                    plugin.messages().text("guild.gui-click-to-promote"))
                             : List.of())
                     .build();
             if (icon.getItemMeta() instanceof SkullMeta skullMeta) {
@@ -87,7 +88,7 @@ public final class GuildMembersGui extends AbstractGui {
             });
         }
 
-        ItemStack back = new ItemBuilder(Material.ARROW).name(plugin.messages().parse("<gray>« Back")).build();
+        ItemStack back = new ItemBuilder(Material.ARROW).name(plugin.messages().text("gui.back")).build();
         setButton(BACK_SLOT, back, event -> {
             if (event.getWhoClicked() instanceof Player player) {
                 new GuildMainGui(plugin, guildManager, guild, viewerUuid).open(player);

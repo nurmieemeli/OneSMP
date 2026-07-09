@@ -9,7 +9,8 @@ import org.bukkit.entity.Player;
 import java.util.Optional;
 import java.util.function.Function;
 
-// Named own_name/own_tag, not guild_name/guild_tag - that name is already used elsewhere for an explicitly-queried guild, not the viewer's own.
+// Named own_name/own_tag, not guild_name/guild_tag - that name is already used elsewhere for an explicitly-queried guild,
+// not the viewer's own.
 public final class GuildPlaceholderExpansion {
 
     private GuildPlaceholderExpansion() {

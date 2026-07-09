@@ -26,7 +26,8 @@ public final class SpawnWorldManager {
             return;
         }
 
-        // Tracked ourselves rather than inferred from disk - an unloaded world isn't necessarily new, and getWorldContainer() isn't a reliable path to gate a one-time build on.
+        // Tracked ourselves rather than inferred from disk - an unloaded world isn't necessarily new
+        // and getWorldContainer() isn't a reliable path to gate a one-time build on.
         boolean platformAlreadyBuilt = plugin.getConfig().getBoolean("spawn.platform-built", false);
 
         plugin.scheduler().runGlobal(() -> {

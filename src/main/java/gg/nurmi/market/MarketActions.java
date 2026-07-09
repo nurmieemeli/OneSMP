@@ -42,7 +42,7 @@ public final class MarketActions {
                             plugin.messages().send(buyer, "market.bought",
                                     Placeholder.unparsed("amount", String.valueOf(listing.item().getAmount())),
                                     Placeholder.unparsed("item", TextUtil.prettyName(listing.item().getType())),
-                                    Placeholder.unparsed("seller", listing.sellerName() == null ? "?" : listing.sellerName()),
+                                    Placeholder.unparsed("seller", listing.sellerName() == null ? plugin.messages().raw("general.unknown-name") : listing.sellerName()),
                                     Placeholder.unparsed("price", plugin.economy().format(listing.price())));
                             if (dropped) {
                                 plugin.messages().send(buyer, "market.item-dropped");

@@ -16,7 +16,7 @@ import java.util.List;
 public final class WorldListGui extends AbstractGui {
 
     public WorldListGui(OneSMPPlugin plugin, WorldManager worldManager, int page) {
-        super(plugin, plugin.messages().parse("<gradient:#38bdf8:#818cf8><bold>Managed Worlds</bold></gradient>"), 6);
+        super(plugin, plugin.messages().text("world.gui-list-title"), 6);
 
         List<WorldSettings> worlds = List.copyOf(worldManager.listWorlds());
         Pagination<WorldSettings> pagination = new Pagination<>(worlds, PAGE_SIZE);
@@ -26,13 +26,13 @@ public final class WorldListGui extends AbstractGui {
         for (WorldSettings settings : pageWorlds) {
             ItemStack icon = new ItemBuilder(WorldIcons.iconFor(settings.environment(),
                     settings.generatorMode() == WorldSettings.GeneratorMode.VOID))
-                    .name(plugin.messages().parse("<white><name>", Placeholder.unparsed("name", settings.name())))
+                    .name(plugin.messages().text("gui.name-format", Placeholder.unparsed("name", settings.name())))
                     .lore(
-                            plugin.messages().parse("<gray>Environment: <white><value>",
+                            plugin.messages().text("world.gui-environment-lore",
                                     Placeholder.unparsed("value", settings.environment().name())),
-                            plugin.messages().parse("<gray>Generator: <white><value>",
+                            plugin.messages().text("world.gui-generator-lore",
                                     Placeholder.unparsed("value", settings.generatorMode().name())),
-                            plugin.messages().parse("<gray>Click for details"))
+                            plugin.messages().text("world.gui-click-for-details"))
                     .build();
             setButton(slot++, icon, event -> {
                 if (event.getWhoClicked() instanceof Player player) {

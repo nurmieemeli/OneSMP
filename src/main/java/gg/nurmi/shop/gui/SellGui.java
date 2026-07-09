@@ -10,7 +10,6 @@ import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
-import org.bukkit.event.inventory.InventoryDragEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
@@ -28,12 +27,12 @@ public final class SellGui extends AbstractGui {
     private boolean returned;
 
     public SellGui(OneSMPPlugin plugin) {
-        super(plugin, plugin.messages().parse("<gradient:#fb923c:#f87171><bold>Sell Items</bold></gradient>"), 6);
+        super(plugin, plugin.messages().text("shop.gui-title"), 6);
         this.plugin = plugin;
 
         openSlots(0, INPUT_SLOTS);
 
-        ItemStack filler = new ItemBuilder(Material.GRAY_STAINED_GLASS_PANE).name(plugin.messages().parse(" ")).build();
+        ItemStack filler = new ItemBuilder(Material.GRAY_STAINED_GLASS_PANE).name(plugin.messages().text("gui.filler")).build();
         for (int slot = INPUT_SLOTS; slot < 54; slot++) {
             if (slot != INFO_SLOT && slot != CONFIRM_SLOT && slot != CLOSE_SLOT) {
                 setItem(slot, filler);
@@ -42,7 +41,7 @@ public final class SellGui extends AbstractGui {
 
         setButton(CONFIRM_SLOT, buildConfirmIcon(), this::handleConfirm);
 
-        ItemStack close = new ItemBuilder(Material.BARRIER).name(plugin.messages().parse("<red>Close")).build();
+        ItemStack close = new ItemBuilder(Material.BARRIER).name(plugin.messages().text("gui.close")).build();
         setButton(CLOSE_SLOT, close, event -> event.getWhoClicked().closeInventory());
 
         updateInfo();
@@ -141,17 +140,17 @@ public final class SellGui extends AbstractGui {
         }
 
         setItem(INFO_SLOT, new ItemBuilder(Material.GOLD_INGOT)
-                .name(plugin.messages().parse("<yellow>Sellable value: <price>",
+                .name(plugin.messages().text("shop.gui-value-name",
                         Placeholder.unparsed("price", plugin.economy().format(total))))
-                .lore(plugin.messages().parse("<gray>Sellable items: <white><count>",
+                .lore(plugin.messages().text("shop.gui-count-lore",
                         Placeholder.unparsed("count", String.valueOf(itemCount))))
                 .build());
     }
 
     private ItemStack buildConfirmIcon() {
         return new ItemBuilder(Material.LIME_WOOL)
-                .name(plugin.messages().parse("<green><bold>Confirm Sell"))
-                .lore(plugin.messages().parse("<gray>Sells everything placed above"))
+                .name(plugin.messages().text("shop.gui-confirm-button"))
+                .lore(plugin.messages().text("shop.gui-confirm-lore"))
                 .build();
     }
 }

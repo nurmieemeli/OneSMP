@@ -161,7 +161,8 @@ public final class RtpManager {
         attempt(world, minRadius, maxRadius, maxAttempts, onFound, onFail);
     }
 
-    // Picks a random point in the radius ring, loads its chunk, and retries elsewhere if it isn't safe, until attemptsLeft runs out.
+    // Picks a random point in the radius ring, loads its chunk, and retries elsewhere if it isn't safe,
+    // until attemptsLeft runs out.
     private void attempt(World world, int minRadius, int maxRadius, int attemptsLeft, Consumer<Location> onFound, Runnable onFail) {
         if (attemptsLeft <= 0) {
             onFail.run();

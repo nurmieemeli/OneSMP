@@ -202,7 +202,7 @@ public final class GuildCommand implements CommandExecutor, TabCompleter {
                 guildManager.refreshCache(player.getUniqueId());
                 guildManager.getGuildByMember(player.getUniqueId()).thenAccept(joined ->
                         plugin.messages().send(player, "guild.joined",
-                                Placeholder.unparsed("guild", joined.map(Guild::name).orElse("?"))));
+                                Placeholder.unparsed("guild", joined.map(Guild::name).orElse(plugin.messages().raw("general.unknown-name")))));
             });
         });
     }

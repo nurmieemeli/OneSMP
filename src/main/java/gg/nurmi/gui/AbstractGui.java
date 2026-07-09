@@ -3,7 +3,6 @@ package gg.nurmi.gui;
 import gg.nurmi.OneSMPPlugin;
 import gg.nurmi.util.ItemBuilder;
 import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.HumanEntity;
@@ -97,11 +96,11 @@ public abstract class AbstractGui implements InventoryHolder {
     }
 
     protected void addPaginationFooter(Pagination<?> pagination, int page, BiConsumer<Player, Integer> onNavigate) {
-        ItemStack close = new ItemBuilder(Material.BARRIER).name(Component.text("Close", NamedTextColor.RED)).build();
+        ItemStack close = new ItemBuilder(Material.BARRIER).name(plugin.messages().text("gui.close")).build();
         setButton(CLOSE_SLOT, close, event -> event.getWhoClicked().closeInventory());
 
         if (page > 0) {
-            ItemStack prev = new ItemBuilder(Material.PAPER).name(Component.text("« Previous Page", NamedTextColor.GRAY)).build();
+            ItemStack prev = new ItemBuilder(Material.PAPER).name(plugin.messages().text("gui.previous-page")).build();
             setButton(PREV_SLOT, prev, event -> {
                 if (event.getWhoClicked() instanceof Player player) {
                     onNavigate.accept(player, page - 1);
@@ -109,7 +108,7 @@ public abstract class AbstractGui implements InventoryHolder {
             });
         }
         if (page < pagination.pageCount() - 1) {
-            ItemStack next = new ItemBuilder(Material.PAPER).name(Component.text("Next Page »", NamedTextColor.GRAY)).build();
+            ItemStack next = new ItemBuilder(Material.PAPER).name(plugin.messages().text("gui.next-page")).build();
             setButton(NEXT_SLOT, next, event -> {
                 if (event.getWhoClicked() instanceof Player player) {
                     onNavigate.accept(player, page + 1);

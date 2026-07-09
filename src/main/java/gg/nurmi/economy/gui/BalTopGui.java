@@ -19,15 +19,15 @@ public final class BalTopGui extends AbstractGui {
     private static final int CLOSE_SLOT = 49;
 
     public BalTopGui(OneSMPPlugin plugin, List<EconomyManager.BalanceEntry> entries) {
-        super(plugin, plugin.messages().parse("<gradient:#facc15:#fbbf24><bold>Balance Leaderboard</bold></gradient>"), ROWS);
+        super(plugin, plugin.messages().text("economy.gui-baltop-title"), ROWS);
 
         for (int i = 0; i < entries.size() && i < 45; i++) {
             EconomyManager.BalanceEntry entry = entries.get(i);
             ItemStack head = new ItemBuilder(Material.PLAYER_HEAD)
-                    .name(plugin.messages().parse("<yellow>#<rank> <white><target>",
+                    .name(plugin.messages().text("economy.gui-rank-name",
                             Placeholder.unparsed("rank", String.valueOf(i + 1)),
-                            Placeholder.unparsed("target", entry.name() == null ? "?" : entry.name())))
-                    .lore(plugin.messages().parse("<gray>Balance: <green><balance>",
+                            Placeholder.unparsed("target", entry.name() == null ? plugin.messages().raw("general.unknown-name") : entry.name())))
+                    .lore(plugin.messages().text("economy.gui-balance-lore",
                             Placeholder.unparsed("balance", plugin.economy().format(entry.balance()))))
                     .build();
 
@@ -43,7 +43,7 @@ public final class BalTopGui extends AbstractGui {
         }
 
         ItemStack close = new ItemBuilder(Material.BARRIER)
-                .name(plugin.messages().parse("<red>Close"))
+                .name(plugin.messages().text("gui.close"))
                 .build();
         setButton(CLOSE_SLOT, close, event -> event.getWhoClicked().closeInventory());
     }

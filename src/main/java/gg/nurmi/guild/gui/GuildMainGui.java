@@ -19,22 +19,24 @@ import java.util.UUID;
 public final class GuildMainGui extends AbstractGui {
 
     public GuildMainGui(OneSMPPlugin plugin, GuildManager guildManager, Guild guild, UUID viewerUuid) {
-        super(plugin, plugin.messages().parse("<gradient:#fbbf24:#f59e0b><bold><guild_name></bold></gradient> <gray>[<guild_tag>]</gray>",
+        super(plugin, plugin.messages().text("guild.gui-main-title",
                 Placeholder.unparsed("guild_name", guild.name()), Placeholder.unparsed("guild_tag", guild.tag())), 3);
 
         GuildRole viewerRole = guild.member(viewerUuid).map(GuildMember::role).orElse(GuildRole.MEMBER);
         String ownerName = Optional.ofNullable(Bukkit.getOfflinePlayer(guild.owner()).getName()).orElse(guild.owner().toString());
 
         ItemStack info = new ItemBuilder(Material.BOOK)
-                .name(plugin.messages().parse("<yellow>Guild Info"))
+                .name(plugin.messages().text("guild.gui-info-button"))
                 .lore(
-                        plugin.messages().parse("<gray>Owner: <white>" + ownerName),
-                        plugin.messages().parse("<gray>Members: <white>" + guild.members().size() + "/" + guild.memberLimit()),
-                        plugin.messages().parse("<gray>Bank: <green>" + plugin.economy().format(guild.balance())))
+                        plugin.messages().text("guild.gui-owner-lore", Placeholder.unparsed("owner", ownerName)),
+                        plugin.messages().text("guild.gui-members-lore",
+                                Placeholder.unparsed("count", String.valueOf(guild.members().size())),
+                                Placeholder.unparsed("limit", String.valueOf(guild.memberLimit()))),
+                        plugin.messages().text("guild.gui-bank-lore", Placeholder.unparsed("balance", plugin.economy().format(guild.balance()))))
                 .build();
         setItem(4, info);
 
-        ItemStack membersIcon = new ItemBuilder(Material.PLAYER_HEAD).name(plugin.messages().parse("<white>Members")).build();
+        ItemStack membersIcon = new ItemBuilder(Material.PLAYER_HEAD).name(plugin.messages().text("guild.gui-members-button")).build();
         setButton(11, membersIcon, event -> {
             if (event.getWhoClicked() instanceof Player player) {
                 new GuildMembersGui(plugin, guildManager, guild, viewerUuid).open(player);
@@ -42,7 +44,7 @@ public final class GuildMainGui extends AbstractGui {
         });
 
         if (guild.hasHome()) {
-            ItemStack homeIcon = new ItemBuilder(Material.RED_BED).name(plugin.messages().parse("<white>Guild Home")).build();
+            ItemStack homeIcon = new ItemBuilder(Material.RED_BED).name(plugin.messages().text("guild.gui-home-button")).build();
             setButton(13, homeIcon, event -> {
                 if (event.getWhoClicked() instanceof Player player) {
                     plugin.teleportExecutor().executeSafely(player, guild.homeLocation());
@@ -50,7 +52,7 @@ public final class GuildMainGui extends AbstractGui {
             });
         }
 
-        ItemStack chatToggle = new ItemBuilder(Material.WRITABLE_BOOK).name(plugin.messages().parse("<white>Toggle Guild Chat")).build();
+        ItemStack chatToggle = new ItemBuilder(Material.WRITABLE_BOOK).name(plugin.messages().text("guild.gui-toggle-chat-button")).build();
         setButton(17, chatToggle, event -> {
             if (event.getWhoClicked() instanceof Player player) {
                 boolean enabled = plugin.guildChat().toggle(player.getUniqueId());
@@ -59,14 +61,14 @@ public final class GuildMainGui extends AbstractGui {
         });
 
         if (viewerRole.canManageSettings()) {
-            ItemStack setHomeIcon = new ItemBuilder(Material.COMPASS).name(plugin.messages().parse("<white>Set Guild Home Here")).build();
+            ItemStack setHomeIcon = new ItemBuilder(Material.COMPASS).name(plugin.messages().text("guild.gui-set-home-button")).build();
             setButton(15, setHomeIcon, event -> {
                 if (event.getWhoClicked() instanceof Player player) {
                     guildManager.setHome(guild.id(), player.getLocation()).thenRun(() -> plugin.messages().send(player, "guild.home-set"));
                 }
             });
 
-            ItemStack disbandIcon = new ItemBuilder(Material.TNT).name(plugin.messages().parse("<red>Disband Guild")).build();
+            ItemStack disbandIcon = new ItemBuilder(Material.TNT).name(plugin.messages().text("guild.gui-disband-button")).build();
             setButton(21, disbandIcon, event -> {
                 if (event.getWhoClicked() instanceof Player player) {
                     guildManager.disbandGuild(guild.id()).thenAccept(deleted -> {
@@ -78,7 +80,7 @@ public final class GuildMainGui extends AbstractGui {
                 }
             });
         } else {
-            ItemStack leaveIcon = new ItemBuilder(Material.OAK_DOOR).name(plugin.messages().parse("<red>Leave Guild")).build();
+            ItemStack leaveIcon = new ItemBuilder(Material.OAK_DOOR).name(plugin.messages().text("guild.gui-leave-button")).build();
             setButton(21, leaveIcon, event -> {
                 if (event.getWhoClicked() instanceof Player player) {
                     guildManager.removeMember(guild.id(), player.getUniqueId()).thenRun(() ->
@@ -88,7 +90,7 @@ public final class GuildMainGui extends AbstractGui {
             });
         }
 
-        ItemStack close = new ItemBuilder(Material.BARRIER).name(plugin.messages().parse("<red>Close")).build();
+        ItemStack close = new ItemBuilder(Material.BARRIER).name(plugin.messages().text("gui.close")).build();
         setButton(22, close, event -> event.getWhoClicked().closeInventory());
     }
 }

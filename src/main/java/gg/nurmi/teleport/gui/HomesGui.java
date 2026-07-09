@@ -21,7 +21,7 @@ public final class HomesGui extends AbstractGui {
     }
 
     public HomesGui(OneSMPPlugin plugin, HomeManager homeManager, TeleportExecutor teleportExecutor, List<Home> homes, int page) {
-        super(plugin, plugin.messages().parse("<gradient:#60a5fa:#3b82f6><bold>Your Homes</bold></gradient>"), 6);
+        super(plugin, plugin.messages().text("teleport.gui-homes-title"), 6);
 
         Pagination<Home> pagination = new Pagination<>(homes, PAGE_SIZE);
         List<Home> pageHomes = pagination.page(page);
@@ -29,10 +29,10 @@ public final class HomesGui extends AbstractGui {
         int slot = 0;
         for (Home home : pageHomes) {
             ItemStack icon = new ItemBuilder(Material.RED_BED)
-                    .name(plugin.messages().parse("<white><name>", Placeholder.unparsed("name", home.name())))
+                    .name(plugin.messages().text("gui.name-format", Placeholder.unparsed("name", home.name())))
                     .lore(
-                            plugin.messages().parse("<gray>Click to teleport"),
-                            plugin.messages().parse("<dark_gray>Shift-click to delete"))
+                            plugin.messages().text("gui.click-to-teleport"),
+                            plugin.messages().text("teleport.gui-click-to-delete"))
                     .build();
             setButton(slot++, icon, event -> {
                 if (!(event.getWhoClicked() instanceof Player player)) {

@@ -15,11 +15,12 @@ import org.bukkit.inventory.meta.ItemMeta;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 public final class MarketMineGui extends AbstractGui {
 
     public MarketMineGui(OneSMPPlugin plugin, MarketManager marketManager, List<MarketListing> listings, int page) {
-        super(plugin, plugin.messages().parse("<gradient:#34d399:#10b981><bold>My Listings</bold></gradient>"), 6);
+        super(plugin, plugin.messages().text("market.gui-mine-title"), 6);
 
         Pagination<MarketListing> pagination = new Pagination<>(listings, PAGE_SIZE);
         List<MarketListing> pageListings = pagination.page(page);
@@ -40,11 +41,11 @@ public final class MarketMineGui extends AbstractGui {
 
     private static ItemStack buildIcon(OneSMPPlugin plugin, MarketListing listing) {
         ItemMeta meta = listing.item().getItemMeta();
-        List<Component> lore = new ArrayList<>(meta != null && meta.hasLore() ? meta.lore() : List.of());
-        lore.add(plugin.messages().parse(" "));
-        lore.add(plugin.messages().parse("<gray>Price: <green><price>",
+        List<Component> lore = new ArrayList<>(meta != null && meta.hasLore() ? Objects.requireNonNull(meta.lore()) : List.of());
+        lore.add(plugin.messages().text("gui.filler"));
+        lore.add(plugin.messages().text("market.gui-price-lore",
                 Placeholder.unparsed("price", plugin.economy().format(listing.price()))));
-        lore.add(plugin.messages().parse("<dark_gray>Click to cancel and reclaim"));
+        lore.add(plugin.messages().text("market.gui-cancel-lore"));
 
         return new ItemBuilder(listing.item())
                 .lore(lore)

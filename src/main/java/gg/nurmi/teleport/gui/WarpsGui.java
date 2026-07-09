@@ -20,7 +20,7 @@ public final class WarpsGui extends AbstractGui {
     }
 
     public WarpsGui(OneSMPPlugin plugin, TeleportExecutor teleportExecutor, List<Warp> warps, int page) {
-        super(plugin, plugin.messages().parse("<gradient:#c084fc:#a855f7><bold>Server Warps</bold></gradient>"), 6);
+        super(plugin, plugin.messages().text("teleport.gui-warps-title"), 6);
 
         Pagination<Warp> pagination = new Pagination<>(warps, PAGE_SIZE);
         List<Warp> pageWarps = pagination.page(page);
@@ -28,8 +28,8 @@ public final class WarpsGui extends AbstractGui {
         int slot = 0;
         for (Warp warp : pageWarps) {
             ItemStack icon = new ItemBuilder(Material.ENDER_PEARL)
-                    .name(plugin.messages().parse("<white><name>", Placeholder.unparsed("name", warp.name())))
-                    .lore(plugin.messages().parse("<gray>Click to teleport"))
+                    .name(plugin.messages().text("gui.name-format", Placeholder.unparsed("name", warp.name())))
+                    .lore(plugin.messages().text("gui.click-to-teleport"))
                     .build();
             setButton(slot++, icon, event -> {
                 if (event.getWhoClicked() instanceof Player player) {

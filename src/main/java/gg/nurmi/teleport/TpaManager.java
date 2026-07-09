@@ -64,7 +64,7 @@ public final class TpaManager {
                 if (requester != null) {
                     Player target = Bukkit.getPlayer(entry.getKey());
                     plugin.messages().send(requester, "teleport.tpa-expired",
-                            Placeholder.unparsed("target", target != null ? target.getName() : "?"));
+                            Placeholder.unparsed("target", target != null ? target.getName() : plugin.messages().raw("general.unknown-name")));
                 }
             }
         }, 5000, 5000);

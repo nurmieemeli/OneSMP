@@ -45,24 +45,26 @@ public final class StatsManager {
             }
         }
 
-        public String title() {
-            return switch (this) {
-                case KILLS -> "<gradient:#facc15:#fbbf24><bold>Kills Leaderboard</bold></gradient>";
-                case DEATHS -> "<gradient:#f87171:#ef4444><bold>Deaths Leaderboard</bold></gradient>";
-                case KILLSTREAK -> "<gradient:#fb923c:#f97316><bold>Killstreak Leaderboard</bold></gradient>";
-                case PLAYTIME -> "<gradient:#38bdf8:#818cf8><bold>Playtime Leaderboard</bold></gradient>";
-                case KD -> "<gradient:#a78bfa:#818cf8><bold>K/D Leaderboard</bold></gradient>";
+        public String title(OneSMPPlugin plugin) {
+            String key = switch (this) {
+                case KILLS -> "stats.title-kills";
+                case DEATHS -> "stats.title-deaths";
+                case KILLSTREAK -> "stats.title-killstreak";
+                case PLAYTIME -> "stats.title-playtime";
+                case KD -> "stats.title-kd";
             };
+            return plugin.messages().raw(key);
         }
 
         // KD values arrive scaled by 100 (see StatsManager#topKd) so they can travel through TopEntry's long value.
-        public String formatValue(long value) {
+        public String formatValue(OneSMPPlugin plugin, long value) {
             return switch (this) {
-                case PLAYTIME -> TextUtil.formatDuration(value);
-                case KILLS -> value + " kills";
-                case DEATHS -> value + " deaths";
-                case KILLSTREAK -> "best streak: " + value;
-                case KD -> String.format(Locale.ROOT, "%.2f K/D", value / 100.0);
+                case PLAYTIME -> TextUtil.formatDuration(plugin, value);
+                case KILLS -> plugin.messages().raw("stats.value-kills").replace("<value>", String.valueOf(value));
+                case DEATHS -> plugin.messages().raw("stats.value-deaths").replace("<value>", String.valueOf(value));
+                case KILLSTREAK -> plugin.messages().raw("stats.value-killstreak").replace("<value>", String.valueOf(value));
+                case KD -> plugin.messages().raw("stats.value-kd")
+                        .replace("<value>", String.format(Locale.ROOT, "%.2f", value / 100.0));
             };
         }
     }

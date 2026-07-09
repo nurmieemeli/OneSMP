@@ -1,18 +1,20 @@
 package gg.nurmi.stats;
 
+import gg.nurmi.OneSMPPlugin;
 import gg.nurmi.util.TextUtil;
 import io.github.miniplaceholders.api.Expansion;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.tag.Tag;
 import org.bukkit.entity.Player;
 
-// Registers live stats (e.g. <stats_kills>) as MiniPlaceholders tags so any MiniMessage text can use them without depending on StatsManager.
+// Registers live stats (e.g. <stats_kills>) as MiniPlaceholders tags so any MiniMessage text can use
+// them without depending on StatsManager.
 public final class StatsPlaceholderExpansion {
 
     private StatsPlaceholderExpansion() {
     }
 
-    public static Expansion register(StatsManager statsManager) {
+    public static Expansion register(OneSMPPlugin plugin, StatsManager statsManager) {
         Expansion expansion = Expansion.builder("stats")
                 .audiencePlaceholder(Player.class, "kills", (player, queue, ctx) ->
                         Tag.selfClosingInserting(Component.text(snapshot(statsManager, player).kills())))
@@ -25,7 +27,7 @@ public final class StatsPlaceholderExpansion {
                 .audiencePlaceholder(Player.class, "best_killstreak", (player, queue, ctx) ->
                         Tag.selfClosingInserting(Component.text(snapshot(statsManager, player).bestKillstreak())))
                 .audiencePlaceholder(Player.class, "playtime", (player, queue, ctx) ->
-                        Tag.selfClosingInserting(Component.text(TextUtil.formatDuration(snapshot(statsManager, player).playtimeSeconds()))))
+                        Tag.selfClosingInserting(Component.text(TextUtil.formatDuration(plugin, snapshot(statsManager, player).playtimeSeconds()))))
                 .build();
         expansion.register();
         return expansion;

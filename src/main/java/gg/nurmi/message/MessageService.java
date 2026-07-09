@@ -46,7 +46,9 @@ public final class MessageService {
         this.prefixComponent = miniMessage.deserialize(messages.getString("prefix", ""));
     }
 
-    private String raw(String path) {
+    // Public so callers that build Components outside chat (GUI titles/lore, dialogs) can still
+    // source their MiniMessage template from messages.yml instead of hardcoding it.
+    public String raw(String path) {
         return messages.getString(path, path);
     }
 
@@ -112,6 +114,11 @@ public final class MessageService {
 
     public Component parse(String rawInput, TagResolver... resolvers) {
         return miniMessage.deserialize(rawInput, resolvers);
+    }
+
+    // Like parse(), but the template comes from messages.yml at `path` instead of being inlined at the call site.
+    public Component text(String path, TagResolver... resolvers) {
+        return parse(raw(path), resolvers);
     }
 
     public Component parse(String rawInput, Pointered audience, TagResolver... resolvers) {

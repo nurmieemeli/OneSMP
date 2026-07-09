@@ -25,10 +25,10 @@ public final class StatsTopGui extends AbstractGui {
         for (int i = 0; i < entries.size() && i < 45; i++) {
             StatsManager.TopEntry entry = entries.get(i);
             ItemStack head = new ItemBuilder(Material.PLAYER_HEAD)
-                    .name(plugin.messages().parse("<yellow>#<rank> <white><target>",
+                    .name(plugin.messages().text("stats.gui-rank-name",
                             Placeholder.unparsed("rank", String.valueOf(i + 1)),
-                            Placeholder.unparsed("target", entry.name() == null ? "?" : entry.name())))
-                    .lore(plugin.messages().parse("<gray><value>",
+                            Placeholder.unparsed("target", entry.name() == null ? plugin.messages().raw("general.unknown-name") : entry.name())))
+                    .lore(plugin.messages().text("stats.gui-value-lore",
                             Placeholder.unparsed("value", valueFormatter.apply(entry.value()))))
                     .build();
 
@@ -44,7 +44,7 @@ public final class StatsTopGui extends AbstractGui {
         }
 
         ItemStack close = new ItemBuilder(Material.BARRIER)
-                .name(plugin.messages().parse("<red>Close"))
+                .name(plugin.messages().text("gui.close"))
                 .build();
         setButton(CLOSE_SLOT, close, event -> event.getWhoClicked().closeInventory());
     }

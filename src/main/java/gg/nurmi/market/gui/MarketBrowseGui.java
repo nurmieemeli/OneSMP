@@ -40,8 +40,8 @@ public final class MarketBrowseGui extends AbstractGui {
                 new MarketBrowseGui(plugin, marketManager, listings, query, targetPage).open(player));
 
         ItemStack searchIcon = new ItemBuilder(Material.COMPASS)
-                .name(plugin.messages().parse("<white>Search"))
-                .lore(plugin.messages().parse("<gray>Click to search by item name"))
+                .name(plugin.messages().text("market.gui-search-button"))
+                .lore(plugin.messages().text("market.gui-search-lore"))
                 .build();
         setButton(45, searchIcon, event -> {
             if (event.getWhoClicked() instanceof Player player) {
@@ -53,20 +53,20 @@ public final class MarketBrowseGui extends AbstractGui {
 
     private static Component title(OneSMPPlugin plugin, String query) {
         return query == null || query.isBlank()
-                ? plugin.messages().parse("<gradient:#34d399:#10b981><bold>Market</bold></gradient>")
-                : plugin.messages().parse("<gradient:#34d399:#10b981><bold>Market: <query></bold></gradient>",
+                ? plugin.messages().text("market.gui-browse-title")
+                : plugin.messages().text("market.gui-browse-title-query",
                         Placeholder.unparsed("query", query));
     }
 
     private static ItemStack buildIcon(OneSMPPlugin plugin, MarketListing listing) {
         ItemMeta meta = listing.item().getItemMeta();
         List<Component> lore = new ArrayList<>(meta != null && meta.hasLore() ? meta.lore() : List.of());
-        lore.add(plugin.messages().parse(" "));
-        lore.add(plugin.messages().parse("<gray>Seller: <white><seller>",
-                Placeholder.unparsed("seller", listing.sellerName() == null ? "?" : listing.sellerName())));
-        lore.add(plugin.messages().parse("<gray>Price: <green><price>",
+        lore.add(plugin.messages().text("gui.filler"));
+        lore.add(plugin.messages().text("market.gui-seller-lore",
+                Placeholder.unparsed("seller", listing.sellerName() == null ? plugin.messages().raw("general.unknown-name") : listing.sellerName())));
+        lore.add(plugin.messages().text("market.gui-price-lore",
                 Placeholder.unparsed("price", plugin.economy().format(listing.price()))));
-        lore.add(plugin.messages().parse("<dark_gray>Click to buy"));
+        lore.add(plugin.messages().text("market.gui-buy-lore"));
 
         return new ItemBuilder(listing.item())
                 .lore(lore)

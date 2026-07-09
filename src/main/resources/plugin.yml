@@ -108,6 +108,12 @@ commands:
   help:
     description: Browse server help articles, organized into categories.
     usage: /help [category] [article]
+  discord:
+    description: Get a link to the server's Discord.
+    usage: /discord
+  store:
+    description: Get a link to the server's store.
+    usage: /store
 
 permissions:
   onesmp.admin:
@@ -150,3 +156,5 @@ permissions:
   onesmp.stats.use: { default: true }
   onesmp.stats.hologram.admin: { default: op }
   onesmp.help.use: { default: true }
+  onesmp.discord.use: { default: true }
+  onesmp.store.use: { default: true }

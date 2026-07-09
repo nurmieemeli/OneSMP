@@ -86,6 +86,7 @@ public final class ScoreboardManager {
 
         for (int i = newTotal; i < oldTotal; i++) {
             Team team = board.getTeam("csln_" + i);
+            assert team != null;
             for (String entry : team.getEntries()) {
                 board.resetScores(entry);
             }

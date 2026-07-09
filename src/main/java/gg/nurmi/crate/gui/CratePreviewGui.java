@@ -18,7 +18,7 @@ public final class CratePreviewGui extends AbstractGui {
     }
 
     public CratePreviewGui(OneSMPPlugin plugin, CrateType type, int page) {
-        super(plugin, plugin.messages().parse("<white><type> <gray>Rewards",
+        super(plugin, plugin.messages().text("crate.gui-preview-title",
                 Placeholder.component("type", plugin.messages().parse(type.displayName()))), 6);
 
         List<CrateReward> rewards = type.rewards();
@@ -39,7 +39,7 @@ public final class CratePreviewGui extends AbstractGui {
     private ItemStack buildIcon(OneSMPPlugin plugin, CrateReward reward, double chance) {
         return new ItemBuilder(reward.iconMaterial())
                 .name(plugin.messages().parse(reward.displayName()))
-                .lore(plugin.messages().parse("<gray>Chance: <yellow><chance>%</yellow>",
+                .lore(plugin.messages().text("crate.gui-chance-lore",
                         Placeholder.unparsed("chance", String.format("%.2f", chance))))
                 .build();
     }

@@ -14,7 +14,8 @@ import org.bukkit.entity.Player;
 
 import java.util.List;
 
-// Category -> article navigation via Paper's Dialog API (https://docs.papermc.io/paper/dev/dialogs/); each click swaps in the next dialog server-side.
+// Category -> article navigation via Paper's Dialog API (https://docs.papermc.io/paper/dev/dialogs/);
+// each click swaps in the next dialog server-side.
 public final class HelpDialogs {
 
     private static final int COLUMNS = 2;
@@ -36,9 +37,9 @@ public final class HelpDialogs {
                 .toList();
 
         Dialog dialog = Dialog.create(factory -> factory.empty()
-                .base(DialogBase.builder(plugin.messages().parse("<gradient:#38bdf8:#818cf8><bold>Help</bold></gradient>"))
+                .base(DialogBase.builder(plugin.messages().parse(helpManager.message("dialog-title")))
                         .body(List.of(DialogBody.plainMessage(
-                                plugin.messages().parse("<gray>Pick a category to browse its articles."))))
+                                plugin.messages().parse(helpManager.message("dialog-subtitle")))))
                         .build())
                 .type(DialogType.multiAction(buttons).columns(COLUMNS).build()));
 
@@ -51,8 +52,8 @@ public final class HelpDialogs {
                 .toList();
 
         ActionButton back = ActionButton.create(
-                plugin.messages().parse("<gray>« Back"),
-                plugin.messages().parse("<gray>Back to categories"),
+                plugin.messages().parse(helpManager.message("dialog-back")),
+                plugin.messages().parse(helpManager.message("dialog-back-to-categories")),
                 BUTTON_WIDTH,
                 DialogAction.customClick((response, audience) -> {
                     if (audience instanceof Player viewer) {
@@ -75,12 +76,12 @@ public final class HelpDialogs {
 
     public static void openArticle(OneSMPPlugin plugin, HelpManager helpManager, Player player, HelpCategory category, HelpArticle article) {
         Component body = article.body().isEmpty()
-                ? plugin.messages().parse("<gray>(no content)")
+                ? plugin.messages().parse(helpManager.message("dialog-no-content"))
                 : plugin.messages().parse(String.join("<newline>", article.body()));
 
         ActionButton back = ActionButton.create(
-                plugin.messages().parse("<gray>« Back"),
-                plugin.messages().parse("<gray>Back to <category>",
+                plugin.messages().parse(helpManager.message("dialog-back")),
+                plugin.messages().parse(helpManager.message("dialog-back-to-category"),
                         Placeholder.component("category", plugin.messages().parse(category.displayName()))),
                 BUTTON_WIDTH,
                 DialogAction.customClick((response, audience) -> {
@@ -113,7 +114,7 @@ public final class HelpDialogs {
     private static ActionButton articleButton(OneSMPPlugin plugin, HelpManager helpManager, HelpCategory category, HelpArticle article) {
         return ActionButton.create(
                 plugin.messages().parse(article.title()),
-                plugin.messages().parse("<gray>Click to read"),
+                plugin.messages().parse(helpManager.message("dialog-click-to-read")),
                 BUTTON_WIDTH,
                 DialogAction.customClick((response, audience) -> {
                     if (audience instanceof Player viewer) {
