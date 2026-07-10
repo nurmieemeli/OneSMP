@@ -15,7 +15,7 @@ public final class EconomyListener implements Listener {
 
     @EventHandler
     public void onJoin(PlayerJoinEvent event) {
-        economyManager.handleJoin(event.getPlayer().getUniqueId(), event.getPlayer().getName());
+        economyManager.handleJoin(event.getPlayer().getUniqueId());
     }
 
     @EventHandler

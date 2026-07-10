@@ -262,7 +262,7 @@ public final class GuildCommand implements CommandExecutor, TabCompleter {
             guildManager.setRole(guild.id(), targetUuid.get(), newRole).thenRun(() ->
                     plugin.messages().send(player, promote ? "guild.promoted" : "guild.demoted",
                             Placeholder.unparsed("target", targetName),
-                            Placeholder.unparsed("role", newRole.name())));
+                            Placeholder.parsed("role", plugin.messages().raw(newRole.translationKey()))));
         });
     }
 

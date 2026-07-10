@@ -32,6 +32,11 @@ categories:
           - "<white>/sethome</white> y <white>/home</white> guardan y te devuelven a tus propias ubicaciones."
           - "<white>/tpa <player></white> solicita teletransportarte a otro jugador; <white>/tpaccept</white> o <white>/tpdeny</white> para responder."
           - "<white>/rtp</white> te teletransporta aleatoriamente a algún lugar inexplorado."
+      combat:
+        title: "<white>Combate y Desconexión"
+        body:
+          - "No cierres sesión en mitad de una pelea — desconectarte poco después de recibir un golpe te matará en lugar de dejarte escapar a salvo."
+          - "Esa misma ventana de tiempo también bloquea teletransportarte (hogares, teletransportes, RTP, TPA) hasta que pase."
   economy:
     display-name: "<gold>Economía"
     icon: GOLD_INGOT
@@ -87,6 +92,13 @@ categories:
         title: "<white>Hogar del Gremio"
         body:
           - "<white>/guild sethome</white> establece el hogar compartido de tu gremio; <white>/guild home</white> te teletransporta allí."
+      managing:
+        title: "<white>Gestionar Tu Gremio"
+        body:
+          - "<white>/guild kick <player></white> expulsa a un miembro; <white>/guild promote <player></white> y <white>/guild demote <player></white> cambian su rango."
+          - "<white>/guild info</white> muestra los detalles de tu gremio; <white>/guild list</white> muestra todos los gremios del servidor."
+          - "<white>/guild leave</white> abandona tu gremio; el propietario puede disolverlo por completo con <white>/guild disband</white>."
+          - "<white>/guild gui</white> (o simplemente <white>/guild</white>) abre un menú que cubre todo lo anterior."
   crates:
     display-name: "<yellow>Cajas"
     icon: CHEST
@@ -97,3 +109,46 @@ categories:
         body:
           - "Haz clic derecho en un bloque de caja vinculado mientras sostienes una llave compatible para abrirla."
           - "Las llaves son objetos de apariencia normal marcados para un tipo de caja específico — no se pueden falsificar."
+          - "Haz clic izquierdo en una caja vinculada para previsualizar cada posible recompensa y su probabilidad exacta, sin gastar una llave."
+  stats:
+    display-name: "<red>Estadísticas de Jugador"
+    icon: DIAMOND_SWORD
+    description: "Sigue tus asesinatos, muertes y tiempo de juego."
+    articles:
+      overview:
+        title: "<white>Tus Estadísticas"
+        body:
+          - "<white>/stats</white> muestra tus propios asesinatos, muertes, racha de asesinatos, tiempo de juego y K/D; <white>/stats <player></white> consulta las de otra persona, online u offline."
+          - "El crédito de asesinato no se limita al combate cuerpo a cuerpo directo — una flecha disparada, TNT lanzado, un Cristal del End destruido o un ancla de reaparición activada también cuentan si la muerte ocurre poco después."
+      leaderboards:
+        title: "<white>Clasificaciones"
+        body:
+          - "<white>/statstop <kills|deaths|killstreak|playtime|kd></white> abre una clasificación para esa estadística."
+  vote:
+    display-name: "<blue>Recompensas por Votar"
+    icon: NETHER_STAR
+    description: "Vota por el servidor y consigue recompensas."
+    articles:
+      voting:
+        title: "<white>Votar"
+        body:
+          - "<white>/vote</white> muestra los enlaces de los sitios de votación y tu número de votos y racha actuales."
+          - "Votar concede dinero y llaves de cajas automáticamente — mantén tu racha activa para conseguir recompensas extra en ciertos hitos."
+      leaderboard:
+        title: "<white>Clasificación de Votos"
+        body:
+          - "<white>/votetop</white> muestra quién ha votado más."
+  messaging:
+    display-name: "<dark_aqua>Mensajes Privados"
+    icon: PAPER
+    description: "Envía mensajes privados a otros jugadores."
+    articles:
+      basics:
+        title: "<white>Enviar Mensajes"
+        body:
+          - "<white>/msg <player> <message></white> (o <white>/tell</white>, <white>/w</white>, <white>/pm</white>) envía un mensaje privado."
+          - "<white>/reply <message></white> (o <white>/r</white>) responde a tu último mensaje privado sin volver a escribir el nombre."
+      ignoring:
+        title: "<white>Ignorar Jugadores"
+        body:
+          - "<white>/ignore <player></white> activa o desactiva el bloqueo de mensajes privados de ese jugador."

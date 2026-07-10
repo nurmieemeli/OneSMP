@@ -32,6 +32,11 @@ categories:
           - "<white>/sethome</white> and <white>/home</white> save and return to your own locations."
           - "<white>/tpa <player></white> requests to teleport to another player; <white>/tpaccept</white> or <white>/tpdeny</white> to respond."
           - "<white>/rtp</white> randomly teleports you somewhere unexplored."
+      combat:
+        title: "<white>Combat & Disconnecting"
+        body:
+          - "Don't log out mid-fight — disconnecting shortly after being hit kills you instead of letting you escape safely."
+          - "That same window also blocks teleporting away (homes, warps, RTP, TPA) until it passes."
   economy:
     display-name: "<gold>Economy"
     icon: GOLD_INGOT
@@ -87,6 +92,13 @@ categories:
         title: "<white>Guild Home"
         body:
           - "<white>/guild sethome</white> sets your guild's shared home; <white>/guild home</white> teleports there."
+      managing:
+        title: "<white>Managing Your Guild"
+        body:
+          - "<white>/guild kick <player></white> removes a member; <white>/guild promote <player></white> and <white>/guild demote <player></white> change their role."
+          - "<white>/guild info</white> shows your guild's details; <white>/guild list</white> browses every guild on the server."
+          - "<white>/guild leave</white> leaves your guild; the owner can <white>/guild disband</white> it entirely."
+          - "<white>/guild gui</white> (or just <white>/guild</white>) opens a menu covering everything above."
   crates:
     display-name: "<yellow>Crates"
     icon: CHEST
@@ -97,3 +109,46 @@ categories:
         body:
           - "Right-click a bound crate block while holding a matching key to open it."
           - "Keys are ordinary-looking items tagged for a specific crate type — they can't be faked."
+          - "Left-click a bound crate to preview every possible reward and its exact odds, without spending a key."
+  stats:
+    display-name: "<red>Player Stats"
+    icon: DIAMOND_SWORD
+    description: "Track your kills, deaths, and playtime."
+    articles:
+      overview:
+        title: "<white>Your Stats"
+        body:
+          - "<white>/stats</white> shows your own kills, deaths, killstreak, playtime, and K/D; <white>/stats <player></white> checks anyone else's, online or offline."
+          - "Kill credit isn't just direct melee — a shot arrow, thrown TNT, a broken End Crystal, or a triggered respawn anchor still counts if the kill follows soon after."
+      leaderboards:
+        title: "<white>Leaderboards"
+        body:
+          - "<white>/statstop <kills|deaths|killstreak|playtime|kd></white> opens a leaderboard for that stat."
+  vote:
+    display-name: "<blue>Vote Rewards"
+    icon: NETHER_STAR
+    description: "Vote for the server and get rewarded."
+    articles:
+      voting:
+        title: "<white>Voting"
+        body:
+          - "<white>/vote</white> shows the vote-site links and your current vote count and streak."
+          - "Voting grants money and crate keys automatically; keep your streak alive for bonus rewards at milestone streaks."
+      leaderboard:
+        title: "<white>Vote Leaderboard"
+        body:
+          - "<white>/votetop</white> shows who's voted the most."
+  messaging:
+    display-name: "<dark_aqua>Private Messaging"
+    icon: PAPER
+    description: "Send private messages to other players."
+    articles:
+      basics:
+        title: "<white>Sending Messages"
+        body:
+          - "<white>/msg <player> <message></white> (or <white>/tell</white>, <white>/w</white>, <white>/pm</white>) sends a private message."
+          - "<white>/reply <message></white> (or <white>/r</white>) replies to your last DM without typing the name again."
+      ignoring:
+        title: "<white>Ignoring Players"
+        body:
+          - "<white>/ignore <player></white> toggles blocking DMs from that player."

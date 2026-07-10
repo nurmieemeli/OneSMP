@@ -45,7 +45,7 @@ public final class VoteManager {
     }
 
     // Loads this player's snapshot into the live cache so MiniPlaceholders can read it without blocking.
-    public void handleJoin(UUID uuid, String name) {
+    public void handleJoin(UUID uuid) {
         plugin.scheduler().runAsync(() -> cache.put(uuid, loadSnapshotFromDb(uuid)));
     }
 
@@ -70,11 +70,11 @@ public final class VoteManager {
         plugin.scheduler().runAsync(() -> {
             VoteResult result = recordVote(uuid, name);
             Reward reward = baseReward();
-            grant(uuid, name, reward);
+            grant(uuid, reward);
             if (result.milestoneReached()) {
                 Reward bonus = milestoneReward(result.milestoneStreak());
                 if (bonus != null) {
-                    grant(uuid, name, bonus);
+                    grant(uuid, bonus);
                 }
             }
             plugin.scheduler().runGlobal(() -> announce(uuid, name, result));
@@ -124,25 +124,24 @@ public final class VoteManager {
 
             try (PreparedStatement upsert = mysql()
                     ? connection.prepareStatement("""
-                        INSERT INTO player_votes (uuid, name, total_votes, current_streak, best_streak, last_vote_epoch_day)
-                        VALUES (?, ?, ?, ?, ?, ?)
-                        ON DUPLICATE KEY UPDATE name = VALUES(name), total_votes = VALUES(total_votes),
+                        INSERT INTO player_votes (uuid, total_votes, current_streak, best_streak, last_vote_epoch_day)
+                        VALUES (?, ?, ?, ?, ?)
+                        ON DUPLICATE KEY UPDATE total_votes = VALUES(total_votes),
                             current_streak = VALUES(current_streak), best_streak = VALUES(best_streak),
                             last_vote_epoch_day = VALUES(last_vote_epoch_day)
                         """)
                     : connection.prepareStatement("""
-                        INSERT INTO player_votes (uuid, name, total_votes, current_streak, best_streak, last_vote_epoch_day)
-                        VALUES (?, ?, ?, ?, ?, ?)
-                        ON CONFLICT(uuid) DO UPDATE SET name = excluded.name, total_votes = excluded.total_votes,
+                        INSERT INTO player_votes (uuid, total_votes, current_streak, best_streak, last_vote_epoch_day)
+                        VALUES (?, ?, ?, ?, ?)
+                        ON CONFLICT(uuid) DO UPDATE SET total_votes = excluded.total_votes,
                             current_streak = excluded.current_streak, best_streak = excluded.best_streak,
                             last_vote_epoch_day = excluded.last_vote_epoch_day
                         """)) {
                 upsert.setString(1, uuid.toString());
-                upsert.setString(2, name);
-                upsert.setInt(3, totalVotes);
-                upsert.setInt(4, currentStreak);
-                upsert.setInt(5, bestStreak);
-                upsert.setLong(6, lastVoteEpochDay);
+                upsert.setInt(2, totalVotes);
+                upsert.setInt(3, currentStreak);
+                upsert.setInt(4, bestStreak);
+                upsert.setLong(5, lastVoteEpochDay);
                 upsert.executeUpdate();
             }
 
@@ -156,7 +155,7 @@ public final class VoteManager {
         }
     }
 
-    private void grant(UUID uuid, String name, Reward reward) {
+    private void grant(UUID uuid, Reward reward) {
         if (reward.money().signum() > 0) {
             plugin.economy().deposit(uuid, reward.money());
         }
@@ -311,12 +310,12 @@ public final class VoteManager {
             List<TopEntry> entries = new ArrayList<>();
             try (Connection connection = database.getConnection();
                  PreparedStatement statement = connection.prepareStatement(
-                         "SELECT uuid, name, total_votes FROM player_votes WHERE name IS NOT NULL ORDER BY total_votes DESC LIMIT ?")) {
+                         "SELECT uuid, total_votes FROM player_votes ORDER BY total_votes DESC LIMIT ?")) {
                 statement.setInt(1, limit);
                 try (ResultSet resultSet = statement.executeQuery()) {
                     while (resultSet.next()) {
-                        entries.add(new TopEntry(UUID.fromString(resultSet.getString("uuid")),
-                                resultSet.getString("name"), resultSet.getLong("total_votes")));
+                        UUID uuid = UUID.fromString(resultSet.getString("uuid"));
+                        entries.add(new TopEntry(uuid, Bukkit.getOfflinePlayer(uuid).getName(), resultSet.getLong("total_votes")));
                     }
                 }
             } catch (SQLException ex) {

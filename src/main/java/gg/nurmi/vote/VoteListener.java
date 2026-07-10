@@ -54,7 +54,7 @@ public final class VoteListener implements Listener {
 
     @EventHandler
     public void onJoin(PlayerJoinEvent event) {
-        voteManager.handleJoin(event.getPlayer().getUniqueId(), event.getPlayer().getName());
+        voteManager.handleJoin(event.getPlayer().getUniqueId());
         voteManager.deliverPending(event.getPlayer());
     }
 

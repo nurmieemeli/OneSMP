@@ -32,6 +32,11 @@ categories:
           - "<white>/sethome</white> und <white>/home</white> speichern und bringen dich zu deinen eigenen Orten zurück."
           - "<white>/tpa <player></white> fragt an, zu einem anderen Spieler zu teleportieren; <white>/tpaccept</white> oder <white>/tpdeny</white>, um zu antworten."
           - "<white>/rtp</white> teleportiert dich zufällig an einen unerforschten Ort."
+      combat:
+        title: "<white>Kampf & Verbindungsabbruch"
+        body:
+          - "Verlasse den Server nicht mitten im Kampf — wer sich kurz nach einem Treffer trennt, wird getötet, anstatt sicher zu entkommen."
+          - "Dasselbe Zeitfenster blockiert auch das Teleportieren (Zuhause, Warps, RTP, TPA), bis es vorüber ist."
   economy:
     display-name: "<gold>Wirtschaft"
     icon: GOLD_INGOT
@@ -87,6 +92,13 @@ categories:
         title: "<white>Gildenzuhause"
         body:
           - "<white>/guild sethome</white> legt das gemeinsame Zuhause deiner Gilde fest; <white>/guild home</white> teleportiert dorthin."
+      managing:
+        title: "<white>Deine Gilde verwalten"
+        body:
+          - "<white>/guild kick <player></white> entfernt ein Mitglied; <white>/guild promote <player></white> und <white>/guild demote <player></white> ändern seine Rolle."
+          - "<white>/guild info</white> zeigt die Details deiner Gilde; <white>/guild list</white> durchsucht alle Gilden auf dem Server."
+          - "<white>/guild leave</white> verlässt deine Gilde; der Besitzer kann sie mit <white>/guild disband</white> vollständig auflösen."
+          - "<white>/guild gui</white> (oder einfach <white>/guild</white>) öffnet ein Menü, das alles oben Genannte abdeckt."
   crates:
     display-name: "<yellow>Kisten"
     icon: CHEST
@@ -97,3 +109,46 @@ categories:
         body:
           - "Rechtsklicke einen gebundenen Kistenblock, während du einen passenden Schlüssel hältst, um ihn zu öffnen."
           - "Schlüssel sind gewöhnlich aussehende Gegenstände, die für einen bestimmten Kistentyp markiert sind — sie können nicht gefälscht werden."
+          - "Linksklicke eine gebundene Kiste, um jede mögliche Belohnung und ihre genaue Chance zu sehen, ohne einen Schlüssel zu verbrauchen."
+  stats:
+    display-name: "<red>Spielerstatistiken"
+    icon: DIAMOND_SWORD
+    description: "Behalte deine Kills, Tode und Spielzeit im Blick."
+    articles:
+      overview:
+        title: "<white>Deine Statistiken"
+        body:
+          - "<white>/stats</white> zeigt deine eigenen Kills, Tode, Killstreak, Spielzeit und K/D; <white>/stats <player></white> prüft die eines anderen Spielers, online oder offline."
+          - "Kill-Gutschrift ist nicht nur direkter Nahkampf — ein abgeschossener Pfeil, geworfenes TNT, ein zerstörter Ender-Kristall oder ein ausgelöster Respawn-Anker zählen ebenfalls, wenn der Tod bald darauf folgt."
+      leaderboards:
+        title: "<white>Bestenlisten"
+        body:
+          - "<white>/statstop <kills|deaths|killstreak|playtime|kd></white> öffnet eine Bestenliste für diese Statistik."
+  vote:
+    display-name: "<blue>Vote-Belohnungen"
+    icon: NETHER_STAR
+    description: "Votet für den Server und erhaltet Belohnungen."
+    articles:
+      voting:
+        title: "<white>Voten"
+        body:
+          - "<white>/vote</white> zeigt die Vote-Links sowie deine aktuelle Vote-Anzahl und Serie."
+          - "Voten gewährt automatisch Geld und Kistenschlüssel — halte deine Serie am Leben für Bonusbelohnungen bei bestimmten Meilensteinen."
+      leaderboard:
+        title: "<white>Vote-Bestenliste"
+        body:
+          - "<white>/votetop</white> zeigt, wer am meisten gevotet hat."
+  messaging:
+    display-name: "<dark_aqua>Privatnachrichten"
+    icon: PAPER
+    description: "Sende Privatnachrichten an andere Spieler."
+    articles:
+      basics:
+        title: "<white>Nachrichten senden"
+        body:
+          - "<white>/msg <player> <message></white> (oder <white>/tell</white>, <white>/w</white>, <white>/pm</white>) sendet eine Privatnachricht."
+          - "<white>/reply <message></white> (oder <white>/r</white>) antwortet auf deine letzte private Nachricht, ohne den Namen erneut einzugeben."
+      ignoring:
+        title: "<white>Spieler ignorieren"
+        body:
+          - "<white>/ignore <player></white> schaltet das Blockieren von Nachrichten dieses Spielers um."

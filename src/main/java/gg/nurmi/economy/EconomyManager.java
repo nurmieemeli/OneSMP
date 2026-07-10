@@ -2,6 +2,7 @@ package gg.nurmi.economy;
 
 import gg.nurmi.OneSMPPlugin;
 import gg.nurmi.util.Database;
+import org.bukkit.Bukkit;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -54,49 +55,37 @@ public final class EconomyManager {
         if (cached != null) {
             return CompletableFuture.completedFuture(cached);
         }
-        return plugin.scheduler().supplyAsync(() -> loadOrCreate(uuid, null));
+        return plugin.scheduler().supplyAsync(() -> loadOrCreate(uuid));
     }
 
-    public void handleJoin(UUID uuid, String name) {
-        plugin.scheduler().runAsync(() -> cache.put(uuid, loadOrCreate(uuid, name)));
+    public void handleJoin(UUID uuid) {
+        plugin.scheduler().runAsync(() -> cache.put(uuid, loadOrCreate(uuid)));
     }
 
     public void handleQuit(UUID uuid) {
         cache.remove(uuid);
     }
 
-    private BigDecimal loadOrCreate(UUID uuid, String knownName) {
+    private BigDecimal loadOrCreate(UUID uuid) {
         try (Connection connection = database.getConnection()) {
             try (PreparedStatement select = connection.prepareStatement("SELECT balance FROM accounts WHERE uuid = ?")) {
                 select.setString(1, uuid.toString());
                 try (ResultSet resultSet = select.executeQuery()) {
                     if (resultSet.next()) {
-                        if (knownName != null) {
-                            updateName(connection, uuid, knownName);
-                        }
                         return resultSet.getBigDecimal("balance").setScale(2, RoundingMode.HALF_UP);
                     }
                 }
             }
             try (PreparedStatement insert = connection.prepareStatement(
-                    "INSERT INTO accounts(uuid, name, balance) VALUES (?, ?, ?)")) {
+                    "INSERT INTO accounts(uuid, balance) VALUES (?, ?)")) {
                 insert.setString(1, uuid.toString());
-                insert.setString(2, knownName);
-                insert.setBigDecimal(3, startingBalance);
+                insert.setBigDecimal(2, startingBalance);
                 insert.executeUpdate();
             }
             return startingBalance;
         } catch (SQLException ex) {
             plugin.getLogger().log(Level.WARNING, "Failed to load balance for " + uuid, ex);
             throw new RuntimeException("Failed to load balance for " + uuid, ex);
-        }
-    }
-
-    private void updateName(Connection connection, UUID uuid, String name) throws SQLException {
-        try (PreparedStatement update = connection.prepareStatement("UPDATE accounts SET name = ? WHERE uuid = ?")) {
-            update.setString(1, name);
-            update.setString(2, uuid.toString());
-            update.executeUpdate();
         }
     }
 
@@ -160,13 +149,17 @@ public final class EconomyManager {
         });
     }
 
+    // Resolves the name through Mojang/Bukkit's own cache (the authority on current name -> UUID), not our
+    // possibly-stale `accounts.name` column, then confirms that UUID actually has an account here.
+    @SuppressWarnings("deprecation")
     public CompletableFuture<UUID> resolveUuidByName(String name) {
         return plugin.scheduler().supplyAsync(() -> {
+            UUID uuid = Bukkit.getOfflinePlayer(name).getUniqueId();
             try (Connection connection = database.getConnection();
-                 PreparedStatement statement = connection.prepareStatement("SELECT uuid FROM accounts WHERE name = ?")) {
-                statement.setString(1, name);
+                 PreparedStatement statement = connection.prepareStatement("SELECT 1 FROM accounts WHERE uuid = ?")) {
+                statement.setString(1, uuid.toString());
                 try (ResultSet resultSet = statement.executeQuery()) {
-                    return resultSet.next() ? UUID.fromString(resultSet.getString("uuid")) : null;
+                    return resultSet.next() ? uuid : null;
                 }
             } catch (SQLException ex) {
                 plugin.getLogger().log(Level.WARNING, "Failed to resolve UUID for name " + name, ex);
@@ -180,13 +173,12 @@ public final class EconomyManager {
             List<BalanceEntry> entries = new ArrayList<>();
             try (Connection connection = database.getConnection();
                  PreparedStatement statement = connection.prepareStatement(
-                         "SELECT uuid, name, balance FROM accounts WHERE name IS NOT NULL ORDER BY balance DESC LIMIT ?")) {
+                         "SELECT uuid, balance FROM accounts ORDER BY balance DESC LIMIT ?")) {
                 statement.setInt(1, limit);
                 try (ResultSet resultSet = statement.executeQuery()) {
                     while (resultSet.next()) {
-                        entries.add(new BalanceEntry(
-                                UUID.fromString(resultSet.getString("uuid")),
-                                resultSet.getString("name"),
+                        UUID uuid = UUID.fromString(resultSet.getString("uuid"));
+                        entries.add(new BalanceEntry(uuid, Bukkit.getOfflinePlayer(uuid).getName(),
                                 resultSet.getBigDecimal("balance").setScale(2, RoundingMode.HALF_UP)));
                     }
                 }

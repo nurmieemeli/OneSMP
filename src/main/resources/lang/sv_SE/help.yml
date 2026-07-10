@@ -32,6 +32,11 @@ categories:
           - "<white>/sethome</white> och <white>/home</white> sparar och tar dig tillbaka till dina egna platser."
           - "<white>/tpa <player></white> begär att teleportera till en annan spelare; <white>/tpaccept</white> eller <white>/tpdeny</white> för att svara."
           - "<white>/rtp</white> teleporterar dig slumpmässigt till en outforskad plats."
+      combat:
+        title: "<white>Strid & Uppkopplingsavbrott"
+        body:
+          - "Logga inte ut mitt i en strid — om du kopplar från strax efter att ha blivit träffad dödar det dig istället för att låta dig fly säkert."
+          - "Samma tidsfönster blockerar också teleportering (hem, warps, RTP, TPA) tills det har gått över."
   economy:
     display-name: "<gold>Ekonomi"
     icon: GOLD_INGOT
@@ -87,6 +92,13 @@ categories:
         title: "<white>Gildehem"
         body:
           - "<white>/guild sethome</white> sätter ditt gilles gemensamma hem; <white>/guild home</white> teleporterar dit."
+      managing:
+        title: "<white>Hantera Ditt Gille"
+        body:
+          - "<white>/guild kick <player></white> tar bort en medlem; <white>/guild promote <player></white> och <white>/guild demote <player></white> ändrar deras roll."
+          - "<white>/guild info</white> visar ditt gilles detaljer; <white>/guild list</white> bläddrar bland alla gillen på servern."
+          - "<white>/guild leave</white> lämnar ditt gille; ägaren kan <white>/guild disband</white> upplösa det helt."
+          - "<white>/guild gui</white> (eller bara <white>/guild</white>) öppnar en meny som täcker allt ovan."
   crates:
     display-name: "<yellow>Kistor"
     icon: CHEST
@@ -97,3 +109,46 @@ categories:
         body:
           - "Högerklicka på ett bundet kistblock medan du håller en matchande nyckel för att öppna det."
           - "Nycklar är föremål som ser vanliga ut men är märkta för en specifik kisttyp — de kan inte förfalskas."
+          - "Vänsterklicka på en bunden kista för att förhandsgranska varje möjlig belöning och dess exakta odds, utan att spendera en nyckel."
+  stats:
+    display-name: "<red>Spelarstatistik"
+    icon: DIAMOND_SWORD
+    description: "Håll koll på dina dödar, dödsfall och speltid."
+    articles:
+      overview:
+        title: "<white>Din Statistik"
+        body:
+          - "<white>/stats</white> visar dina egna dödar, dödsfall, dödsstreak, speltid och K/D; <white>/stats <player></white> kontrollerar någon annans, online eller offline."
+          - "Dödspoäng är inte bara direkt närstrid — en avfyrad pil, kastad TNT, en förstörd Enderkristall eller en utlöst respawn-ankare räknas fortfarande om dödandet följer strax efter."
+      leaderboards:
+        title: "<white>Topplistor"
+        body:
+          - "<white>/statstop <kills|deaths|killstreak|playtime|kd></white> öppnar en topplista för den statistiken."
+  vote:
+    display-name: "<blue>Röstbelöningar"
+    icon: NETHER_STAR
+    description: "Rösta på servern och få belöningar."
+    articles:
+      voting:
+        title: "<white>Röstning"
+        body:
+          - "<white>/vote</white> visar länkarna till röstsajterna samt ditt nuvarande röstantal och streak."
+          - "Röstning ger automatiskt pengar och kistnycklar — håll din streak vid liv för bonusbelöningar vid vissa milstolpar."
+      leaderboard:
+        title: "<white>Röstningstopplista"
+        body:
+          - "<white>/votetop</white> visar vem som har röstat mest."
+  messaging:
+    display-name: "<dark_aqua>Privata Meddelanden"
+    icon: PAPER
+    description: "Skicka privata meddelanden till andra spelare."
+    articles:
+      basics:
+        title: "<white>Skicka Meddelanden"
+        body:
+          - "<white>/msg <player> <message></white> (eller <white>/tell</white>, <white>/w</white>, <white>/pm</white>) skickar ett privat meddelande."
+          - "<white>/reply <message></white> (eller <white>/r</white>) svarar på ditt senaste DM utan att skriva namnet igen."
+      ignoring:
+        title: "<white>Ignorera Spelare"
+        body:
+          - "<white>/ignore <player></white> växlar blockering av DM från den spelaren."

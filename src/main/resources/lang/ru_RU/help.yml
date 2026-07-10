@@ -32,6 +32,11 @@ categories:
           - "<white>/sethome</white> и <white>/home</white> сохраняют и возвращают вас в ваши собственные точки."
           - "<white>/tpa <player></white> запрашивает телепортацию к другому игроку; <white>/tpaccept</white> или <white>/tpdeny</white>, чтобы ответить."
           - "<white>/rtp</white> телепортирует вас в случайное неисследованное место."
+      combat:
+        title: "<white>Бой и отключение от сервера"
+        body:
+          - "Не выходите из игры посреди боя — отключение вскоре после получения удара убьёт вас вместо того, чтобы дать безопасно сбежать."
+          - "То же самое окно времени блокирует телепортацию (дома, варпы, RTP, TPA), пока оно не истечёт."
   economy:
     display-name: "<gold>Экономика"
     icon: GOLD_INGOT
@@ -87,6 +92,13 @@ categories:
         title: "<white>Дом гильдии"
         body:
           - "<white>/guild sethome</white> устанавливает общий дом вашей гильдии; <white>/guild home</white> телепортирует туда."
+      managing:
+        title: "<white>Управление гильдией"
+        body:
+          - "<white>/guild kick <player></white> исключает участника; <white>/guild promote <player></white> и <white>/guild demote <player></white> изменяют его роль."
+          - "<white>/guild info</white> показывает информацию о вашей гильдии; <white>/guild list</white> показывает список всех гильдий на сервере."
+          - "<white>/guild leave</white> покидает вашу гильдию; владелец может полностью распустить её командой <white>/guild disband</white>."
+          - "<white>/guild gui</white> (или просто <white>/guild</white>) открывает меню, охватывающее всё вышеперечисленное."
   crates:
     display-name: "<yellow>Кейсы"
     icon: CHEST
@@ -97,3 +109,46 @@ categories:
         body:
           - "Нажмите правой кнопкой мыши на привязанный блок кейса, держа подходящий ключ, чтобы открыть его."
           - "Ключи выглядят как обычные предметы, но помечены для конкретного типа кейса — подделать их нельзя."
+          - "Нажмите левой кнопкой мыши на привязанный кейс, чтобы увидеть все возможные награды и их точные шансы, не тратя ключ."
+  stats:
+    display-name: "<red>Статистика игроков"
+    icon: DIAMOND_SWORD
+    description: "Отслеживайте свои убийства, смерти и время в игре."
+    articles:
+      overview:
+        title: "<white>Ваша статистика"
+        body:
+          - "<white>/stats</white> показывает ваши собственные убийства, смерти, серию убийств, время в игре и K/D; <white>/stats <player></white> проверяет чужую, онлайн или офлайн."
+          - "Засчитывается не только прямая ближняя атака — выпущенная стрела, брошенный TNT, разбитый Кристалл Края или сработавший якорь возрождения тоже засчитываются, если смерть следует вскоре после этого."
+      leaderboards:
+        title: "<white>Таблицы лидеров"
+        body:
+          - "<white>/statstop <kills|deaths|killstreak|playtime|kd></white> открывает таблицу лидеров по этой статистике."
+  vote:
+    display-name: "<blue>Награды за голосование"
+    icon: NETHER_STAR
+    description: "Голосуйте за сервер и получайте награды."
+    articles:
+      voting:
+        title: "<white>Голосование"
+        body:
+          - "<white>/vote</white> показывает ссылки на сайты для голосования, а также ваше текущее количество голосов и серию."
+          - "Голосование автоматически даёт деньги и ключи от кейсов — поддерживайте серию, чтобы получать бонусные награды на определённых рубежах."
+      leaderboard:
+        title: "<white>Таблица лидеров голосования"
+        body:
+          - "<white>/votetop</white> показывает, кто проголосовал больше всех."
+  messaging:
+    display-name: "<dark_aqua>Личные сообщения"
+    icon: PAPER
+    description: "Отправляйте личные сообщения другим игрокам."
+    articles:
+      basics:
+        title: "<white>Отправка сообщений"
+        body:
+          - "<white>/msg <player> <message></white> (или <white>/tell</white>, <white>/w</white>, <white>/pm</white>) отправляет личное сообщение."
+          - "<white>/reply <message></white> (или <white>/r</white>) отвечает на последнее полученное сообщение без повторного ввода имени."
+      ignoring:
+        title: "<white>Игнорирование игроков"
+        body:
+          - "<white>/ignore <player></white> включает или выключает блокировку сообщений от этого игрока."

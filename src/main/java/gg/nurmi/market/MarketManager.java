@@ -2,6 +2,7 @@ package gg.nurmi.market;
 
 import gg.nurmi.OneSMPPlugin;
 import gg.nurmi.util.Database;
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
@@ -23,7 +24,7 @@ import java.util.logging.Level;
 public final class MarketManager {
 
     private static final String SELECT_COLUMNS =
-            "id, seller_uuid, seller_name, material, item_data, price, created_at";
+            "id, seller_uuid, material, item_data, price, created_at";
 
     public enum BuyResult {
         SUCCESS, NOT_FOUND, OWN_LISTING, INSUFFICIENT_FUNDS, SOLD_OUT
@@ -72,16 +73,15 @@ public final class MarketManager {
         String material = item.getType().name();
 
         return plugin.scheduler().supplyAsync(() -> {
-            String insert = "INSERT INTO market_listings(seller_uuid, seller_name, material, item_data, price, created_at) "
-                    + "VALUES (?, ?, ?, ?, ?, ?)";
+            String insert = "INSERT INTO market_listings(seller_uuid, material, item_data, price, created_at) "
+                    + "VALUES (?, ?, ?, ?, ?)";
             try (Connection connection = database.getConnection();
                  PreparedStatement statement = connection.prepareStatement(insert, Statement.RETURN_GENERATED_KEYS)) {
                 statement.setString(1, sellerUuid.toString());
-                statement.setString(2, sellerName);
-                statement.setString(3, material);
-                statement.setBytes(4, data);
-                statement.setBigDecimal(5, scaledPrice);
-                statement.setLong(6, createdAt);
+                statement.setString(2, material);
+                statement.setBytes(3, data);
+                statement.setBigDecimal(4, scaledPrice);
+                statement.setLong(5, createdAt);
                 statement.executeUpdate();
                 try (ResultSet keys = statement.getGeneratedKeys()) {
                     int id = keys.next() ? keys.getInt(1) : -1;
@@ -225,10 +225,11 @@ public final class MarketManager {
 
     private MarketListing readListing(ResultSet resultSet) throws SQLException {
         ItemStack item = ItemStack.deserializeBytes(resultSet.getBytes("item_data"));
+        UUID sellerUuid = UUID.fromString(resultSet.getString("seller_uuid"));
         return new MarketListing(
                 resultSet.getInt("id"),
-                UUID.fromString(resultSet.getString("seller_uuid")),
-                resultSet.getString("seller_name"),
+                sellerUuid,
+                Bukkit.getOfflinePlayer(sellerUuid).getName(),
                 item,
                 resultSet.getBigDecimal("price").setScale(2, RoundingMode.HALF_UP),
                 resultSet.getLong("created_at"));

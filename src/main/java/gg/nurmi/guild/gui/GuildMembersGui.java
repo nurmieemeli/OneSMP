@@ -41,7 +41,8 @@ public final class GuildMembersGui extends AbstractGui {
 
             ItemStack icon = new ItemBuilder(Material.PLAYER_HEAD)
                     .name(plugin.messages().text("guild.gui-member-name",
-                            Placeholder.unparsed("name", name), Placeholder.unparsed("role", member.role().name())))
+                            Placeholder.unparsed("name", name),
+                            Placeholder.parsed("role", plugin.messages().raw(member.role().translationKey()))))
                     .lore(viewerRole.canManageMembers() && !guild.isOwner(member.uuid()) && !member.uuid().equals(viewerUuid)
                             ? List.of(
                                     plugin.messages().text("guild.gui-click-to-kick"),
@@ -69,7 +70,8 @@ public final class GuildMembersGui extends AbstractGui {
                     guildManager.setRole(guild.id(), member.uuid(), newRole).thenRun(() ->
                             plugin.scheduler().runAtEntity(player, () -> {
                                 plugin.messages().send(player, newRole == GuildRole.OFFICER ? "guild.promoted" : "guild.demoted",
-                                        Placeholder.unparsed("target", name), Placeholder.unparsed("role", newRole.name()));
+                                        Placeholder.unparsed("target", name),
+                                        Placeholder.parsed("role", plugin.messages().raw(newRole.translationKey())));
                                 new GuildMembersGui(plugin, guildManager, guild, viewerUuid).open(player);
                             }, () -> {}));
                 } else {
@@ -89,6 +91,11 @@ public final class GuildMembersGui extends AbstractGui {
             });
         }
 
+        ItemStack filler = new ItemBuilder(Material.GRAY_STAINED_GLASS_PANE).name(plugin.messages().text("gui.filler")).build();
+        for (int emptySlot = slot; emptySlot < PAGE_SIZE; emptySlot++) {
+            setItem(emptySlot, filler);
+        }
+
         ItemStack back = new ItemBuilder(Material.ARROW).name(plugin.messages().text("gui.back")).build();
         setButton(BACK_SLOT, back, event -> {
             if (event.getWhoClicked() instanceof Player player) {
@@ -98,5 +105,11 @@ public final class GuildMembersGui extends AbstractGui {
 
         addPaginationFooter(pagination, page, (player, targetPage) ->
                 new GuildMembersGui(plugin, guildManager, guild, viewerUuid, targetPage).open(player));
+
+        for (int footerSlot = footerRowStart; footerSlot < footerRowStart + 9; footerSlot++) {
+            if (getInventory().getItem(footerSlot) == null) {
+                setItem(footerSlot, filler);
+            }
+        }
     }
 }

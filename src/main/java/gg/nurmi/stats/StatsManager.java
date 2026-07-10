@@ -3,6 +3,7 @@ package gg.nurmi.stats;
 import gg.nurmi.OneSMPPlugin;
 import gg.nurmi.util.Database;
 import gg.nurmi.util.TextUtil;
+import org.bukkit.Bukkit;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -71,13 +72,12 @@ public final class StatsManager {
     public record TopEntry(UUID uuid, String name, long value) {
     }
 
-    public record Snapshot(String name, int kills, int deaths, int currentKillstreak, int bestKillstreak, long playtimeSeconds) {
+    public record Snapshot(int kills, int deaths, int currentKillstreak, int bestKillstreak, long playtimeSeconds) {
     }
 
-    public static final Snapshot EMPTY_SNAPSHOT = new Snapshot(null, 0, 0, 0, 0, 0);
+    public static final Snapshot EMPTY_SNAPSHOT = new Snapshot(0, 0, 0, 0, 0);
 
     private static final class Stats {
-        volatile String name;
         final AtomicInteger kills = new AtomicInteger();
         final AtomicInteger deaths = new AtomicInteger();
         final AtomicInteger currentKillstreak = new AtomicInteger();
@@ -95,9 +95,9 @@ public final class StatsManager {
         this.database = plugin.database();
     }
 
-    public void handleJoin(UUID uuid, String name) {
+    public void handleJoin(UUID uuid) {
         plugin.scheduler().runAsync(() -> {
-            Stats stats = loadOrCreate(uuid, name);
+            Stats stats = loadOrCreate(uuid);
             stats.sessionStartMillis = System.currentTimeMillis();
             cache.put(uuid, stats);
         });
@@ -138,8 +138,8 @@ public final class StatsManager {
     }
 
     // Returns the killer's current killstreak after this kill, for milestone broadcasts.
-    public int recordKill(UUID killer, String killerName) {
-        Stats stats = cache.computeIfAbsent(killer, ignored -> loadOrCreate(killer, killerName));
+    public int recordKill(UUID killer) {
+        Stats stats = cache.computeIfAbsent(killer, this::loadOrCreate);
         stats.kills.incrementAndGet();
         int streak = stats.currentKillstreak.incrementAndGet();
         stats.bestKillstreak.updateAndGet(best -> Math.max(best, streak));
@@ -147,8 +147,8 @@ public final class StatsManager {
         return streak;
     }
 
-    public void recordDeath(UUID victim, String victimName) {
-        Stats stats = cache.computeIfAbsent(victim, ignored -> loadOrCreate(victim, victimName));
+    public void recordDeath(UUID victim) {
+        Stats stats = cache.computeIfAbsent(victim, this::loadOrCreate);
         stats.deaths.incrementAndGet();
         stats.currentKillstreak.set(0);
         persist(victim, stats);
@@ -170,18 +170,18 @@ public final class StatsManager {
         }
         long liveSeconds = cached.playtimeSeconds.get()
                 + Math.max(0, (System.currentTimeMillis() - cached.sessionStartMillis) / 1000);
-        return new Snapshot(cached.name, cached.kills.get(), cached.deaths.get(),
+        return new Snapshot(cached.kills.get(), cached.deaths.get(),
                 cached.currentKillstreak.get(), cached.bestKillstreak.get(), liveSeconds);
     }
 
     private Snapshot loadSnapshotFromDb(UUID uuid) {
         try (Connection connection = database.getConnection();
              PreparedStatement select = connection.prepareStatement(
-                     "SELECT name, kills, deaths, current_killstreak, best_killstreak, playtime_seconds FROM player_stats WHERE uuid = ?")) {
+                     "SELECT kills, deaths, current_killstreak, best_killstreak, playtime_seconds FROM player_stats WHERE uuid = ?")) {
             select.setString(1, uuid.toString());
             try (ResultSet resultSet = select.executeQuery()) {
                 if (resultSet.next()) {
-                    return new Snapshot(resultSet.getString("name"), resultSet.getInt("kills"), resultSet.getInt("deaths"),
+                    return new Snapshot(resultSet.getInt("kills"), resultSet.getInt("deaths"),
                             resultSet.getInt("current_killstreak"), resultSet.getInt("best_killstreak"),
                             resultSet.getLong("playtime_seconds"));
                 }
@@ -192,47 +192,31 @@ public final class StatsManager {
         return EMPTY_SNAPSHOT;
     }
 
-    private Stats loadOrCreate(UUID uuid, String knownName) {
+    private Stats loadOrCreate(UUID uuid) {
         try (Connection connection = database.getConnection()) {
             try (PreparedStatement select = connection.prepareStatement(
-                    "SELECT name, kills, deaths, current_killstreak, best_killstreak, playtime_seconds FROM player_stats WHERE uuid = ?")) {
+                    "SELECT kills, deaths, current_killstreak, best_killstreak, playtime_seconds FROM player_stats WHERE uuid = ?")) {
                 select.setString(1, uuid.toString());
                 try (ResultSet resultSet = select.executeQuery()) {
                     if (resultSet.next()) {
                         Stats stats = new Stats();
-                        stats.name = knownName != null ? knownName : resultSet.getString("name");
                         stats.kills.set(resultSet.getInt("kills"));
                         stats.deaths.set(resultSet.getInt("deaths"));
                         stats.currentKillstreak.set(resultSet.getInt("current_killstreak"));
                         stats.bestKillstreak.set(resultSet.getInt("best_killstreak"));
                         stats.playtimeSeconds.set(resultSet.getLong("playtime_seconds"));
-                        if (knownName != null) {
-                            updateName(connection, uuid, knownName);
-                        }
                         return stats;
                     }
                 }
             }
-            try (PreparedStatement insert = connection.prepareStatement(
-                    "INSERT INTO player_stats(uuid, name) VALUES (?, ?)")) {
+            try (PreparedStatement insert = connection.prepareStatement("INSERT INTO player_stats(uuid) VALUES (?)")) {
                 insert.setString(1, uuid.toString());
-                insert.setString(2, knownName);
                 insert.executeUpdate();
             }
-            Stats stats = new Stats();
-            stats.name = knownName;
-            return stats;
+            return new Stats();
         } catch (SQLException ex) {
             plugin.getLogger().log(Level.WARNING, "Failed to load stats for " + uuid, ex);
             throw new RuntimeException("Failed to load stats for " + uuid, ex);
-        }
-    }
-
-    private void updateName(Connection connection, UUID uuid, String name) throws SQLException {
-        try (PreparedStatement update = connection.prepareStatement("UPDATE player_stats SET name = ? WHERE uuid = ?")) {
-            update.setString(1, name);
-            update.setString(2, uuid.toString());
-            update.executeUpdate();
         }
     }
 
@@ -243,41 +227,44 @@ public final class StatsManager {
     private void persistSync(UUID uuid, Stats stats) {
         String upsert = database.isMysql()
                 ? """
-                  INSERT INTO player_stats(uuid, name, kills, deaths, current_killstreak, best_killstreak, playtime_seconds)
-                  VALUES (?, ?, ?, ?, ?, ?, ?)
-                  ON DUPLICATE KEY UPDATE name = VALUES(name), kills = VALUES(kills), deaths = VALUES(deaths),
+                  INSERT INTO player_stats(uuid, kills, deaths, current_killstreak, best_killstreak, playtime_seconds)
+                  VALUES (?, ?, ?, ?, ?, ?)
+                  ON DUPLICATE KEY UPDATE kills = VALUES(kills), deaths = VALUES(deaths),
                       current_killstreak = VALUES(current_killstreak), best_killstreak = VALUES(best_killstreak),
                       playtime_seconds = VALUES(playtime_seconds)
                   """
                 : """
-                  INSERT INTO player_stats(uuid, name, kills, deaths, current_killstreak, best_killstreak, playtime_seconds)
-                  VALUES (?, ?, ?, ?, ?, ?, ?)
-                  ON CONFLICT(uuid) DO UPDATE SET name = excluded.name, kills = excluded.kills, deaths = excluded.deaths,
+                  INSERT INTO player_stats(uuid, kills, deaths, current_killstreak, best_killstreak, playtime_seconds)
+                  VALUES (?, ?, ?, ?, ?, ?)
+                  ON CONFLICT(uuid) DO UPDATE SET kills = excluded.kills, deaths = excluded.deaths,
                       current_killstreak = excluded.current_killstreak, best_killstreak = excluded.best_killstreak,
                       playtime_seconds = excluded.playtime_seconds
                   """;
         try (Connection connection = database.getConnection();
              PreparedStatement statement = connection.prepareStatement(upsert)) {
             statement.setString(1, uuid.toString());
-            statement.setString(2, stats.name);
-            statement.setInt(3, stats.kills.get());
-            statement.setInt(4, stats.deaths.get());
-            statement.setInt(5, stats.currentKillstreak.get());
-            statement.setInt(6, stats.bestKillstreak.get());
-            statement.setLong(7, stats.playtimeSeconds.get());
+            statement.setInt(2, stats.kills.get());
+            statement.setInt(3, stats.deaths.get());
+            statement.setInt(4, stats.currentKillstreak.get());
+            statement.setInt(5, stats.bestKillstreak.get());
+            statement.setLong(6, stats.playtimeSeconds.get());
             statement.executeUpdate();
         } catch (SQLException ex) {
             plugin.getLogger().log(Level.WARNING, "Failed to persist stats for " + uuid, ex);
         }
     }
 
+    // Resolves the name through Mojang/Bukkit's own cache (the authority on current name -> UUID), not our
+    // possibly-stale `player_stats.name` column, then confirms that UUID actually has stats here.
+    @SuppressWarnings("deprecation")
     public CompletableFuture<UUID> resolveUuidByName(String name) {
         return plugin.scheduler().supplyAsync(() -> {
+            UUID uuid = Bukkit.getOfflinePlayer(name).getUniqueId();
             try (Connection connection = database.getConnection();
-                 PreparedStatement statement = connection.prepareStatement("SELECT uuid FROM player_stats WHERE name = ?")) {
-                statement.setString(1, name);
+                 PreparedStatement statement = connection.prepareStatement("SELECT 1 FROM player_stats WHERE uuid = ?")) {
+                statement.setString(1, uuid.toString());
                 try (ResultSet resultSet = statement.executeQuery()) {
-                    return resultSet.next() ? UUID.fromString(resultSet.getString("uuid")) : null;
+                    return resultSet.next() ? uuid : null;
                 }
             } catch (SQLException ex) {
                 plugin.getLogger().log(Level.WARNING, "Failed to resolve UUID for name " + name, ex);
@@ -292,15 +279,14 @@ public final class StatsManager {
         }
         return plugin.scheduler().supplyAsync(() -> {
             List<TopEntry> entries = new ArrayList<>();
-            String sql = "SELECT uuid, name, " + type.column + " AS value FROM player_stats WHERE name IS NOT NULL ORDER BY "
-                    + type.column + " DESC LIMIT ?";
+            String sql = "SELECT uuid, " + type.column + " AS value FROM player_stats ORDER BY " + type.column + " DESC LIMIT ?";
             try (Connection connection = database.getConnection();
                  PreparedStatement statement = connection.prepareStatement(sql)) {
                 statement.setInt(1, limit);
                 try (ResultSet resultSet = statement.executeQuery()) {
                     while (resultSet.next()) {
-                        entries.add(new TopEntry(UUID.fromString(resultSet.getString("uuid")),
-                                resultSet.getString("name"), resultSet.getLong("value")));
+                        UUID uuid = UUID.fromString(resultSet.getString("uuid"));
+                        entries.add(new TopEntry(uuid, Bukkit.getOfflinePlayer(uuid).getName(), resultSet.getLong("value")));
                     }
                 }
             } catch (SQLException ex) {
@@ -310,19 +296,19 @@ public final class StatsManager {
         });
     }
 
-    private record KillsDeaths(UUID uuid, String name, int kills, int deaths) {
+    private record KillsDeaths(UUID uuid, int kills, int deaths) {
     }
 
     // Ratio isn't a stored column, so this pulls raw kill/death counts and sorts in Java rather than expressing it portably across SQLite and MySQL.
     private CompletableFuture<List<TopEntry>> topKd(int limit) {
         return plugin.scheduler().supplyAsync(() -> {
             List<KillsDeaths> rows = new ArrayList<>();
-            String sql = "SELECT uuid, name, kills, deaths FROM player_stats WHERE name IS NOT NULL AND kills > 0";
+            String sql = "SELECT uuid, kills, deaths FROM player_stats WHERE kills > 0";
             try (Connection connection = database.getConnection();
                  PreparedStatement statement = connection.prepareStatement(sql);
                  ResultSet resultSet = statement.executeQuery()) {
                 while (resultSet.next()) {
-                    rows.add(new KillsDeaths(UUID.fromString(resultSet.getString("uuid")), resultSet.getString("name"),
+                    rows.add(new KillsDeaths(UUID.fromString(resultSet.getString("uuid")),
                             resultSet.getInt("kills"), resultSet.getInt("deaths")));
                 }
             } catch (SQLException ex) {
@@ -331,7 +317,8 @@ public final class StatsManager {
             return rows.stream()
                     .sorted(Comparator.comparingDouble((KillsDeaths row) -> kdRatio(row.kills(), row.deaths())).reversed())
                     .limit(limit)
-                    .map(row -> new TopEntry(row.uuid(), row.name(), Math.round(kdRatio(row.kills(), row.deaths()) * 100)))
+                    .map(row -> new TopEntry(row.uuid(), Bukkit.getOfflinePlayer(row.uuid()).getName(),
+                            Math.round(kdRatio(row.kills(), row.deaths()) * 100)))
                     .toList();
         });
     }

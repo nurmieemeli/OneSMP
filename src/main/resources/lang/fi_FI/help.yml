@@ -32,6 +32,11 @@ categories:
           - "<white>/sethome</white> ja <white>/home</white> tallentavat ja palauttavat sinut omiin sijainteihisi."
           - "<white>/tpa <player></white> pyytää siirtymistä toisen pelaajan luo; <white>/tpaccept</white> tai <white>/tpdeny</white> vastaa pyyntöön."
           - "<white>/rtp</white> siirtää sinut satunnaisesti johonkin tutkimattomaan paikkaan."
+      combat:
+        title: "<white>Taistelu ja Yhteyden Katkaiseminen"
+        body:
+          - "Älä poistu pelistä kesken taistelun — yhteyden katkaiseminen pian osuman jälkeen tappaa sinut sen sijaan, että pääsisit turvallisesti pakoon."
+          - "Sama ajanjakso estää myös siirtymisen pois (kodit, warpit, RTP, TPA), kunnes se päättyy."
   economy:
     display-name: "<gold>Talous"
     icon: GOLD_INGOT
@@ -87,6 +92,13 @@ categories:
         title: "<white>Killan Koti"
         body:
           - "<white>/guild sethome</white> asettaa killan yhteisen kodin; <white>/guild home</white> siirtää sinne."
+      managing:
+        title: "<white>Killan Hallinta"
+        body:
+          - "<white>/guild kick <player></white> poistaa jäsenen; <white>/guild promote <player></white> ja <white>/guild demote <player></white> muuttavat hänen roolinsa."
+          - "<white>/guild info</white> näyttää killan tiedot; <white>/guild list</white> selaa kaikkia palvelimen kiltoja."
+          - "<white>/guild leave</white> poistuu killasta; omistaja voi <white>/guild disband</white> hajottaa sen kokonaan."
+          - "<white>/guild gui</white> (tai pelkkä <white>/guild</white>) avaa valikon, joka kattaa kaiken yllä mainitun."
   crates:
     display-name: "<yellow>Arkut"
     icon: CHEST
@@ -97,3 +109,46 @@ categories:
         body:
           - "Klikkaa hiiren oikealla painikkeella sidottua arkkulohkoa pitäen sopivaa avainta kädessäsi avataksesi sen."
           - "Avaimet näyttävät tavallisilta esineiltä, mutta ne on merkitty tietylle arkkutyypille — niitä ei voi väärentää."
+          - "Klikkaa hiiren vasemmalla painikkeella sidottua arkkua nähdäksesi kaikki mahdolliset palkinnot ja niiden tarkat todennäköisyydet, käyttämättä avainta."
+  stats:
+    display-name: "<red>Pelaajatilastot"
+    icon: DIAMOND_SWORD
+    description: "Seuraa tappojasi, kuolemiasi ja peliaikaasi."
+    articles:
+      overview:
+        title: "<white>Tilastosi"
+        body:
+          - "<white>/stats</white> näyttää omat tapposi, kuolemasi, tappoputkesi, peliaikasi ja K/D-suhteesi; <white>/stats <player></white> tarkistaa jonkun muun, verkossa tai poissa."
+          - "Tappopiste ei rajoitu suoraan lähitaisteluun — ammuttu nuoli, heitetty TNT, rikottu End-kristalli tai laukaistu herätysankkuri lasketaan silti, jos tappo seuraa pian sen jälkeen."
+      leaderboards:
+        title: "<white>Tulostaulut"
+        body:
+          - "<white>/statstop <kills|deaths|killstreak|playtime|kd></white> avaa tulostaulun kyseiselle tilastolle."
+  vote:
+    display-name: "<blue>Äänestyspalkkiot"
+    icon: NETHER_STAR
+    description: "Äänestä palvelinta ja saa palkkioita."
+    articles:
+      voting:
+        title: "<white>Äänestäminen"
+        body:
+          - "<white>/vote</white> näyttää äänestyssivujen linkit sekä nykyisen äänimääräsi ja putkesi."
+          - "Äänestäminen antaa automaattisesti rahaa ja arkkuavaimia — pidä putkesi käynnissä saadaksesi bonuspalkkioita tietyissä virstanpylväissä."
+      leaderboard:
+        title: "<white>Äänestystaulukko"
+        body:
+          - "<white>/votetop</white> näyttää, kuka on äänestänyt eniten."
+  messaging:
+    display-name: "<dark_aqua>Yksityisviestit"
+    icon: PAPER
+    description: "Lähetä yksityisviestejä muille pelaajille."
+    articles:
+      basics:
+        title: "<white>Viestien Lähettäminen"
+        body:
+          - "<white>/msg <player> <message></white> (tai <white>/tell</white>, <white>/w</white>, <white>/pm</white>) lähettää yksityisviestin."
+          - "<white>/reply <message></white> (tai <white>/r</white>) vastaa viimeisimpään viestiisi ilman nimen uudelleen kirjoittamista."
+      ignoring:
+        title: "<white>Pelaajien Jättäminen Huomiotta"
+        body:
+          - "<white>/ignore <player></white> vaihtaa kyseisen pelaajan viestien estämisen päälle/pois."

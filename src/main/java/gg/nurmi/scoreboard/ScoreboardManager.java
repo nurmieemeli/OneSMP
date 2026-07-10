@@ -1,12 +1,14 @@
 package gg.nurmi.scoreboard;
 
 import gg.nurmi.OneSMPPlugin;
+import io.papermc.paper.scoreboard.numbers.NumberFormat;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.scoreboard.Criteria;
 import org.bukkit.scoreboard.DisplaySlot;
 import org.bukkit.scoreboard.Objective;
+import org.bukkit.scoreboard.Score;
 import org.bukkit.scoreboard.Scoreboard;
 import org.bukkit.scoreboard.Team;
 
@@ -104,7 +106,9 @@ public final class ScoreboardManager {
                 team.prefix(lines.get(i));
             }
             if (newTotal != oldTotal) {
-                objective.getScore(entry).setScore(newTotal - i);
+                Score score = objective.getScore(entry);
+                score.setScore(newTotal - i);
+                score.numberFormat(NumberFormat.blank());
             }
         }
     }

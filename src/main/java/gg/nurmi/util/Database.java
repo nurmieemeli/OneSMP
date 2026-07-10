@@ -87,10 +87,10 @@ public final class Database {
             statement.executeUpdate("""
                 CREATE TABLE IF NOT EXISTS accounts (
                     uuid VARCHAR(36) PRIMARY KEY,
-                    name VARCHAR(16),
                     balance DECIMAL(20,2) NOT NULL DEFAULT 0
                 )
                 """);
+            dropColumnIfExists(connection, "accounts", "name");
 
             statement.executeUpdate("""
                 CREATE TABLE IF NOT EXISTS homes (
@@ -159,7 +159,6 @@ public final class Database {
             statement.executeUpdate("""
                 CREATE TABLE IF NOT EXISTS player_stats (
                     uuid VARCHAR(36) PRIMARY KEY,
-                    name VARCHAR(16),
                     kills INT NOT NULL DEFAULT 0,
                     deaths INT NOT NULL DEFAULT 0,
                     current_killstreak INT NOT NULL DEFAULT 0,
@@ -167,6 +166,7 @@ public final class Database {
                     playtime_seconds BIGINT NOT NULL DEFAULT 0
                 )
                 """);
+            dropColumnIfExists(connection, "player_stats", "name");
 
             statement.executeUpdate("""
                 CREATE TABLE IF NOT EXISTS leaderboard_holograms (
@@ -198,24 +198,24 @@ public final class Database {
                 CREATE TABLE IF NOT EXISTS market_listings (
                     id %s,
                     seller_uuid VARCHAR(36) NOT NULL,
-                    seller_name VARCHAR(16),
                     material VARCHAR(64) NOT NULL,
                     item_data BLOB NOT NULL,
                     price DECIMAL(20,2) NOT NULL,
                     created_at BIGINT NOT NULL
                 )
                 """.formatted(idType));
+            dropColumnIfExists(connection, "market_listings", "seller_name");
 
             statement.executeUpdate("""
                 CREATE TABLE IF NOT EXISTS player_votes (
                     uuid VARCHAR(36) PRIMARY KEY,
-                    name VARCHAR(16),
                     total_votes INT NOT NULL DEFAULT 0,
                     current_streak INT NOT NULL DEFAULT 0,
                     best_streak INT NOT NULL DEFAULT 0,
                     last_vote_epoch_day BIGINT NOT NULL DEFAULT 0
                 )
                 """);
+            dropColumnIfExists(connection, "player_votes", "name");
 
             statement.executeUpdate("""
                 CREATE TABLE IF NOT EXISTS pending_vote_rewards (
@@ -240,6 +240,19 @@ public final class Database {
         }
         try (Statement alter = connection.createStatement()) {
             alter.executeUpdate("ALTER TABLE " + table + " ADD COLUMN " + column + " " + columnDefinition);
+        }
+    }
+
+    // Drops a column left over from a previous schema version (e.g. a persisted player-name column we no longer want -
+    // names must only ever be resolved live via Bukkit, never stored as the way to identify a player's data).
+    private void dropColumnIfExists(Connection connection, String table, String column) throws SQLException {
+        try (var columns = connection.getMetaData().getColumns(null, null, table, column)) {
+            if (!columns.next()) {
+                return;
+            }
+        }
+        try (Statement alter = connection.createStatement()) {
+            alter.executeUpdate("ALTER TABLE " + table + " DROP COLUMN " + column);
         }
     }
 

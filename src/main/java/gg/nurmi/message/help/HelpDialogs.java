@@ -10,13 +10,15 @@ import io.papermc.paper.registry.data.dialog.type.DialogType;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.event.ClickCallback;
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
+import org.bukkit.Material;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
 
 import java.util.List;
 
 public final class HelpDialogs {
 
-    private static final int COLUMNS = 2;
+    private static final Material ROOT_ICON = Material.KNOWLEDGE_BOOK;
     private static final int BUTTON_WIDTH = 150;
     private static final ClickCallback.Options SINGLE_USE = ClickCallback.Options.builder().uses(1).build();
 
@@ -36,10 +38,9 @@ public final class HelpDialogs {
 
         Dialog dialog = Dialog.create(factory -> factory.empty()
                 .base(DialogBase.builder(plugin.messages().parse(helpManager.message("dialog-title")))
-                        .body(List.of(DialogBody.plainMessage(
-                                plugin.messages().parse(helpManager.message("dialog-subtitle")))))
+                        .body(List.of(iconBody(ROOT_ICON, plugin.messages().parse(helpManager.message("dialog-subtitle")))))
                         .build())
-                .type(DialogType.multiAction(buttons).columns(COLUMNS).build()));
+                .type(DialogType.multiAction(buttons).columns(columnsFor(buttons.size())).build()));
 
         player.showDialog(dialog);
     }
@@ -63,13 +64,31 @@ public final class HelpDialogs {
 
         Dialog dialog = Dialog.create(factory -> factory.empty()
                 .base(DialogBase.builder(plugin.messages().parse(category.displayName()))
-                        .body(List.of(DialogBody.plainMessage(description)))
+                        .body(List.of(iconBody(category.icon(), description)))
                         .build())
                 .type(buttons.isEmpty()
                         ? DialogType.notice(back)
-                        : DialogType.multiAction(buttons).exitAction(back).columns(COLUMNS).build()));
+                        : DialogType.multiAction(buttons).exitAction(back).columns(columnsFor(buttons.size())).build()));
 
         player.showDialog(dialog);
+    }
+
+    // A category/root icon plus its description rendered side by side, instead of plain text alone.
+    private static DialogBody iconBody(Material icon, Component description) {
+        return DialogBody.item(new ItemStack(icon))
+                .description(DialogBody.plainMessage(description))
+                .showDecorations(false)
+                .showTooltip(false)
+                .build();
+    }
+
+    // Scales the button grid to the item count instead of a fixed 2 columns, so a category with one
+    // article isn't stretched as wide as one with eight.
+    private static int columnsFor(int buttonCount) {
+        if (buttonCount <= 1) {
+            return 1;
+        }
+        return buttonCount <= 4 ? 2 : 3;
     }
 
     public static void openArticle(OneSMPPlugin plugin, HelpManager helpManager, Player player, HelpCategory category, HelpArticle article) {

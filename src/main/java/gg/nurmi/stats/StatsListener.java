@@ -27,7 +27,7 @@ public final class StatsListener implements Listener {
 
     @EventHandler
     public void onJoin(PlayerJoinEvent event) {
-        statsManager.handleJoin(event.getPlayer().getUniqueId(), event.getPlayer().getName());
+        statsManager.handleJoin(event.getPlayer().getUniqueId());
     }
 
     @EventHandler
@@ -38,13 +38,13 @@ public final class StatsListener implements Listener {
     @EventHandler
     public void onDeath(PlayerDeathEvent event) {
         Player victim = event.getEntity();
-        statsManager.recordDeath(victim.getUniqueId(), victim.getName());
+        statsManager.recordDeath(victim.getUniqueId());
 
         RecentAttackerTracker.KillCredit credit = attackerTracker.resolve(victim);
         if (credit == null) {
             return;
         }
-        int streak = statsManager.recordKill(credit.uuid(), credit.name());
+        int streak = statsManager.recordKill(credit.uuid());
         Player killerOnline = Bukkit.getPlayer(credit.uuid());
         if (killerOnline != null) {
             broadcastMilestone(killerOnline, streak);
