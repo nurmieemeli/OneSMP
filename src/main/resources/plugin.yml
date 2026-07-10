@@ -6,7 +6,7 @@ folia-supported: true
 description: ${project.description}
 
 depend: [MiniPlaceholders]
-softdepend: [Vault, PacketEvents, LuckPerms, FancyHolograms, NuVotifier]
+softdepend: [Vault, PacketEvents, LuckPerms, FancyHolograms, Votifier]
 
 commands:
   onesmp:

@@ -15,6 +15,8 @@ import java.util.logging.Level;
 
 // NuVotifier isn't a compile-time dependency - its vote event class is looked up and invoked entirely via
 // reflection, so this plugin builds and runs fine whether or not NuVotifier is installed on the server.
+// NuVotifier registers itself in Bukkit under the plugin name "Votifier" (kept for backwards compatibility
+// with the original Votifier plugin it forked from), not "NuVotifier" - that's the name getPlugin() needs.
 public final class VoteListener implements Listener {
 
     private final OneSMPPlugin plugin;
@@ -27,7 +29,7 @@ public final class VoteListener implements Listener {
 
     @SuppressWarnings("unchecked")
     public void registerIfAvailable() {
-        if (Bukkit.getPluginManager().getPlugin("NuVotifier") == null) {
+        if (Bukkit.getPluginManager().getPlugin("Votifier") == null) {
             plugin.getLogger().info("NuVotifier not found - install it for /vote rewards to trigger from real votes.");
             return;
         }

@@ -1,4 +1,4 @@
-package gg.nurmi.help;
+package gg.nurmi.message.help;
 
 import java.util.List;
 

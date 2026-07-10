@@ -1,4 +1,4 @@
-package gg.nurmi.help;
+package gg.nurmi.message.help;
 
 import gg.nurmi.OneSMPPlugin;
 import io.papermc.paper.dialog.Dialog;
