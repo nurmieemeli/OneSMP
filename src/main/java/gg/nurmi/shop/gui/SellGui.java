@@ -69,6 +69,10 @@ public final class SellGui extends AbstractGui {
         if (!(event.getWhoClicked() instanceof Player player)) {
             return;
         }
+        long cooldownMillis = plugin.getConfig().getLong("anti-spam.action-cooldown-millis", 500);
+        if (!plugin.actionCooldown().tryAcquire(player.getUniqueId(), "shop-sell", cooldownMillis)) {
+            return;
+        }
 
         BigDecimal total = BigDecimal.ZERO;
         int itemsSold = 0;

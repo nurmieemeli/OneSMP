@@ -206,7 +206,7 @@ crates:
         display-name: "<gold>Legendarisk Nyckel"
         display-item: TRIPWIRE_HOOK
         commands:
-          - "crate key epic %player% 1"
+          - "crate key legendary %player% 1"
 
   legendary:
     display-name: "<gold>Legendarisk Kista"
@@ -270,4 +270,4 @@ crates:
         display-name: "<gold>Legendarisk Nyckel"
         display-item: TRIPWIRE_HOOK
         commands:
-          - "crate key epic %player% 1"
+          - "crate key legendary %player% 1"

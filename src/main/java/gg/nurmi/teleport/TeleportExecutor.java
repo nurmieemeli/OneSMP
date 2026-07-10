@@ -1,6 +1,7 @@
 package gg.nurmi.teleport;
 
 import gg.nurmi.OneSMPPlugin;
+import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 
@@ -23,7 +24,19 @@ public final class TeleportExecutor {
             plugin.messages().send(player, "teleport.destination-unavailable");
             return;
         }
+        if (isInCombat(player)) {
+            plugin.messages().send(player, "teleport.in-combat");
+            return;
+        }
         warmup.start(player, () -> teleportNow(player, destination, successMessageKey));
+    }
+
+    private boolean isInCombat(Player player) {
+        if (!plugin.getConfig().getBoolean("combat-log.disable-teleport", true)) {
+            return false;
+        }
+        long windowMillis = Math.max(0, plugin.getConfig().getInt("combat-log.timeout-seconds", 15)) * 1000L;
+        return plugin.attackerTracker().recentAttacker(player.getUniqueId(), windowMillis) != null;
     }
 
     private void teleportNow(Player player, Location destination, String successMessageKey) {
@@ -47,6 +60,11 @@ public final class TeleportExecutor {
     }
 
     public void teleportToPlayerLocation(Player toTeleport, Player destinationOwner) {
+        if (isInCombat(destinationOwner)) {
+            plugin.messages().send(toTeleport, "teleport.destination-in-combat",
+                    Placeholder.unparsed("target", destinationOwner.getName()));
+            return;
+        }
         plugin.scheduler().runAtEntity(destinationOwner,
                 () -> executeSafely(toTeleport, destinationOwner.getLocation()), () -> {});
     }

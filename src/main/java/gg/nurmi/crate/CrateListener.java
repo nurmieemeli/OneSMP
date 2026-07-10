@@ -77,6 +77,11 @@ public final class CrateListener implements Listener {
             return;
         }
 
+        long cooldownMillis = plugin.getConfig().getLong("anti-spam.action-cooldown-millis", 500);
+        if (!plugin.actionCooldown().tryAcquire(player.getUniqueId(), "crate-open", cooldownMillis)) {
+            return;
+        }
+
         if (held.getAmount() <= 1) {
             player.getInventory().setItemInMainHand(null);
         } else {

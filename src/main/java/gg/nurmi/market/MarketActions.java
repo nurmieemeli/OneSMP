@@ -33,6 +33,10 @@ public final class MarketActions {
     }
 
     public static void buy(OneSMPPlugin plugin, MarketManager marketManager, Player buyer, int listingId) {
+        long cooldownMillis = plugin.getConfig().getLong("anti-spam.action-cooldown-millis", 500);
+        if (!plugin.actionCooldown().tryAcquire(buyer.getUniqueId(), "market", cooldownMillis)) {
+            return;
+        }
         marketManager.buy(buyer, listingId).thenAccept(outcome ->
                 plugin.scheduler().runAtEntity(buyer, () -> {
                     switch (outcome.result()) {
@@ -58,6 +62,10 @@ public final class MarketActions {
     }
 
     public static void cancel(OneSMPPlugin plugin, MarketManager marketManager, Player player, int listingId) {
+        long cooldownMillis = plugin.getConfig().getLong("anti-spam.action-cooldown-millis", 500);
+        if (!plugin.actionCooldown().tryAcquire(player.getUniqueId(), "market", cooldownMillis)) {
+            return;
+        }
         marketManager.cancel(player.getUniqueId(), listingId).thenAccept(outcome ->
                 plugin.scheduler().runAtEntity(player, () -> {
                     switch (outcome.result()) {

@@ -75,6 +75,10 @@ public final class MarketCommand implements CommandExecutor, TabCompleter {
             plugin.messages().send(player, "general.unknown-command", Placeholder.unparsed("usage", "/market sell <price>"));
             return;
         }
+        long cooldownMillis = plugin.getConfig().getLong("anti-spam.action-cooldown-millis", 500);
+        if (!plugin.actionCooldown().tryAcquire(player.getUniqueId(), "market", cooldownMillis)) {
+            return;
+        }
 
         BigDecimal price;
         try {

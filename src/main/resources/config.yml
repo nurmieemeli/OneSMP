@@ -35,6 +35,13 @@ market:
   # A player can't have more than this many active listings at once.
   max-listings-per-player: 10
 
+# Silently ignores repeat attempts (no message, no sound) faster than this many milliseconds apart, per
+# player and per category (market, shop-sell, crate-open) - guards against spam-clicking a GUI button or
+# spamming a command faster than its async round-trip, which could otherwise race past checks like
+# market.max-listings-per-player or trigger overlapping crate-opening animations.
+anti-spam:
+  action-cooldown-millis: 500
+
 # Cosmetic sound/particle feedback only - never affects whether an action succeeds.
 effects:
   enabled: true
@@ -180,6 +187,10 @@ combat-log:
   # killed instead of safely logging out of the fight. Goes through the normal damage pipeline, so a totem of
   # undying/resistance/absorption still applies as it would for any hit.
   timeout-seconds: 15
+  # Blocks /home, /warp, /spawn, /rtp, guild home, world teleports, and TPA (both accepting one yourself
+  # and having someone else accept a request that would bring them to you) for the same window above -
+  # independent of the enabled/kill-on-quit setting.
+  disable-teleport: true
 
 # Requires FancyHolograms (disables /statshologram otherwise). FancyHolograms owns the hologram entities themselves; this only controls how often their text is refreshed.
 hologram:

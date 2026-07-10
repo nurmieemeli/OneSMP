@@ -41,7 +41,7 @@ public final class DeathMessageListener implements Listener {
             if (lastDamage instanceof EntityDamageByEntityEvent byEntity
                     && byEntity.getDamager() instanceof LivingEntity mob && !(mob instanceof Player)) {
                 message = plugin.messages().text("death.mob", victimPlaceholder,
-                        Placeholder.unparsed("mob", TextUtil.prettyName(mob.getType())));
+                        Placeholder.unparsed("mob", TextUtil.entityName(plugin, mob.getType())));
             } else {
                 String key = causeKey(lastDamage != null ? lastDamage.getCause() : null);
                 message = plugin.messages().text(key, victimPlaceholder);

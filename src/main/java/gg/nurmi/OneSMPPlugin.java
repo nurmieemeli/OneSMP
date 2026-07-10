@@ -11,6 +11,7 @@ import gg.nurmi.economy.EconomyManager;
 import gg.nurmi.economy.EconomyPlaceholderExpansion;
 import gg.nurmi.economy.PayCommand;
 import gg.nurmi.economy.VaultEconomyProvider;
+import gg.nurmi.util.ActionCooldown;
 import gg.nurmi.util.EffectsManager;
 import gg.nurmi.message.ChatFormatListener;
 import gg.nurmi.message.JoinLeaveMessageListener;
@@ -106,6 +107,7 @@ public final class OneSMPPlugin extends JavaPlugin {
     private Database database;
     private EffectsManager effectsManager;
     private MessageService messageService;
+    private ActionCooldown actionCooldown;
     private SubcommandAliases subcommandAliases;
     private EconomyManager economyManager;
     private Expansion economyPlaceholderExpansion;
@@ -120,6 +122,7 @@ public final class OneSMPPlugin extends JavaPlugin {
     private TablistManager tablistManager;
     private WorldManager worldManager;
     private StatsManager statsManager;
+    private RecentAttackerTracker attackerTracker;
     private Expansion statsPlaceholderExpansion;
     private MaintenanceManager maintenanceManager;
     private MarketManager marketManager;
@@ -137,6 +140,7 @@ public final class OneSMPPlugin extends JavaPlugin {
         this.messageService = new MessageService(this);
         this.subcommandAliases = new SubcommandAliases(this);
         subcommandAliases.load();
+        this.actionCooldown = new ActionCooldown();
 
         this.database = new Database(this);
         database.connect();
@@ -188,7 +192,7 @@ public final class OneSMPPlugin extends JavaPlugin {
 
     private void registerStats() {
         this.statsManager = new StatsManager(this);
-        RecentAttackerTracker attackerTracker = new RecentAttackerTracker(this);
+        this.attackerTracker = new RecentAttackerTracker(this);
         getServer().getPluginManager().registerEvents(attackerTracker, this);
         getServer().getPluginManager().registerEvents(new StatsListener(this, statsManager, attackerTracker), this);
         getServer().getPluginManager().registerEvents(new DeathMessageListener(this, attackerTracker), this);
@@ -452,6 +456,10 @@ public final class OneSMPPlugin extends JavaPlugin {
         return effectsManager;
     }
 
+    public ActionCooldown actionCooldown() {
+        return actionCooldown;
+    }
+
     public SubcommandAliases subcommandAliases() {
         return subcommandAliases;
     }
@@ -506,6 +514,10 @@ public final class OneSMPPlugin extends JavaPlugin {
 
     public StatsManager stats() {
         return statsManager;
+    }
+
+    public RecentAttackerTracker attackerTracker() {
+        return attackerTracker;
     }
 
     public MaintenanceManager maintenance() {
