@@ -53,10 +53,10 @@ Vault-compatible currency with a configurable symbol/name, starting balance, and
 A player-to-player marketplace backed by the database, so listings survive restarts and sell while the seller is offline. `/market sell <price>` lists the item in your hand for a set total price; `/market` opens a paginated GUI of active listings to buy from. `/market search <query>` filters that GUI — run it with no query, or click the compass button in the browse GUI, to search through a native Paper [dialog](https://docs.papermc.io/paper/dev/dialogs/) text prompt instead of typing the query as a command argument. `/market mine` lists your own active listings, cancellable to reclaim the item. `market.max-listings-per-player` in `config.yml` caps how many listings one player can have active. Overflow-safe throughout: if a buyer's or canceller's inventory is full, the item drops at their feet instead of being lost.
 
 ### Shop
-`/sell` opens an empty inventory to drop items into, showing a running payout as you fill it and paying out on confirm. Per-item prices live in `shop.yml`; `shop.sell-price-multiplier` in `config.yml` scales every price at once. Unsold items left in the menu when it's closed drop back into your inventory.
+`/sell` opens an empty inventory to drop items into, showing a running payout as you fill it and paying out on confirm. Per-item prices live in `sell-prices.yml`; `shop.sell-price-multiplier` in `config.yml` scales every price at once. Unsold items left in the menu when it's closed drop back into your inventory.
 
 ### Crates
-Crate types — key appearance and a weighted reward pool of items, money, and console commands — are defined entirely in `crates.yml`. `/crate create <type>` binds the block an admin is looking at; `/crate remove` unbinds it. `/crate key <type> <player> [amount]` gives key items tagged with a hidden marker for that crate type, so they can't be duplicated from an ordinary item of the same material. Right-clicking a bound crate with a matching key consumes it, rolls a weighted-random reward, and plays a slot-machine-style reel that always lands on the reward already rolled — purely cosmetic, and the reward is granted the moment the reel stops (or immediately if the menu is closed early). Left-clicking opens a read-only preview of every reward in the pool with its exact drop chance. With FancyHolograms installed, `/crate create` also drops a floating name hologram above the block, removed again by `/crate remove`.
+Crate types — key appearance and a weighted reward pool of items, money, and console commands — are defined entirely in `lang/<language>/crates.yml`. `/crate create <type>` binds the block an admin is looking at; `/crate remove` unbinds it. `/crate key <type> <player> [amount]` gives key items tagged with a hidden marker for that crate type, so they can't be duplicated from an ordinary item of the same material. Right-clicking a bound crate with a matching key consumes it, rolls a weighted-random reward, and plays a slot-machine-style reel that always lands on the reward already rolled — purely cosmetic, and the reward is granted the moment the reel stops (or immediately if the menu is closed early). Left-clicking opens a read-only preview of every reward in the pool with its exact drop chance. With FancyHolograms installed, `/crate create` also drops a floating name hologram above the block, removed again by `/crate remove`.
 
 ### Teleportation
 **Homes** — `/sethome [name]`, `/home [name]`, `/delhome <name>`, with per-rank limits via `onesmp.home.limit.<n>`/`onesmp.home.unlimited`. Running `/home` with no name opens a GUI of all your homes. **Warps** — admin-defined via `/setwarp`/`/delwarp`; `/warp` with no name opens a browser GUI. **TPA** — `/tpa <player>`/`/tpahere <player>` with clickable Accept/Deny buttons in chat, automatic expiry, `/tpaccept`/`/tpdeny`. All three share the same configurable teleport warmup, cancelled on movement.
@@ -92,19 +92,25 @@ A MiniMessage/MiniPlaceholders-driven sidebar scoreboard with a configurable tit
 `/spectate <player>` toggles a packet-driven vanish + spectator view of the target — the target never sees the moderator, who can fly through blocks to observe. Requires PacketEvents; refuses to run without it rather than offer a false sense of invisibility.
 
 ### Help
-`/help` opens a native Paper [dialog](https://docs.papermc.io/paper/dev/dialogs/) listing categories; clicking one shows its articles, and clicking an article shows its content — server-side navigation, no inventory GUI or chat involved. `/help <category>` and `/help <category> <article>` jump straight in. Categories and articles (title, description, icon, MiniMessage body) are entirely defined in `help.yml`.
+`/help` opens a native Paper [dialog](https://docs.papermc.io/paper/dev/dialogs/) listing categories; clicking one shows its articles, and clicking an article shows its content — server-side navigation, no inventory GUI or chat involved. `/help <category>` and `/help <category> <article>` jump straight in. Categories and articles (title, description, icon, MiniMessage body) are entirely defined in `lang/<language>/help.yml`.
 
 ### Private Messaging
 `/msg`/`/tell`/`/w`/`/pm`, `/reply`, `/ignore`, and `/socialspy` (mirrors every DM to whoever has it enabled), with a configurable per-sender cooldown.
 
+### Links
+`/discord` and `/store` print a clickable, hoverable link built from `links.discord-url`/`links.store-url` in `config.yml`.
+
 ### Feedback & Effects
-Every command reply is automatically paired with a sound — `messages.yml`'s own `<green>`/`<red>` color convention picks success or denial, so this works for every command without per-command wiring. Teleporting plays a particle/sound burst at both ends; every chest-GUI menu plays a soft click on open; joining plays a short chime. Each category (and cosmetic effects as a whole) is independently toggleable under `effects` in `config.yml` — purely cosmetic, never affects whether an action succeeds.
+Every command reply is automatically paired with a sound — dedicated `<success>`/`<fail>` markers right after `<prefix>` in `messages.yml` pick the chime or the denial grunt, kept deliberately separate from whatever color the message actually uses so translating or restyling a message can never break its sound. Teleporting plays a particle/sound burst at both ends; every chest-GUI menu plays a soft click on open; joining plays a short chime. Each category (and cosmetic effects as a whole) is independently toggleable under `effects` in `config.yml` — purely cosmetic, never affects whether an action succeeds.
+
+### Localization
+Six languages ship out of the box — `en_US`, `fi_FI`, `sv_SE`, `de_DE`, `ru_RU`, `es_ES` — covering every player-facing string: chat/GUI/dialog text, help articles, crate/reward names, and command/subcommand aliases. Set `language` in `config.yml` to switch, and run `/onesmp reload` (or restart) to apply it.
 
 ## Commands
 
 | Command | Description | Permission |
 |---|---|---|
-| `/onesmp reload` (`/cs`) | Reload `config.yml`, `messages.yml`, `shop.yml`, `crates.yml`, `help.yml`, `subcommand-aliases.yml` | `onesmp.admin` |
+| `/onesmp reload` (`/cs`) | Reload `config.yml`, `sell-prices.yml`, and the active language's `messages.yml`/`crates.yml`/`help.yml`/`subcommand-aliases.yml` | `onesmp.admin` |
 | `/balance [player]` (`/bal`, `/money`) | Check a balance | `onesmp.economy.use` |
 | `/pay <player> <amount>` | Send money | `onesmp.economy.use` |
 | `/baltop` (`/bt`) | Rich-list GUI | `onesmp.economy.use` |
@@ -132,8 +138,10 @@ Every command reply is automatically paired with a sound — `messages.yml`'s ow
 | `/statshologram <create\|remove\|list> ...` | Manage leaderboard holograms (requires FancyHolograms) | `onesmp.stats.hologram.admin` |
 | `/help [category] [article]` | Browse help articles via a native dialog | `onesmp.help.use` |
 | `/maintenance <on\|off\|status>` | Toggle maintenance mode (backed by the server whitelist) | `onesmp.maintenance.admin` |
+| `/discord` | Print the Discord invite link | `onesmp.discord.use` |
+| `/store` | Print the store link | `onesmp.store.use` |
 
-Every command's own name always works regardless of configuration — the aliases above are just the shipped defaults. Both command aliases and per-subcommand aliases (e.g. `/world tp` for `/world teleport`) are editable via `aliases.yml`/`subcommand-aliases.yml`; `subcommand-aliases.yml` changes apply on `/onesmp reload`, while `aliases.yml` needs a restart since those aliases are registered into Bukkit's command map once at enable.
+Every command's own name always works regardless of configuration — the aliases above are just the shipped defaults. Both command aliases and per-subcommand aliases (e.g. `/world tp` for `/world teleport`) are editable via `lang/<language>/aliases.yml`/`subcommand-aliases.yml`; `subcommand-aliases.yml` changes apply on `/onesmp reload`, while `aliases.yml` needs a restart since those aliases are registered into Bukkit's command map once at enable.
 
 ## Permissions
 
@@ -166,33 +174,41 @@ Every command's own name always works regardless of configuration — the aliase
 | `onesmp.stats.use` | true | `/stats`, `/statstop` |
 | `onesmp.stats.hologram.admin` | op | `/statshologram` (create/remove/list) |
 | `onesmp.help.use` | true | `/help` |
+| `onesmp.discord.use` | true | `/discord` |
+| `onesmp.store.use` | true | `/store` |
 
 </details>
 
 ## Configuration
 
-Six files are created in `plugins/OneSMP/` on first start, plus `worlds.yml` once you first use `/world create`:
+`plugins/OneSMP/` is populated on first start with `config.yml`, `sell-prices.yml`, a `lang/` folder (see [Localization](#localization) below), and `worlds.yml` once you first use `/world create`:
 
-- **`config.yml`** — storage backend, economy, teleport warmup/TPA timeouts, home limits, RTP settings, guild rules, chat format, join/leave toggles, market listing cap, maintenance mode, spawn/void-world settings, nametag/tablist/scoreboard settings, private-message cooldown, stats/hologram intervals, and cosmetic effect toggles.
-- **`messages.yml`** — every message the plugin sends, in MiniMessage. The shared `<prefix>` is defined once at the top.
-- **`shop.yml`** — per-item `/sell` prices. Market listings aren't configured here — they're created in-game and stored in the database.
-- **`crates.yml`** — crate types: key appearance and a weighted reward pool per type.
-- **`help.yml`** — `/help` categories and their articles.
-- **`aliases.yml`** — extra command aliases, registered into Bukkit's command map at enable. Changes need a restart.
-- **`subcommand-aliases.yml`** — extra aliases for individual subcommands (e.g. `/world tp`). Not real Bukkit commands, just labels checked in code; picked up by `/onesmp reload`.
+- **`config.yml`** — storage backend, economy, teleport warmup/TPA timeouts, home limits, RTP settings, guild rules, join/leave toggles, market listing cap, maintenance mode, spawn/void-world settings, nametag/tablist/scoreboard intervals, private-message cooldown, stats/hologram intervals, Discord/store links, the active `language`, and cosmetic effect toggles.
+- **`sell-prices.yml`** — per-item `/sell` prices. Market listings aren't configured here — they're created in-game and stored in the database.
+- **`lang/<language>/messages.yml`** — every message the plugin sends, in MiniMessage, plus the chat format, scoreboard title/lines, and the guild "no guild" placeholder. The shared `<prefix>` is defined once at the top.
+- **`lang/<language>/help.yml`** — `/help` categories and their articles.
+- **`lang/<language>/crates.yml`** — crate types: key appearance and a weighted reward pool per type.
+- **`lang/<language>/aliases.yml`** — extra command aliases, registered into Bukkit's command map at enable. Changes need a restart.
+- **`lang/<language>/subcommand-aliases.yml`** — extra aliases for individual subcommands (e.g. `/world tp`). Not real Bukkit commands, just labels checked in code; picked up by `/onesmp reload`.
 - **`worlds.yml`** — one entry per `/world create`d world, storing its generator settings. Managed entirely by `/world` — no hand-editing needed.
 
 On every startup, each file above except `worlds.yml` is checked against the version bundled in the jar, and any option missing on disk is added with its default value — existing settings are never touched. Since re-saving a YAML file drops hand-written comments, this only re-saves when something was actually missing, and always leaves a `<file>.bak` copy of the pre-update version first.
+
+### Localization
+
+Set `language` in `config.yml` to pick which `lang/<language>/` set of files gets loaded — shipped out of the box: `en_US`, `sv_SE`, `fi_FI`, `de_DE`, `ru_RU`, `es_ES`. An unrecognized code falls back to `en_US` with a warning logged. Switching languages and running `/onesmp reload` (or restarting) applies the change immediately, with one exception: the guild "no guild" placeholder text is cached once at startup, so that one specific string needs a full restart to pick up a new language.
+
+Each language is upgraded independently the same way as any other config file — a plugin update that adds a new message key adds it (in that language) to every `lang/<language>/` file without touching your edits. A pre-existing root-level `messages.yml`/`help.yml`/`crates.yml`/`aliases.yml`/`subcommand-aliases.yml` from before this system existed is moved into `lang/en_US/` automatically the first time the plugin loads it, so upgrading servers don't lose their customizations.
 
 <details>
 <summary>Example: chat format</summary>
 
 ```yaml
 chat:
-  format: "<guild_segment><luckperms_prefix><player_name><dark_gray>:</dark_gray> <gray><message>"
+  format: "<guild_segment><luckperms_prefix><player_name><gray>:</gray> <white><message>"
 ```
 
-`<player_name>` isn't reset/re-colored after `<luckperms_prefix>` by default, so a prefix that doesn't close its own color tag (e.g. `<red>[Admin] `) carries that color onto the name too — add your own `<reset>` before `<player_name>` if that's unwanted.
+`<player_name>` isn't reset/re-colored after `<luckperms_prefix>` by default, so a prefix that doesn't close its own color tag (e.g. `<red>[Admin] `) carries that color onto the name too — add your own `<reset>` before `<player_name>` if that's unwanted. `<guild_segment>` carries its own trailing space (via `chat.guild-segment-format`) and renders to nothing for guildless players, so don't add a space after it yourself. `chat.guild-chat-format` (the guild-only channel toggled by `/guild chat`) can use `<guild_segment>` too, alongside `<guild_name>`/`<guild_tag>` directly.
 
 </details>
 
@@ -218,7 +234,7 @@ rtp:
 ```yaml
 nametag:
   guild-tag:
-    format: "<gray>[<tag>]</gray>"
+    format: "<dark_aqua>[<aqua><guild_tag></aqua>]</dark_aqua>"
     y-offset: 0.55
 ```
 
