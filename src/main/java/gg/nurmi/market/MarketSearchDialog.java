@@ -12,8 +12,6 @@ import org.bukkit.entity.Player;
 
 import java.util.List;
 
-// The search prompt, built with Paper's Dialog API (https://docs.papermc.io/paper/dev/dialogs/)
-// instead of a chat/anvil text-input workaround.
 public final class MarketSearchDialog {
 
     private static final String QUERY_KEY = "query";
@@ -21,6 +19,7 @@ public final class MarketSearchDialog {
     private MarketSearchDialog() {
     }
 
+    // Built with Paper's Dialog API instead of a chat/anvil text-input workaround.
     public static void open(OneSMPPlugin plugin, MarketManager marketManager, Player player) {
         ActionButton searchButton = ActionButton.create(
                 plugin.messages().text("market.dialog-search-button"),

@@ -23,6 +23,7 @@ public final class TpAcceptCommand implements CommandExecutor {
         this.teleportExecutor = teleportExecutor;
     }
 
+    // For /tpahere requests, the *requester* asked to be teleported to the accepter, not the other way around.
     @Override
     public boolean onCommand(@NonNull CommandSender sender, @NonNull Command command, @NonNull String label, String @NonNull [] args) {
         if (!(sender instanceof Player player)) {
@@ -47,7 +48,6 @@ public final class TpAcceptCommand implements CommandExecutor {
 
         plugin.messages().send(requester, "teleport.tpa-accepted", Placeholder.unparsed("target", player.getName()));
 
-        // here = /tpahere, so the *requester* asked to be teleported to the accepter, not the other way around.
         if (request.here()) {
             teleportExecutor.teleportToPlayerLocation(player, requester);
         } else {

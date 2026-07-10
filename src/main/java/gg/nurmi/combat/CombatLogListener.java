@@ -8,11 +8,6 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerQuitEvent;
 
-// Kills a player who quits shortly after being hit by another player, instead of letting them safely
-// disconnect out of a losing fight. Goes through Player#damage() rather than setHealth(0) so totems of
-// undying/absorption/resistance still apply exactly as they would for any other lethal hit. The resulting
-// death is a normal PlayerDeathEvent, so it's credited and announced through the usual stats/death-message
-// pipeline - no separate logic needed here for that part.
 public final class CombatLogListener implements Listener {
 
     private final OneSMPPlugin plugin;
@@ -23,6 +18,7 @@ public final class CombatLogListener implements Listener {
         this.attackerTracker = attackerTracker;
     }
 
+    // Kills a player who quits shortly after being hit, via Player#damage() so totems/absorption/resistance still apply like any other lethal hit.
     @EventHandler
     public void onQuit(PlayerQuitEvent event) {
         if (!plugin.getConfig().getBoolean("combat-log.enabled", true)) {

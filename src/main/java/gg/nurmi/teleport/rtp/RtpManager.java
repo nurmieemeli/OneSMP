@@ -26,6 +26,8 @@ import java.util.function.Consumer;
 
 public final class RtpManager {
 
+    private static final int NETHER_CEILING_SCAN_START = 120;
+
     private final OneSMPPlugin plugin;
     private final Cooldown cooldown = new Cooldown();
     private final Random random = new Random();
@@ -61,8 +63,7 @@ public final class RtpManager {
         return section == null ? 0 : section.getDouble("cost", 0);
     }
 
-    // Player-facing, so it lives in messages.yml (translatable) rather than config.yml - falls back to
-    // the world's own (container-stripped) name if no rtp.world-names entry exists for it.
+    // Lives in messages.yml (translatable) rather than config.yml, falling back to the world's own name if untranslated.
     public String displayName(World world) {
         String container = plugin.getConfig().getString("world-creation.container", "");
         String logicalName = WorldPaths.strip(container, world.getName());
@@ -79,9 +80,7 @@ public final class RtpManager {
         return worlds;
     }
 
-    // World-creation config nests custom worlds under a container folder, so the Bukkit world name
-    // (e.g. "container/myworld") won't match the logical name admins write under rtp.worlds
-    // (e.g. "myworld"). Try the raw name first, then fall back to the container-stripped name.
+    // Tries the raw Bukkit world name first, then falls back to the container-stripped name admins actually write under rtp.worlds.
     private ConfigurationSection worldSection(World world) {
         ConfigurationSection worlds = plugin.getConfig().getConfigurationSection("rtp.worlds");
         if (worlds == null) {
@@ -124,9 +123,7 @@ public final class RtpManager {
                 () -> plugin.messages().send(player, "rtp.failed"));
     }
 
-    // Only charges once a destination actually exists, and refunds if the teleport itself still
-    // doesn't happen (combat block, warmup cancelled by movement/disconnect, etc.) - a player should
-    // never be charged for a random teleport that never occurred.
+    // Only charges once a destination exists, and refunds if the teleport itself still doesn't happen (combat block, warmup cancelled, etc.).
     private void chargeAndTeleport(Player player, World world, Location location) {
         BigDecimal cost = BigDecimal.valueOf(cost(world));
         if (cost.signum() <= 0) {
@@ -158,9 +155,7 @@ public final class RtpManager {
         return queue == null ? null : queue.pollFirst();
     }
 
-    // Tops off every enabled, loaded, under-target world's cache by at most one location per call each
-    // (relies on being invoked repeatedly), skipping entirely under low TPS. All worlds are filled in
-    // parallel so one world's queue never starves another's while it fills up.
+    // Tops off every under-target world's cache by one location per call (relies on repeated invocation), skipping under low TPS.
     public void precacheTick() {
         if (!plugin.getConfig().getBoolean("rtp.precache.enabled", true) || !filling.compareAndSet(false, true)) {
             return;
@@ -211,8 +206,7 @@ public final class RtpManager {
         attempt(world, minRadius, maxRadius, maxAttempts, onFound, onFail);
     }
 
-    // Picks a random point in the radius ring, loads its chunk, and retries elsewhere if it isn't safe,
-    // until attemptsLeft runs out.
+    // Picks a random point in the radius ring and retries elsewhere if it isn't safe, until attemptsLeft runs out.
     private void attempt(World world, int minRadius, int maxRadius, int attemptsLeft, Consumer<Location> onFound, Runnable onFail) {
         if (attemptsLeft <= 0) {
             onFail.run();
@@ -228,7 +222,11 @@ public final class RtpManager {
 
         world.getChunkAtAsync(chunkX, chunkZ).thenRun(() ->
                 plugin.scheduler().runAtChunk(world, chunkX, chunkZ, () -> {
-                    int y = world.getHighestBlockYAt(x, z, HeightMap.MOTION_BLOCKING_NO_LEAVES);
+                    Integer y = groundY(world, x, z);
+                    if (y == null) {
+                        attempt(world, minRadius, maxRadius, attemptsLeft - 1, onFound, onFail);
+                        return;
+                    }
                     Location candidate = new Location(world, x + 0.5, y + 1, z + 0.5);
                     if (LocationUtil.isSafe(candidate) && !isAvoidedBiome(world, x, y, z)) {
                         onFound.accept(candidate);
@@ -236,6 +234,23 @@ public final class RtpManager {
                         attempt(world, minRadius, maxRadius, attemptsLeft - 1, onFound, onFail);
                     }
                 }));
+    }
+
+    // For the Nether, scans down from just below the bedrock roof for an open pocket instead of using the heightmap, which would return the roof itself.
+    private Integer groundY(World world, int x, int z) {
+        if (world.getEnvironment() != World.Environment.NETHER) {
+            return world.getHighestBlockYAt(x, z, HeightMap.MOTION_BLOCKING_NO_LEAVES);
+        }
+        int top = Math.min(world.getMaxHeight() - 2, NETHER_CEILING_SCAN_START);
+        int bottom = world.getMinHeight() + 1;
+        for (int y = top; y > bottom; y--) {
+            if (world.getBlockAt(x, y, z).getType().isSolid()
+                    && world.getBlockAt(x, y + 1, z).getType().isAir()
+                    && world.getBlockAt(x, y + 2, z).getType().isAir()) {
+                return y;
+            }
+        }
+        return null;
     }
 
     private boolean isAvoidedBiome(World world, int x, int y, int z) {

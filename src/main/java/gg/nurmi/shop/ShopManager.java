@@ -11,7 +11,6 @@ import java.io.File;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-// Backs /sell only - the server no longer sells items itself, see the gg.nurmi.market package for that.
 public final class ShopManager {
 
     private final OneSMPPlugin plugin;

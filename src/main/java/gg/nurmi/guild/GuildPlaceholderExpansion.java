@@ -9,13 +9,12 @@ import org.bukkit.entity.Player;
 import java.util.Optional;
 import java.util.function.Function;
 
-// Named own_name/own_tag, not guild_name/guild_tag - that name is already used elsewhere for an explicitly-queried guild,
-// not the viewer's own.
 public final class GuildPlaceholderExpansion {
 
     private GuildPlaceholderExpansion() {
     }
 
+    // Named own_name/own_tag, not guild_name/guild_tag - that's already used elsewhere for an explicitly-queried guild.
     public static Expansion register(OneSMPPlugin plugin, GuildManager guildManager) {
         Component noGuild = plugin.messages().parse(plugin.messages().raw("guild.no-guild-placeholder"));
 

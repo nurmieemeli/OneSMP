@@ -130,6 +130,7 @@ public final class OneSMPPlugin extends JavaPlugin {
     private VoteManager voteManager;
     private Expansion votePlaceholderExpansion;
     private LeaderboardHologramManager leaderboardHologramManager;
+    private NametagManager nametagManager;
 
     @Override
     public void onEnable() {
@@ -179,7 +180,7 @@ public final class OneSMPPlugin extends JavaPlugin {
         Objects.requireNonNull(getCommand("onesmp")).setExecutor(new OneSMPCommand(this));
     }
 
-    // aliases.yml is excluded - its aliases are registered into Bukkit's command map once at enable and can't be re-registered at runtime.
+    // aliases.yml isn't reloaded here - aliases are registered into Bukkit's command map once at enable and can't be re-registered at runtime.
     public void reloadAll() {
         ConfigMigrator.migrate(this, "config.yml", Set.of("rtp.worlds"));
         reloadConfig();
@@ -211,9 +212,8 @@ public final class OneSMPPlugin extends JavaPlugin {
         this.statsPlaceholderExpansion = StatsPlaceholderExpansion.register(this, statsManager);
     }
 
+    // Bound-crate holograms are recreated here (not in registerCrates()) since that runs before the worlds their blocks live in are loaded.
     private void registerHolograms() {
-        // Bound-crate holograms are recreated here rather than in registerCrates() itself, since that runs
-        // before registerSpawn()/registerWorlds() - too early for the worlds their blocks live in to be loaded.
         crateManager.respawnHolograms();
 
         boolean available = getServer().getPluginManager().getPlugin("FancyHolograms") != null;
@@ -290,13 +290,16 @@ public final class OneSMPPlugin extends JavaPlugin {
         if (!getConfig().getBoolean("nametag.enabled", true)) {
             return;
         }
-        NametagManager nametagManager = new NametagManager(this);
+        this.nametagManager = new NametagManager(this);
         getServer().getPluginManager().registerEvents(new NametagListener(nametagManager), this);
         int periodSeconds = Math.max(5, getConfig().getInt("nametag.refresh-interval-seconds", 30));
         schedulerUtil.runGlobalRepeating(nametagManager::refreshAll, periodSeconds * 20L, periodSeconds * 20L);
 
         int remountTicks = Math.max(20, getConfig().getInt("nametag.guild-tag.remount-interval-ticks", 100));
         schedulerUtil.runGlobalRepeating(nametagManager::reassertMounts, remountTicks, remountTicks);
+
+        int worldCheckTicks = Math.max(10, getConfig().getInt("nametag.guild-tag.world-check-interval-ticks", 20));
+        schedulerUtil.runGlobalRepeating(nametagManager::checkWorldChanges, worldCheckTicks, worldCheckTicks);
     }
 
     private void registerSpawn() {
@@ -518,6 +521,11 @@ public final class OneSMPPlugin extends JavaPlugin {
 
     public StatsManager stats() {
         return statsManager;
+    }
+
+    // Null if nametag.enabled is false in config.yml - registerNametags() skips creating it entirely.
+    public NametagManager nametags() {
+        return nametagManager;
     }
 
     public RecentAttackerTracker attackerTracker() {

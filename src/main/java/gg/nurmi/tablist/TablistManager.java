@@ -27,9 +27,6 @@ import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.atomic.AtomicLong;
 
-// Maintains a fixed-size grid of fake tablist entries (via PacketEvents) so the tablist never shrinks:
-// real players are mirrored into slots sorted by LuckPerms weight, and every unused slot
-// is backfilled with an invisible filler entry.
 public final class TablistManager {
 
     private static final int COLUMNS = 4;
@@ -46,6 +43,7 @@ public final class TablistManager {
     private final UUID[] slotOccupant = new UUID[MAX_SLOTS];
     private final Object layoutLock = new Object();
 
+    // Maintains a fixed-size grid of fake tablist entries via PacketEvents so the tablist never shrinks below MAX_SLOTS.
     public TablistManager(OneSMPPlugin plugin) {
         this.plugin = plugin;
         this.slotIds = new ArrayList<>(MAX_SLOTS);
@@ -76,6 +74,7 @@ public final class TablistManager {
         }
     }
 
+    // Gathers snapshots concurrently then broadcasts once; generation guards against a newer refresh starting mid-gather.
     public void refreshLayout() {
         if (!fillerSlotsEnabled()) {
             return;
@@ -93,7 +92,7 @@ public final class TablistManager {
         }
 
         CompletableFuture.allOf(futures.toArray(new CompletableFuture[0])).thenRun(() -> {
-            if (generation.get() != myGeneration) return; // a newer refresh started while this one was gathering snapshots
+            if (generation.get() != myGeneration) return;
             List<PlayerSnapshot> snapshots = futures.stream()
                     .map(CompletableFuture::join)
                     .filter(Objects::nonNull)
@@ -104,8 +103,7 @@ public final class TablistManager {
         });
     }
 
-    // Only remove/re-add packets are sent for slots whose occupant actually changed
-    // to keep this cheap when the roster is mostly stable.
+    // Only remove/re-add packets are sent for slots whose occupant actually changed, to keep this cheap when the roster is mostly stable.
     private void broadcastLayout(List<PlayerSnapshot> players) {
         int totalSlots = rows() * COLUMNS;
         boolean overflow = players.size() > totalSlots;
@@ -182,8 +180,7 @@ public final class TablistManager {
         return Math.clamp(plugin.getConfig().getInt("tablist.rows", 20), 1, 20);
     }
 
-    // Ranks are computed row-major (fill row 0 left-to-right, then row 1, ...)
-    // but vanilla's list-order lays slots out column-major, so this remaps one to the other.
+    // Ranks are computed row-major but vanilla's list-order lays slots out column-major, so this remaps one to the other.
     private int listOrderFor(int rowMajorRank) {
         int row = rowMajorRank / COLUMNS;
         int column = rowMajorRank % COLUMNS;

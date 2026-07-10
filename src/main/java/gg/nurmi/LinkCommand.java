@@ -11,10 +11,6 @@ import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.jspecify.annotations.NonNull;
 
-// Shared by /discord and /store - both just print a configured URL as a clickable link.
-// The click/hover events are built directly through Adventure's Java API and inserted as a single
-// pre-built Component via Placeholder.component - embedding them as MiniMessage tag arguments
-// (e.g. <click:open_url:'<url>'>) proved unreliable, so this avoids tag-argument substitution entirely.
 public final class LinkCommand implements CommandExecutor {
 
     private final OneSMPPlugin plugin;
@@ -29,6 +25,7 @@ public final class LinkCommand implements CommandExecutor {
         this.permission = permission;
     }
 
+    // Click/hover are built via Adventure's Java API and inserted as a Component - embedding them as MiniMessage tag arguments proved unreliable.
     @Override
     public boolean onCommand(@NonNull CommandSender sender, @NonNull Command command, @NonNull String label, String @NonNull [] args) {
         if (!sender.hasPermission(permission)) {

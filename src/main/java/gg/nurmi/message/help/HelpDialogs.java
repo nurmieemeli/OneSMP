@@ -14,8 +14,6 @@ import org.bukkit.entity.Player;
 
 import java.util.List;
 
-// Category -> article navigation via Paper's Dialog API (https://docs.papermc.io/paper/dev/dialogs/);
-// each click swaps in the next dialog server-side.
 public final class HelpDialogs {
 
     private static final int COLUMNS = 2;

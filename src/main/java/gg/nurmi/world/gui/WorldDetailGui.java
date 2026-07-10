@@ -46,9 +46,7 @@ public final class WorldDetailGui extends AbstractGui {
             }
         });
 
-        // Only worlds this plugin created are safe to unload/delete here - a world the server loaded on
-        // its own (default dimensions, or anything added outside /world create) has no tracked settings
-        // to restore and may be load-bearing (e.g. the primary world), so it gets no delete button.
+        // Only plugin-managed worlds get a delete button - a server-loaded world (e.g. the primary world) may be load-bearing.
         if (worldManager.isManaged(worldName)) {
             setButton(DELETE_SLOT, new ItemBuilder(Material.TNT)
                     .name(plugin.messages().text("world.gui-delete-button"))

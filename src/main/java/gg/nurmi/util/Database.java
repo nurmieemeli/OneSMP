@@ -175,8 +175,6 @@ public final class Database {
                     entry_limit INT NOT NULL DEFAULT 10
                 )
                 """);
-            // Added later so OneSMP can own hologram placement itself instead of relying on FancyHolograms'
-            // own persistence - nullable since older installs won't have this backfilled until next load.
             addColumnIfMissing(connection, "leaderboard_holograms", "world", "VARCHAR(64)");
             addColumnIfMissing(connection, "leaderboard_holograms", "x", "DOUBLE");
             addColumnIfMissing(connection, "leaderboard_holograms", "y", "DOUBLE");

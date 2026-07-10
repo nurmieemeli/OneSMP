@@ -9,7 +9,6 @@ import org.bukkit.inventory.ItemStack;
 
 import java.util.Map;
 
-// Shared buy/cancel/search flows so the /market command, the search dialog, and the browse/mine GUIs stay in sync.
 public final class MarketActions {
 
     public static final int RESULT_LIMIT = 200;

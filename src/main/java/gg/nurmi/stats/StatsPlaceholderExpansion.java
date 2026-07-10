@@ -7,13 +7,12 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.tag.Tag;
 import org.bukkit.entity.Player;
 
-// Registers live stats (e.g. <stats_kills>) as MiniPlaceholders tags so any MiniMessage text can use
-// them without depending on StatsManager.
 public final class StatsPlaceholderExpansion {
 
     private StatsPlaceholderExpansion() {
     }
 
+    // Registers live stats (e.g. <stats_kills>) as MiniPlaceholders tags so any MiniMessage text can use them without depending on StatsManager.
     public static Expansion register(OneSMPPlugin plugin, StatsManager statsManager) {
         Expansion expansion = Expansion.builder("stats")
                 .audiencePlaceholder(Player.class, "kills", (player, queue, ctx) ->

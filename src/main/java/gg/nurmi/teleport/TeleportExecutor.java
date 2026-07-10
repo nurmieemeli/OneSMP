@@ -23,10 +23,7 @@ public final class TeleportExecutor {
         execute(player, destination, successMessageKey, () -> {}, () -> {});
     }
 
-    // onSuccess fires only once the teleport actually lands; onCancelled fires for every way it can
-    // instead fail to happen (combat block, warmup interrupted/cancelled, or teleportAsync itself
-    // failing) - callers with a side effect tied to "the teleport actually happens" (e.g. RTP's cost
-    // and cooldown) hook into these instead of guessing which case to handle or applying eagerly.
+    // onSuccess fires only once the teleport lands; onCancelled fires for every way it can instead fail (combat block, warmup cancelled, etc).
     public void execute(Player player, Location destination, String successMessageKey, Runnable onSuccess, Runnable onCancelled) {
         if (destination == null) {
             plugin.messages().send(player, "teleport.destination-unavailable");
@@ -49,11 +46,11 @@ public final class TeleportExecutor {
         return plugin.attackerTracker().recentAttacker(player.getUniqueId(), windowMillis) != null;
     }
 
+    // Runs the origin-side effect via runAtLocation since origin may now belong to a different region thread than this callback runs on.
     private void teleportNow(Player player, Location destination, String successMessageKey, Runnable onSuccess, Runnable onCancelled) {
         Location origin = player.getLocation();
         player.teleportAsync(destination).thenAccept(success -> {
             if (success) {
-                // origin may now belong to a different region thread than this callback runs on
                 plugin.scheduler().runAtLocation(origin, () -> plugin.effects().teleport(origin));
                 plugin.effects().teleport(player.getLocation());
                 plugin.messages().send(player, successMessageKey);

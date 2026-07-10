@@ -17,9 +17,7 @@ public final class TextUtil {
         return prettyName(entityType.name());
     }
 
-    // Looks up a translated display name from lang/<language>/messages.yml (entities.<key>, hyphenated -
-    // e.g. entities.cave-spider), falling back to the generic ENUM_NAME -> "Enum Name" prettifier for any
-    // entity type not covered there, so an exotic/future mob never shows a raw missing-key string.
+    // Looks up a translated name from messages.yml (entities.<hyphenated-key>), falling back to a prettified enum name if untranslated.
     public static String entityName(OneSMPPlugin plugin, EntityType entityType) {
         String key = "entities." + entityType.name().toLowerCase(java.util.Locale.ROOT).replace('_', '-');
         String translated = plugin.messages().raw(key);

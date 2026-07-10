@@ -22,9 +22,6 @@ import java.util.function.BiConsumer;
 
 public abstract class AbstractGui implements InventoryHolder {
 
-    // The last row is always reserved for the footer (close/prev/next, plus whatever a subclass adds),
-    // so a page's usable capacity is every row above it. Both this and the footer button slots scale
-    // with whatever row count a subclass actually asks for, rather than assuming a fixed 6-row inventory.
     protected final int PAGE_SIZE;
     protected final int footerRowStart;
     private final int prevSlot;
@@ -36,6 +33,7 @@ public abstract class AbstractGui implements InventoryHolder {
     private final Map<Integer, GuiButton> buttons = new HashMap<>();
     private final Set<Integer> openSlots = new HashSet<>();
 
+    // The last row is always reserved for the footer, so page capacity/footer slots scale with whatever row count a subclass asks for.
     protected AbstractGui(OneSMPPlugin plugin, Component title, int rows) {
         this.plugin = plugin;
         this.inventory = Bukkit.createInventory(this, rows * 9, title);

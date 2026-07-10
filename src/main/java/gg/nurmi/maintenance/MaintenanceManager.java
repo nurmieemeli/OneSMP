@@ -9,14 +9,13 @@ import org.bukkit.entity.Player;
 
 import java.util.UUID;
 
-// Thin wrapper around Bukkit's own whitelist: enabling maintenance flips it on, and onesmp.maintenance.bypass
-// lets staff through regardless of whether they're actually whitelisted.
 public final class MaintenanceManager {
 
     private static final String BYPASS_PERMISSION = "onesmp.maintenance.bypass";
 
     private final OneSMPPlugin plugin;
 
+    // Thin wrapper around Bukkit's own whitelist - enabling maintenance flips it on; onesmp.maintenance.bypass lets staff through regardless.
     public MaintenanceManager(OneSMPPlugin plugin) {
         this.plugin = plugin;
         Bukkit.setWhitelist(isEnabled());
@@ -30,9 +29,7 @@ public final class MaintenanceManager {
         return player.hasPermission(BYPASS_PERMISSION);
     }
 
-    // Used from AsyncPlayerPreLoginEvent (no Player/Permissible yet);
-    // ops always bypass, otherwise this needs LuckPerms to resolve the permission for a UUID that hasn't joined,
-    // falling back to op-only without it.
+    // For AsyncPlayerPreLoginEvent (no Player/Permissible yet) - resolves via LuckPerms for a UUID that hasn't joined, falling back to op-only without it.
     public boolean canBypass(UUID uniqueId) {
         OfflinePlayer offlinePlayer = Bukkit.getOfflinePlayer(uniqueId);
         if (offlinePlayer.isOp()) {

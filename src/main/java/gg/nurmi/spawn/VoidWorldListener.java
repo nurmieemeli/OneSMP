@@ -29,8 +29,7 @@ public final class VoidWorldListener implements Listener {
         return spawnWorldManager.isVoidWorld(player.getWorld()) && player.getGameMode() != GameMode.CREATIVE;
     }
 
-    // Only denies the block's own right-click behavior (opening/toggling it) - the held item's own action
-    // (throwing a bottle, eating, drinking, etc.) is left alone since it doesn't change the block itself.
+    // Only denies the block's own right-click behavior - the held item's own action (eating, drinking, etc.) is left alone.
     @EventHandler(ignoreCancelled = true)
     public void onInteract(PlayerInteractEvent event) {
         if (event.getAction() != Action.RIGHT_CLICK_BLOCK) {

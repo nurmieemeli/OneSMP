@@ -28,7 +28,6 @@ public final class StatsManager {
         DEATHS("deaths"),
         KILLSTREAK("best_killstreak"),
         PLAYTIME("playtime_seconds"),
-        // Computed in Java rather than queried directly - see StatsManager#topKd.
         KD("kd_ratio");
 
         private final String column;

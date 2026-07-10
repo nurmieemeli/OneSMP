@@ -73,16 +73,13 @@ public final class RtpWorldSelectGui extends AbstractGui {
                 new RtpWorldSelectGui(plugin, rtpManager, viewer, targetPage).open(viewer));
     }
 
-    // Content rows scale to fit however many worlds are enabled (1-5), plus one fixed footer row -
-    // a server with 2 RTP worlds doesn't need the same 54-slot chest as one with 40.
+    // Content rows scale to fit however many worlds are enabled (1-5), plus one fixed footer row.
     private static int rows(int worldCount) {
         int contentRows = Math.min(5, Math.max(1, (int) Math.ceil(worldCount / 9.0)));
         return contentRows + 1;
     }
 
-    // Spreads itemCount items as evenly as possible across the content rows (row sizes differ by at
-    // most one), then centers each row horizontally - so e.g. 3 worlds sit in the middle of a single
-    // row instead of packed against the left edge.
+    // Spreads items evenly across the content rows (sizes differ by at most one), then centers each row horizontally.
     private static int[] centeredSlots(int contentRows, int itemCount) {
         int[] slots = new int[itemCount];
         int base = itemCount / contentRows;

@@ -36,9 +36,6 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.logging.Level;
 
-// Uses raw PacketEvents packets for everything here: a fake scoreboard team gives the prefix line
-// (no real team is ever registered), and a fake TEXT_DISPLAY entity mounted as a passenger gives the second
-// guild-tag line, since Bukkit has no API for either.
 public final class NametagManager {
 
     private final OneSMPPlugin plugin;
@@ -94,27 +91,46 @@ public final class NametagManager {
         }
     }
 
-    // The fake entity and its passenger mount don't survive a world change, so it's destroyed and respawned/remounted here.
+    // Just a fast path when it fires - Folia doesn't reliably fire this for teleportAsync moves, see checkWorldChanges() for the real fix.
     public void handleWorldChange(Player player) {
         if (!plugin.packetEvents().available()) {
             return;
         }
-        UUID uuid = player.getUniqueId();
-        GuildTagState old = guildTagState.get(uuid);
-        if (old == null) {
+        plugin.scheduler().runAtEntity(player, () -> reconcileWorld(player), () -> {});
+    }
+
+    // Polls each tracked player's actual world against the tag entity's last known world, since PlayerChangedWorldEvent can't be trusted (see handleWorldChange).
+    public void checkWorldChanges() {
+        if (!plugin.packetEvents().available() || guildTagState.isEmpty()) {
             return;
         }
+        for (UUID uuid : guildTagState.keySet()) {
+            Player player = Bukkit.getPlayer(uuid);
+            if (player != null) {
+                plugin.scheduler().runAtEntity(player, () -> reconcileWorld(player), () -> {});
+            }
+        }
+    }
 
-        plugin.scheduler().runAtEntity(player, () -> {
-            destroyGuildTagEntity(old.entityId());
-            int newId = fakeEntityIdCounter.decrementAndGet();
-            UUID displayUuid = UUID.randomUUID();
-            Location location = player.getLocation();
-            guildTagState.put(uuid, new GuildTagState(newId, displayUuid, old.tag(), location.getWorld().getName()));
-            spawnGuildTagEntity(newId, displayUuid, player, location, old.tag());
+    private void reconcileWorld(Player player) {
+        GuildTagState state = guildTagState.get(player.getUniqueId());
+        if (state != null && !state.world().equals(player.getWorld().getName())) {
+            respawnGuildTag(player, state.tag());
+        }
+    }
 
-            plugin.scheduler().runAtEntityDelayed(player, () -> sendMount(player, newId), () -> {}, 5L);
-        }, () -> {});
+    // Destroys any existing tag entity and spawns a fresh one at the player's current location.
+    private void respawnGuildTag(Player player, Component tag) {
+        UUID uuid = player.getUniqueId();
+        GuildTagState existing = guildTagState.get(uuid);
+        if (existing != null) {
+            destroyGuildTagEntity(existing.entityId());
+        }
+        int newId = fakeEntityIdCounter.decrementAndGet();
+        UUID displayUuid = UUID.randomUUID();
+        Location location = player.getLocation();
+        guildTagState.put(uuid, new GuildTagState(newId, displayUuid, tag, location.getWorld().getName()));
+        spawnGuildTagEntity(newId, displayUuid, player, location, tag);
     }
 
     public void refresh(Player player) {
@@ -173,6 +189,14 @@ public final class NametagManager {
         }
     }
 
+    // For callers that already know the player's tag (e.g. GuildManager) - skips refresh()'s own async guild lookup.
+    public void refreshGuildTag(Player player, String tag) {
+        if (!plugin.packetEvents().available()) {
+            return;
+        }
+        plugin.scheduler().runAtEntity(player, () -> applyGuildTag(player, tag), () -> {});
+    }
+
     private void applyGuildTag(Player player, String tag) {
         UUID uuid = player.getUniqueId();
 
@@ -186,17 +210,10 @@ public final class NametagManager {
 
         String format = plugin.getConfig().getString("nametag.guild-tag.format", "<gray>[<guild_tag>]");
         Component rendered = plugin.messages().parse(format, player, Placeholder.unparsed("guild_tag", tag));
-        String currentWorld = player.getWorld().getName();
 
         GuildTagState existing = guildTagState.get(uuid);
-        if (existing == null || !existing.world().equals(currentWorld)) {
-            if (existing != null) {
-                destroyGuildTagEntity(existing.entityId());
-            }
-            int newId = fakeEntityIdCounter.decrementAndGet();
-            UUID displayUuid = UUID.randomUUID();
-            guildTagState.put(uuid, new GuildTagState(newId, displayUuid, rendered, currentWorld));
-            spawnGuildTagEntity(newId, displayUuid, player, player.getLocation(), rendered);
+        if (existing == null || !existing.world().equals(player.getWorld().getName())) {
+            respawnGuildTag(player, rendered);
             return;
         }
 

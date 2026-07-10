@@ -153,9 +153,7 @@ public final class SellGui extends AbstractGui {
                 .build());
     }
 
-    // Damaged tools/armor sell for less: payout scales with remaining durability, so a tool
-    // one hit from breaking pays out near-nothing instead of full price. Unbreakable items and
-    // anything without durability (blocks, food, etc.) are unaffected.
+    // Damaged tools/armor sell for less - payout scales with remaining durability; unbreakable/no-durability items are unaffected.
     private double effectiveUnitPrice(ItemStack stack, ShopItem shopItem) {
         double basePrice = shopItem.sellPrice() * plugin.shop().sellPriceMultiplier();
         short maxDurability = stack.getType().getMaxDurability();

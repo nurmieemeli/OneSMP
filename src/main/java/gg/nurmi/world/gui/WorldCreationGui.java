@@ -165,10 +165,9 @@ public final class WorldCreationGui extends AbstractGui {
                 .build();
     }
 
+    // Every toggle button also closes+reopens this GUI to redraw it, setting resolved first so reopen isn't mistaken for abandoning the session.
     @Override
     protected void onClose(InventoryCloseEvent event) {
-        // Every toggle button also closes+reopens this GUI to redraw it, and sets resolved first so that
-        // reopen isn't mistaken for abandoning the session.
         if (!resolved) {
             worldManager.clearSession(adminUuid);
         }

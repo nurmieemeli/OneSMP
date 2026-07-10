@@ -130,10 +130,7 @@ public final class WorldManager {
         return List.copyOf(managed.values());
     }
 
-    // Unlike listWorlds() (only worlds this plugin created and tracks in worlds.yml), this also surfaces
-    // worlds the server itself loaded (default dimensions, or anything added outside /world create) so
-    // they're at least visible/teleportable - synthesized read-only from live Bukkit state since we never
-    // recorded how they were created.
+    // Unlike listWorlds(), also surfaces worlds the server itself loaded (default dimensions, etc.), synthesized read-only from live Bukkit state.
     public List<WorldSettings> listAllLoadedWorlds() {
         List<WorldSettings> all = new ArrayList<>(managed.values());
         for (World world : Bukkit.getWorlds()) {

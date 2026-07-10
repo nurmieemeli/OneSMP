@@ -26,27 +26,25 @@ public final class SpawnWorldManager {
             return;
         }
 
-        // Tracked ourselves rather than inferred from disk - an unloaded world isn't necessarily new
-        // and getWorldContainer() isn't a reliable path to gate a one-time build on.
-        boolean platformAlreadyBuilt = plugin.getConfig().getBoolean("spawn.platform-built", false);
-
         plugin.scheduler().runGlobal(() -> {
             World world = new WorldCreator(worldName)
                     .generator(new VoidChunkGenerator())
                     .environment(World.Environment.NORMAL)
                     .createWorld();
-            if (world != null && !platformAlreadyBuilt) {
-                buildStarterPlatform(world);
-                plugin.getConfig().set("spawn.platform-built", true);
-                plugin.saveConfig();
+            if (world != null) {
+                buildStarterPlatformIfMissing(world);
             }
         });
     }
 
-    private void buildStarterPlatform(World world) {
+    // Checks actual block state instead of a "did we build this" flag, which can't tell a world that already existed on disk apart from a fresh one.
+    private void buildStarterPlatformIfMissing(World world) {
         int y = plugin.getConfig().getInt("spawn.y", 65) - 1;
 
         plugin.scheduler().runAtChunk(world, 0, 0, () -> {
+            if (world.getBlockAt(1, y, 1).getType() != Material.AIR) {
+                return;
+            }
             for (int x = 0; x <= 2; x++) {
                 for (int z = 0; z <= 2; z++) {
                     world.getBlockAt(x, y, z).setType(Material.STONE);

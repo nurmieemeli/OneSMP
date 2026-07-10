@@ -27,10 +27,7 @@ public final class TeleportWarmup {
         start(player, onComplete, () -> {});
     }
 
-    // onCancelled fires for every way the warmup can end without onComplete: movement-cancel, the
-    // entity being retired mid-warmup (e.g. the player disconnecting), or a duplicate request being
-    // ignored because one is already pending - so callers with a side effect riding on completion
-    // (e.g. RTP's cost) always get a chance to undo it.
+    // onCancelled fires for every way the warmup can end without onComplete: movement-cancel, entity retired mid-warmup, or a duplicate request.
     public void start(Player player, Runnable onComplete, Runnable onCancelled) {
         int warmupSeconds = plugin.getConfig().getInt("teleport.teleport-warmup-seconds", 3);
         if (warmupSeconds <= 0) {
@@ -40,7 +37,7 @@ public final class TeleportWarmup {
 
         UUID uuid = player.getUniqueId();
         if (!pending.add(uuid)) {
-            onCancelled.run(); // already warming up, ignore the duplicate request
+            onCancelled.run();
             return;
         }
 

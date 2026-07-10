@@ -20,7 +20,6 @@ import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.logging.Level;
 
-// Player-to-player listings, persisted so they survive restarts and can sell while the seller is offline.
 public final class MarketManager {
 
     private static final String SELECT_COLUMNS =

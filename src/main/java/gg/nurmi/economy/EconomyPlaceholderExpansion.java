@@ -5,12 +5,12 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.tag.Tag;
 import org.bukkit.entity.Player;
 
-// Registers <economy_balance> as a MiniPlaceholders tag so any MiniMessage text can use it without depending on EconomyManager.
 public final class EconomyPlaceholderExpansion {
 
     private EconomyPlaceholderExpansion() {
     }
 
+    // Registers <economy_balance> as a MiniPlaceholders tag so any MiniMessage text can use it without depending on EconomyManager.
     public static Expansion register(EconomyManager economyManager) {
         Expansion expansion = Expansion.builder("economy")
                 .audiencePlaceholder(Player.class, "balance", (player, queue, ctx) ->

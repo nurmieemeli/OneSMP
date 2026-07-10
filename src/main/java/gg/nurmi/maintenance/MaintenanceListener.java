@@ -7,8 +7,6 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.AsyncPlayerPreLoginEvent;
 
-// Bukkit already presets KICK_WHITELIST here if the whitelist is on and the UUID isn't allowed;
-// this just grants bypass holders an exception and swaps in our own kick message, before a Player object is even constructed.
 public final class MaintenanceListener implements Listener {
 
     private final OneSMPPlugin plugin;
@@ -19,6 +17,7 @@ public final class MaintenanceListener implements Listener {
         this.maintenanceManager = maintenanceManager;
     }
 
+    // Grants bypass holders an exception to Bukkit's own KICK_WHITELIST and swaps in our own kick message, before a Player object even exists.
     @EventHandler(priority = EventPriority.LOW)
     public void onPreLogin(AsyncPlayerPreLoginEvent event) {
         if (!maintenanceManager.isEnabled()) {

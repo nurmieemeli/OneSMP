@@ -17,7 +17,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
 
-// Reward is rolled before this opens; the reel is a cosmetic-only animation that always lands on it.
 public final class CrateOpeningGui extends AbstractGui {
 
     private static final int ROWS = 3;
@@ -36,6 +35,7 @@ public final class CrateOpeningGui extends AbstractGui {
     private final List<CrateReward> reel = new ArrayList<>(REEL_SIZE);
     private boolean finished;
 
+    // Reward is rolled before this opens; the reel is a cosmetic-only animation that always lands on it.
     public CrateOpeningGui(OneSMPPlugin plugin, CrateManager crateManager, CrateType type, CrateReward reward) {
         super(plugin, plugin.messages().text("crate.gui-opening-title",
                 Placeholder.component("type", plugin.messages().parse(type.displayName()))), ROWS);
@@ -61,12 +61,12 @@ public final class CrateOpeningGui extends AbstractGui {
         plugin.scheduler().runAtEntityDelayed(player, () -> tick(player, 1), () -> finish(player), INITIAL_DELAY);
     }
 
+    // Queues the real reward CENTER_INDEX frames early so it reaches the center slot exactly on the last frame.
     private void tick(Player player, int frame) {
         if (finished) {
             return;
         }
         reel.removeFirst();
-        // Queue the real reward CENTER_INDEX frames early so it reaches the center slot exactly on the last frame.
         reel.add(frame == TOTAL_FRAMES - CENTER_INDEX ? reward : randomDecoy());
 
         boolean finalFrame = frame >= TOTAL_FRAMES;

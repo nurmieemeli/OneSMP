@@ -4,6 +4,7 @@ import gg.nurmi.OneSMPPlugin;
 import gg.nurmi.util.Database;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.entity.Player;
 
 import java.math.BigDecimal;
 import java.sql.Connection;
@@ -48,9 +49,10 @@ public final class GuildManager {
         guildCache.remove(uuid);
     }
 
-    // Call after any change to this player's membership so getCachedGuild() doesn't go stale; no-ops if offline.
+    // Call after any change to this player's membership - refreshes the cache and pushes an instant overhead guild-tag update.
     public void refreshCache(UUID uuid) {
-        if (Bukkit.getPlayer(uuid) == null) {
+        Player player = Bukkit.getPlayer(uuid);
+        if (player == null) {
             guildCache.remove(uuid);
             return;
         }
@@ -59,6 +61,9 @@ public final class GuildManager {
                 guildCache.put(uuid, optionalGuild.get());
             } else {
                 guildCache.remove(uuid);
+            }
+            if (plugin.nametags() != null) {
+                plugin.nametags().refreshGuildTag(player, optionalGuild.map(Guild::tag).orElse(null));
             }
         });
     }

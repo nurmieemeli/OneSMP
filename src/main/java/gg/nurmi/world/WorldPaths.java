@@ -1,11 +1,10 @@
 package gg.nurmi.world;
 
-// Bukkit treats a '/'-containing WorldCreator name as both a nested path and the world's identifier,
-// so a container prefix just needs folding into the name consistently.
 public final class WorldPaths {
 
     private WorldPaths() {}
 
+    // Bukkit treats a '/'-containing WorldCreator name as both a nested path and the world's identifier, so this just folds the prefix into the name.
     public static String resolve(String container, String worldName) {
         if (container == null || container.isBlank()) {
             return worldName;
@@ -14,8 +13,7 @@ public final class WorldPaths {
         return normalized.isEmpty() ? worldName : normalized + "/" + worldName;
     }
 
-    // Reverses resolve(): strips the container prefix off a Bukkit world name so it can be matched
-    // against the logical name admins actually configure (e.g. in rtp.worlds).
+    // Reverses resolve(): strips the container prefix off a Bukkit world name to match the logical name admins actually configure.
     public static String strip(String container, String storedName) {
         if (container == null || container.isBlank()) {
             return storedName;

@@ -8,7 +8,6 @@ import org.bukkit.World;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Player;
 
-// Purely cosmetic sound/particle feedback - safe to call unconditionally, it never affects behavior.
 public final class EffectsManager {
 
     private final OneSMPPlugin plugin;

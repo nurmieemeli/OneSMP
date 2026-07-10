@@ -14,8 +14,6 @@ import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
 
-// Overrides vanilla's death message (client-side translated to each viewer's own language) with a MiniMessage
-// template from messages.yml, so every viewer sees it in the server's configured language instead.
 public final class DeathMessageListener implements Listener {
 
     private final OneSMPPlugin plugin;
@@ -26,6 +24,7 @@ public final class DeathMessageListener implements Listener {
         this.attackerTracker = attackerTracker;
     }
 
+    // Overrides vanilla's death message with a MiniMessage template from messages.yml, since vanilla's is client-side translated per viewer.
     @EventHandler
     public void onDeath(PlayerDeathEvent event) {
         Player victim = event.getEntity();

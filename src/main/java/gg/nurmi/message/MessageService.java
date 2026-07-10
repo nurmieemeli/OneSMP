@@ -50,14 +50,12 @@ public final class MessageService {
         this.prefixComponent = miniMessage.deserialize(messages.getString("prefix", ""));
     }
 
-    // Public so callers that build Components outside chat (GUI titles/lore, dialogs) can still
-    // source their MiniMessage template from messages.yml instead of hardcoding it.
+    // Public so callers building Components outside chat (GUI titles/lore, dialogs) can still source their template from messages.yml.
     public String raw(String path) {
         return messages.getString(path, path);
     }
 
-    // For dynamically-keyed lookups (e.g. per-world display names) where the key itself isn't a
-    // sensible fallback and the caller has a real default in mind instead.
+    // For dynamically-keyed lookups (e.g. per-world display names) where the key itself isn't a sensible fallback.
     public String raw(String path, String fallback) {
         return messages.getString(path, fallback);
     }
@@ -70,8 +68,7 @@ public final class MessageService {
         return TagResolver.resolver("prefix", Tag.inserting(prefixComponent));
     }
 
-    // Invisible markers, separate from whatever color the message actually uses - playFeedbackSound() below
-    // detects these instead of <green>/<red> so a translated/restyled messages.yml can't break sound feedback.
+    // Invisible markers playFeedbackSound() detects instead of <green>/<red>, so a translated/restyled messages.yml can't break sound feedback.
     private TagResolver feedbackResolver() {
         return TagResolver.resolver(
                 TagResolver.resolver("success", Tag.selfClosingInserting(Component.empty())),
@@ -124,8 +121,7 @@ public final class MessageService {
         }
     }
 
-    // Relies on the convention that every message starts with <prefix><fail> (error) or <prefix><success> (success) -
-    // dedicated markers rather than <red>/<green> so translated messages.yml files can't accidentally break sound feedback.
+    // Relies on the convention that every message starts with <prefix><fail> or <prefix><success>.
     private void playFeedbackSound(Player player, String template) {
         if (template.startsWith("<prefix><fail>")) {
             plugin.effects().failure(player);

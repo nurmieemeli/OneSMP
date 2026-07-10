@@ -81,6 +81,7 @@ public final class VoteManager {
         });
     }
 
+    // A same-day repeat vote counts toward the total but doesn't extend the streak; a gap of more than a day resets it.
     private VoteResult recordVote(UUID uuid, String name) {
         long today = LocalDate.now().toEpochDay();
         try (Connection connection = database.getConnection()) {
@@ -110,7 +111,7 @@ public final class VoteManager {
             totalVotes++;
             boolean milestoneReached = false;
             if (today == lastVoteEpochDay) {
-                // Already voted today (e.g. a second vote site) - counts toward the total but doesn't extend the streak.
+                // deliberately empty
             } else if (today == lastVoteEpochDay + 1) {
                 currentStreak++;
                 lastVoteEpochDay = today;
@@ -272,7 +273,6 @@ public final class VoteManager {
             try {
                 milestones.put(Integer.parseInt(key), section.getConfigurationSection(key));
             } catch (NumberFormatException ignored) {
-                // non-numeric key, skip
             }
         }
         return milestones;

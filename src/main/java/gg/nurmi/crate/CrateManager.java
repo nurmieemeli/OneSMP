@@ -66,8 +66,7 @@ public final class CrateManager {
         refreshHolograms();
     }
 
-    // Bound crate holograms only get their text set once at spawn time; push the (possibly newly reloaded)
-    // display name into each already-existing hologram so a language reload doesn't require unbind/rebind.
+    // Pushes a reloaded display name into each already-existing hologram so a language reload doesn't require unbind/rebind.
     private void refreshHolograms() {
         if (boundBlocks.isEmpty() || !fancyHologramsAvailable()) {
             return;
@@ -193,9 +192,7 @@ public final class CrateManager {
         }
     }
 
-    // Must be called only after the void spawn world and any /world create worlds have actually loaded
-    // (see SpawnWorldManager/WorldManager) - those are only loaded via a scheduled task queued during
-    // onEnable(), not synchronously, so calling this too early would fail to resolve their locations.
+    // Must be called only after all worlds have actually loaded (see SpawnWorldManager/WorldManager) or their locations won't resolve.
     public void respawnHolograms() {
         if (boundBlocks.isEmpty() || !fancyHologramsAvailable()) {
             return;

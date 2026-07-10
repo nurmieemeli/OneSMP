@@ -23,9 +23,6 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Level;
 
-// OneSMP owns each hologram's location/persistence itself (stored in leaderboard_holograms) and recreates
-// every one of them fresh on enable as a non-persistent FancyHolograms entity - this only leans on
-// FancyHolograms as a renderer, never as the source of truth for what should exist or where.
 public final class LeaderboardHologramManager {
 
     private static final String NAME_PREFIX = "cs_leaderboard_";
@@ -44,12 +41,14 @@ public final class LeaderboardHologramManager {
     private final Database database;
     private final Map<String, LeaderboardEntry> registry = new ConcurrentHashMap<>();
 
+    // OneSMP owns each hologram's location/persistence itself and recreates every one fresh on enable, using FancyHolograms only as a renderer.
     public LeaderboardHologramManager(OneSMPPlugin plugin) {
         this.plugin = plugin;
         this.database = plugin.database();
         load();
     }
 
+    // Defers spawning until onEnable()'s scheduled world-load task completes, so hologram locations can actually resolve.
     private void load() {
         List<StoredRow> rows = new ArrayList<>();
         try (Connection connection = database.getConnection();
@@ -73,9 +72,6 @@ public final class LeaderboardHologramManager {
             return;
         }
 
-        // The void spawn world and any /world create worlds are only loaded via a scheduled task queued
-        // earlier in onEnable() (see SpawnWorldManager/WorldManager), not synchronously - deferring this
-        // the same way ensures those worlds actually exist by the time hologram locations are resolved.
         plugin.scheduler().runGlobal(() -> {
             HologramManager manager = FancyHologramsPlugin.get().getHologramManager();
             for (StoredRow row : rows) {
@@ -84,13 +80,12 @@ public final class LeaderboardHologramManager {
         });
     }
 
+    // A missing stored location means a pre-migration row - back-fills it from FancyHolograms' own (still-persistent, at this point) copy if one exists.
     private void spawnFromRow(HologramManager manager, StoredRow row) {
         Location location = row.world() != null
                 ? LocationUtil.resolve(row.world(), row.x(), row.y(), row.z(), row.yaw(), row.pitch())
                 : null;
         if (location == null) {
-            // Pre-migration row with no stored location yet - back-fill it from FancyHolograms' own
-            // (still-persistent, at this point) copy if it still has one, so nothing gets lost.
             location = manager.getHologram(row.name()).map(h -> h.getData().getLocation()).orElse(null);
             if (location == null) {
                 plugin.getLogger().warning("Leaderboard hologram '" + row.name() + "' has no known location "

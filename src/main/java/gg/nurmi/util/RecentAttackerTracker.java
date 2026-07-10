@@ -27,14 +27,6 @@ import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 
-// Tracks the last player to damage each victim - resolved through projectiles/TNT/crystals/anchors to the
-// actual player - so stats kill-crediting, custom death messages, and combat-log detection all attribute an
-// indirect hit (arrow, knockback into lava/the void, primed TNT, crystal PvP, a triggered respawn anchor) the
-// same way, instead of PlayerDeathEvent#getKiller() (direct melee only) silently crediting no one. A bed
-// exploding in the Nether/End is the same kind of block-only explosion as a respawn anchor but isn't tracked
-// here yet. Every lookup here is read-only: entries are only ever replaced by a newer hit on that player,
-// never actively removed, so multiple listeners can safely query the same state (e.g. on the same death, or
-// on quit) without racing each other over who clears it first.
 public final class RecentAttackerTracker implements Listener {
 
     public record KillCredit(UUID uuid, String name) {
@@ -47,16 +39,11 @@ public final class RecentAttackerTracker implements Listener {
     }
 
     private static final long ANCHOR_TRIGGER_WINDOW_MILLIS = 2000L;
-    private static final double ANCHOR_TRIGGER_RADIUS_SQUARED = 64.0; // 8 blocks - vanilla's anchor blast radius is 5
+    private static final double ANCHOR_TRIGGER_RADIUS_SQUARED = 64.0;
 
     private final OneSMPPlugin plugin;
     private final Map<UUID, RecentAttack> recentAttackers = new ConcurrentHashMap<>();
-    // End Crystal explosions have no equivalent of TNTPrimed#getSource() - the crystal is the "damager" for
-    // its own blast, so we track who last hit each crystal (by its entity UUID) to attribute crystal PvP.
     private final Map<UUID, RecentAttack> crystalBreakers = new ConcurrentHashMap<>();
-    // Respawn anchor (and, in principle, bed) explosions have no entity damager at all - they arrive as a
-    // plain EntityDamageEvent with cause BLOCK_EXPLOSION, so attribution has to correlate by location/timing
-    // instead of an entity UUID. Small and short-lived enough that a linear scan on read is fine.
     private final List<BlockTrigger> recentAnchorTriggers = new CopyOnWriteArrayList<>();
 
     public RecentAttackerTracker(OneSMPPlugin plugin) {
@@ -151,8 +138,7 @@ public final class RecentAttackerTracker implements Listener {
         return null;
     }
 
-    // Prefers the direct killer (melee, only ever set for that case); falls back to the last tracked hit
-    // within stats.indirect-kill-window-seconds.
+    // Prefers the direct melee killer, falling back to the last tracked indirect hit within stats.indirect-kill-window-seconds.
     public KillCredit resolve(Player victim) {
         Player direct = victim.getKiller();
         if (direct != null && !direct.getUniqueId().equals(victim.getUniqueId())) {
@@ -162,8 +148,7 @@ public final class RecentAttackerTracker implements Listener {
         return recentAttacker(victim.getUniqueId(), windowMillis);
     }
 
-    // Caller-specified window, independent of stats' indirect-kill window and getKiller() fallback -
-    // used for things like combat-log detection where the victim isn't dead (yet).
+    // Caller-specified window, independent of resolve()'s - used for combat-log detection where the victim isn't dead (yet).
     public KillCredit recentAttacker(UUID victimUuid, long windowMillis) {
         RecentAttack recent = recentAttackers.get(victimUuid);
         if (recent == null || System.currentTimeMillis() - recent.atMillis() > windowMillis) {

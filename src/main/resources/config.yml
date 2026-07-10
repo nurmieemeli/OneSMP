@@ -117,9 +117,6 @@ spawn:
   z: 0.5
   yaw: 0.0
   pitch: 0.0
-  # Internal - set automatically once the starter platform is built, so it's never rebuilt on a later
-  # restart. Don't hand-edit this unless you want the platform re-created.
-  platform-built: false
 
 # Overhead nametag prefixes via PacketEvents team packets only - no real scoreboard team is ever registered. Requires PacketEvents, silently disabled otherwise.
 nametag:
@@ -133,6 +130,11 @@ nametag:
     y-offset: 0.55
     # Re-sent periodically since it's a cheap packet, guarding against the passenger mount desyncing client-side.
     remount-interval-ticks: 20
+    # How often each guild-tagged online player's actual world is checked against the tag entity's last
+    # known world, respawning it if they differ. This is what makes the tag follow a player across
+    # worlds - Folia doesn't reliably fire PlayerChangedWorldEvent for plugin-driven teleports, so this
+    # poll (not that event) is the real mechanism, not just a backstop.
+    world-check-interval-ticks: 20
 
 tablist:
   enabled: true

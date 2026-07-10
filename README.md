@@ -66,13 +66,13 @@ Crate types — key appearance and a weighted reward pool of items, money, and c
 A dedicated void world is created automatically on first enable — a custom `ChunkGenerator` with no terrain, bedrock, caves, structures, or mobs — with a small starter platform so nobody spawns into open air. `/setspawn` (admin) sets the server spawn point; `/spawn` teleports there through the same warmup as homes/warps. First-time joiners land there automatically, as does anyone who dies with no valid bed/anchor. Inside the void world, non-creative players can't break or place blocks, use buckets, open/toggle a block (except doors), trample farmland, take damage, or lose food — but using a held item itself (throwing a bottle, eating, drinking, etc.) is never blocked, only whatever it would change about the world. Falling out (real void damage, not a Y-check) teleports straight back to spawn.
 
 ### World Creation
-`/world create <name> [seed]` opens a GUI to configure a new world — environment, world type, generator (vanilla or the void generator spawn uses), seed, structures, hardcore, difficulty, PvP — before creating it. `/world list` browses every managed world with a detail/teleport/delete view; `/world teleport <name>` goes through the same warmup as `/spawn`. `/world delete <name>` unloads and stops tracking a world but leaves its folder on disk; only `/world delete <name> wipe` permanently deletes the files. Settings persist in `worlds.yml` and reapply identically on every restart.
+`/world create <name> [seed]` opens a GUI to configure a new world — environment, world type, generator (vanilla or the void generator spawn uses), seed, structures, hardcore, difficulty, PvP — before creating it. `/world list` browses every currently loaded world, not just ones OneSMP created — the server's default dimensions and anything added outside `/world create` show up too, read-only where OneSMP has no settings to manage. `/world teleport <name>` works for any loaded world and goes through the same warmup as `/spawn`; `/world delete <name>` (and `wipe` to also delete files from disk) is restricted to worlds OneSMP actually created, since unloading a world it didn't create — like the primary world — could be destructive. Settings persist in `worlds.yml` and reapply identically on every restart.
 
 ### Random Teleport
-`/rtp [world]` teleports to a random safe spot within a configurable radius; with no world given it opens a GUI listing every RTP-enabled world and its fee. Enabled per world with a configurable cost, cooldown (bypassable via `onesmp.rtp.admin`), and biome avoid-list. A background precache keeps a small pool of pre-verified safe locations per world, topped off only while TPS allows, so `/rtp` usually resolves instantly instead of searching live.
+`/rtp [world]` teleports to a random safe spot within a configurable radius; with no world given it opens a GUI listing every RTP-enabled world (with an optional translatable display name) and its fee. Enabled per world with a configurable cost, cooldown (bypassable via `onesmp.rtp.admin`), and biome avoid-list. A background precache keeps a small pool of pre-verified safe locations per world, topped off only while TPS allows, so `/rtp` usually resolves instantly instead of searching live. The cost and cooldown are only ever applied once the teleport actually happens — a warmup interrupted by movement, combat, or disconnecting refunds automatically instead of charging for nothing.
 
 ### Guilds
-`/guild create <name> <tag>` (optional cost), `/guild disband`, `/guild invite`/`accept`, `/guild kick`, `/guild promote`/`demote` across Member/Officer/Owner roles, `/guild info`, `/guild list`, `/guild leave`, `/guild sethome`/`home`, and `/guild chat` for a guild-only channel. `/guild gui` (or bare `/guild`) opens a full management GUI covering everything the commands do. The guild tag renders on a genuine second nametag line in-world. Configurable name/tag length limits, member limit, and creation cost.
+`/guild create <name> <tag>` (optional cost), `/guild disband`, `/guild invite`/`accept`, `/guild kick`, `/guild promote`/`demote` across Member/Officer/Owner roles, `/guild info`, `/guild list`, `/guild leave`, `/guild sethome`/`home`, and `/guild chat` for a guild-only channel. `/guild gui` (or bare `/guild`) opens a full management GUI covering everything the commands do. The guild tag renders on a genuine second nametag line in-world, updating instantly on join/leave/kick/disband and reliably following a player across worlds (including through natural portals) rather than depending on a slow periodic refresh. Configurable name/tag length limits, member limit, and creation cost.
 
 ### Chat Formatting
 One MiniMessage-rendered chat format for everyone, with full MiniPlaceholders and relational placeholder support, configurable in `config.yml`. A built-in `<guild_segment>` placeholder renders to nothing for guildless players. Player-typed message content is always inserted as plain text — players can't smuggle click/hover/color tags into chat unless granted `onesmp.chat.format`, which applies to DMs too. Join/leave messages are MiniMessage templates, each independently toggleable (off means no message at all, not a blank one, replacing vanilla's line either way).
@@ -195,7 +195,7 @@ Every command's own name always works regardless of configuration — the aliase
 
 - **`config.yml`** — storage backend, economy, teleport warmup/TPA timeouts, home limits, RTP settings, guild rules, join/leave toggles, market listing cap, maintenance mode, spawn/void-world settings, nametag/tablist/scoreboard intervals, private-message cooldown, stats/hologram intervals, Discord/store links, the active `language`, cosmetic effect toggles, and the anti-spam action cooldown.
 - **`sell-prices.yml`** — per-item `/sell` prices. Market listings aren't configured here — they're created in-game and stored in the database.
-- **`lang/<language>/messages.yml`** — every message the plugin sends, in MiniMessage, plus the chat format, scoreboard title/lines, and the guild "no guild" placeholder. The shared `<prefix>` is defined once at the top.
+- **`lang/<language>/messages.yml`** — every message the plugin sends, in MiniMessage, plus the chat format, scoreboard title/lines, the guild "no guild" placeholder, and optional per-world RTP display names (`rtp.world-names`).
 - **`lang/<language>/help.yml`** — `/help` categories and their articles.
 - **`lang/<language>/crates.yml`** — crate types: key appearance and a weighted reward pool per type.
 - **`lang/<language>/aliases.yml`** — extra command aliases, registered into Bukkit's command map at enable. Changes need a restart.
@@ -225,6 +225,8 @@ chat:
 <details>
 <summary>Example: per-world RTP settings</summary>
 
+Keys under `rtp.worlds` must match the world's actual Bukkit name, not a dimension name — by default that's `world_nether`/`world_the_end` (your level-name plus `_nether`/`_the_end`), not `the_nether`/`the_end`. Check `/world list` if you're unsure what a world's real name is.
+
 ```yaml
 rtp:
   worlds:
@@ -234,6 +236,15 @@ rtp:
     my_wilderness_world:
       enabled: true
       cost: 50.0
+```
+
+Optional display names (shown in the `/rtp` GUI instead of the raw world name) go in `messages.yml`, not here:
+
+```yaml
+rtp:
+  world-names:
+    world: "Overworld"
+    my_wilderness_world: "The Wilds"
 ```
 
 </details>
@@ -275,6 +286,7 @@ HikariCP, the MySQL driver, and the SQLite driver are shaded and relocated (`gg.
 
 - **Without PacketEvents**: overhead nametags and the tablist's reserved-slot filler are silently disabled (everything else still works); `/spectate` refuses to run at all.
 - The guild-tag nametag line rides as a passenger entity; vanilla doesn't document the exact height a passenger renders at, so `nametag.guild-tag.y-offset` may need visual tuning.
+- On Folia, `PlayerChangedWorldEvent` doesn't reliably fire for plugin-driven teleports, so the guild tag's cross-world tracking is poll-based (`nametag.guild-tag.world-check-interval-ticks`, default every second) rather than event-driven — this is a platform limitation, not a bug in this plugin.
 - The Vault bridge is synchronous by contract, so third-party plugins calling it may block briefly on uncached balance lookups.
 - Kill credit falls back from `PlayerDeathEvent#getKiller()` (direct melee only) to the last player who damaged the victim - directly, via a shot projectile, via TNT they lit, via an End Crystal they broke, or via a respawn anchor they triggered - within `stats.indirect-kill-window-seconds`. A bed exploding in the Nether/End is the same kind of block-only explosion as a respawn anchor but isn't attributed yet. A death with no player behind it at all (fall with no recent hit, natural lava, despawning) still only counts as a death, and always resets the victim's own killstreak regardless of cause.
 - Player market listings are a straightforward "one listing, one buyer, all-or-nothing" design — there's no partial-quantity purchase of a bulk listing.
