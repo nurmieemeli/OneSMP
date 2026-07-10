@@ -10,7 +10,7 @@
   <text x="606" y="126" font-family="'Courier New', 'Lucida Console', monospace" font-size="92" font-weight="700" text-anchor="middle" fill="#1e2530" letter-spacing="2">OneSMP</text>
   <text x="600" y="120" font-family="'Courier New', 'Lucida Console', monospace" font-size="92" font-weight="700" text-anchor="middle" fill="url(#titleGradient)" letter-spacing="2">OneSMP</text>
 
-  <!-- branch name -->
-  <text x="601" y="181" font-family="'Segoe UI', Verdana, sans-serif" font-size="28" font-weight="600" text-anchor="middle" fill="#1e2530" opacity="0.6" letter-spacing="6">PAPER</text>
-  <text x="600" y="180" font-family="'Segoe UI', Verdana, sans-serif" font-size="28" font-weight="600" text-anchor="middle" fill="#94a3b8" letter-spacing="6">PAPER</text>
+  <!-- supported platforms -->
+  <text x="601" y="181" font-family="'Segoe UI', Verdana, sans-serif" font-size="28" font-weight="600" text-anchor="middle" fill="#1e2530" opacity="0.6" letter-spacing="6">PAPER &amp; FOLIA</text>
+  <text x="600" y="180" font-family="'Segoe UI', Verdana, sans-serif" font-size="28" font-weight="600" text-anchor="middle" fill="#94a3b8" letter-spacing="6">PAPER &amp; FOLIA</text>
 </svg>
