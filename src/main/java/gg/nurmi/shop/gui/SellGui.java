@@ -12,6 +12,8 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.Damageable;
+import org.bukkit.inventory.meta.ItemMeta;
 
 import java.math.BigDecimal;
 import java.util.Map;
@@ -80,7 +82,7 @@ public final class SellGui extends AbstractGui {
             if (shopItem == null) {
                 continue;
             }
-            double effectiveSell = shopItem.sellPrice() * plugin.shop().sellPriceMultiplier();
+            double effectiveSell = effectiveUnitPrice(stack, shopItem);
             total = total.add(BigDecimal.valueOf(effectiveSell).multiply(BigDecimal.valueOf(stack.getAmount())));
             itemsSold += stack.getAmount();
             inventory.setItem(slot, null);
@@ -134,7 +136,7 @@ public final class SellGui extends AbstractGui {
             if (shopItem == null) {
                 continue;
             }
-            double effectiveSell = shopItem.sellPrice() * plugin.shop().sellPriceMultiplier();
+            double effectiveSell = effectiveUnitPrice(stack, shopItem);
             total = total.add(BigDecimal.valueOf(effectiveSell).multiply(BigDecimal.valueOf(stack.getAmount())));
             itemCount += stack.getAmount();
         }
@@ -145,6 +147,24 @@ public final class SellGui extends AbstractGui {
                 .lore(plugin.messages().text("shop.gui-count-lore",
                         Placeholder.unparsed("count", String.valueOf(itemCount))))
                 .build());
+    }
+
+    // Damaged tools/armor sell for less: payout scales with remaining durability, so a tool
+    // one hit from breaking pays out near-nothing instead of full price. Unbreakable items and
+    // anything without durability (blocks, food, etc.) are unaffected.
+    private double effectiveUnitPrice(ItemStack stack, ShopItem shopItem) {
+        double basePrice = shopItem.sellPrice() * plugin.shop().sellPriceMultiplier();
+        short maxDurability = stack.getType().getMaxDurability();
+        if (maxDurability <= 0) {
+            return basePrice;
+        }
+        ItemMeta meta = stack.getItemMeta();
+        if (!(meta instanceof Damageable damageable) || damageable.isUnbreakable() || !damageable.hasDamage()) {
+            return basePrice;
+        }
+        double remaining = 1.0 - ((double) damageable.getDamage() / maxDurability);
+        remaining = Math.max(0.0, Math.min(1.0, remaining));
+        return basePrice * remaining;
     }
 
     private ItemStack buildConfirmIcon() {

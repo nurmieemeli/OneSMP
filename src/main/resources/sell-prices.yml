@@ -1262,6 +1262,8 @@ items:
   WARPED_FUNGUS_ON_A_STICK: 15
   # Tool/armor prices = full recipe material cost (all components, not just one ingot/gem)
   # plus a genuine crafting premium (~1.5x tools, ~1.3x armor) - never just "one material's" price.
+  # NOTE: the actual per-sale payout for damageable items is further scaled by remaining
+  # durability at sell time - see DurabilityPricing/sell command logic, not this file.
   WOODEN_SWORD: 1
   WOODEN_PICKAXE: 1.5
   WOODEN_AXE: 1.5
