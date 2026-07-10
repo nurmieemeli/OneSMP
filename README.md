@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="assets/banner.svg" alt="OneSMP" width="100%">
+  <img src="assets/banner.svg" alt="OneSMP - Paper" width="100%">
 </p>
 
 <p align="center">
