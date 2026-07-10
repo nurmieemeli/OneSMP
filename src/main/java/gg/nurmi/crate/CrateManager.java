@@ -15,11 +15,13 @@ import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
+import org.bukkit.World;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.persistence.PersistentDataType;
+import org.joml.Vector3f;
 
 import java.io.File;
 import java.math.BigDecimal;
@@ -162,6 +164,38 @@ public final class CrateManager {
         }
     }
 
+    // Must be called only after the void spawn world and any /world create worlds have actually loaded
+    // (see SpawnWorldManager/WorldManager) - those are only loaded via a scheduled task queued during
+    // onEnable(), not synchronously, so calling this too early would fail to resolve their locations.
+    public void respawnHolograms() {
+        if (boundBlocks.isEmpty() || !fancyHologramsAvailable()) {
+            return;
+        }
+        Map<BlockKey, String> snapshot = Map.copyOf(boundBlocks);
+        plugin.scheduler().runGlobal(() -> {
+            HologramManager manager = FancyHologramsPlugin.get().getHologramManager();
+            for (Map.Entry<BlockKey, String> entry : snapshot.entrySet()) {
+                respawnHologram(manager, entry.getKey(), entry.getValue());
+            }
+        });
+    }
+
+    private void respawnHologram(HologramManager manager, BlockKey key, String typeKey) {
+        CrateType type = types.get(typeKey);
+        if (type == null) {
+            return;
+        }
+        World world = Bukkit.getWorld(key.world());
+        if (world == null) {
+            plugin.getLogger().warning("Crate hologram at " + key.world() + " " + key.x() + "," + key.y() + "," + key.z()
+                    + " couldn't be recreated - its world isn't loaded.");
+            return;
+        }
+
+        manager.getHologram(hologramName(key)).ifPresent(manager::removeHologram);
+        createHologram(new Location(world, key.x(), key.y(), key.z()), type);
+    }
+
     public Map<String, CrateType> types() {
         return types;
     }
@@ -247,8 +281,12 @@ public final class CrateManager {
         }
 
         Location hologramLocation = location.clone().add(0.5, 1.3, 0.5);
+        hologramLocation.setPitch(0f);
         TextHologramData data = new TextHologramData(name, hologramLocation);
         data.setText(new ArrayList<>(List.of(type.displayName())));
+        data.setPersistent(false);
+        data.setVisibilityDistance(50);
+        data.setScale(new Vector3f(1.2f, 1.2f, 1.2f));
         Hologram hologram = manager.create(data);
         manager.addHologram(hologram);
         hologram.forceUpdate();

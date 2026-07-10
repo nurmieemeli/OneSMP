@@ -168,6 +168,44 @@
                                         <exclude>META-INF/*.SF</exclude>
                                         <exclude>META-INF/*.DSA</exclude>
                                         <exclude>META-INF/*.RSA</exclude>
+                                        <!-- JPMS module descriptors are meaningless in a shaded Bukkit plugin jar
+                                             (never loaded via the module path) and just trigger shade-plugin
+                                             encapsulation warnings when merged from multiple dependencies. -->
+                                        <exclude>module-info.class</exclude>
+                                        <exclude>META-INF/versions/*/module-info.class</exclude>
+                                    </excludes>
+                                </filter>
+                                <!-- Drop each dependency's own MANIFEST.MF (scoped per-artifact, NOT *:*, so our
+                                     own project jar's manifest is untouched and survives as the sole copy) -
+                                     silences the shade-plugin "overlapping resource" warning for this file. -->
+                                <filter>
+                                    <artifact>com.zaxxer:HikariCP</artifact>
+                                    <excludes>
+                                        <exclude>META-INF/MANIFEST.MF</exclude>
+                                    </excludes>
+                                </filter>
+                                <filter>
+                                    <artifact>com.mysql:mysql-connector-j</artifact>
+                                    <excludes>
+                                        <exclude>META-INF/MANIFEST.MF</exclude>
+                                    </excludes>
+                                </filter>
+                                <filter>
+                                    <artifact>com.google.protobuf:protobuf-java</artifact>
+                                    <excludes>
+                                        <exclude>META-INF/MANIFEST.MF</exclude>
+                                    </excludes>
+                                </filter>
+                                <filter>
+                                    <artifact>org.slf4j:slf4j-api</artifact>
+                                    <excludes>
+                                        <exclude>META-INF/MANIFEST.MF</exclude>
+                                    </excludes>
+                                </filter>
+                                <filter>
+                                    <artifact>org.xerial:sqlite-jdbc</artifact>
+                                    <excludes>
+                                        <exclude>META-INF/MANIFEST.MF</exclude>
                                     </excludes>
                                 </filter>
                             </filters>

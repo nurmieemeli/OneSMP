@@ -175,6 +175,14 @@ public final class Database {
                     entry_limit INT NOT NULL DEFAULT 10
                 )
                 """);
+            // Added later so OneSMP can own hologram placement itself instead of relying on FancyHolograms'
+            // own persistence - nullable since older installs won't have this backfilled until next load.
+            addColumnIfMissing(connection, "leaderboard_holograms", "world", "VARCHAR(64)");
+            addColumnIfMissing(connection, "leaderboard_holograms", "x", "DOUBLE");
+            addColumnIfMissing(connection, "leaderboard_holograms", "y", "DOUBLE");
+            addColumnIfMissing(connection, "leaderboard_holograms", "z", "DOUBLE");
+            addColumnIfMissing(connection, "leaderboard_holograms", "yaw", "FLOAT");
+            addColumnIfMissing(connection, "leaderboard_holograms", "pitch", "FLOAT");
 
             statement.executeUpdate("""
                 CREATE TABLE IF NOT EXISTS crates (
@@ -222,6 +230,18 @@ public final class Database {
                 """.formatted(idType));
         } catch (SQLException ex) {
             throw new RuntimeException("Failed to run OneSMP schema migration", ex);
+        }
+    }
+
+    // Portable across SQLite/MySQL without relying on ADD COLUMN IF NOT EXISTS syntax support varying by version.
+    private void addColumnIfMissing(Connection connection, String table, String column, String columnDefinition) throws SQLException {
+        try (var columns = connection.getMetaData().getColumns(null, null, table, column)) {
+            if (columns.next()) {
+                return;
+            }
+        }
+        try (Statement alter = connection.createStatement()) {
+            alter.executeUpdate("ALTER TABLE " + table + " ADD COLUMN " + column + " " + columnDefinition);
         }
     }
 

@@ -204,6 +204,10 @@ public final class OneSMPPlugin extends JavaPlugin {
     }
 
     private void registerHolograms() {
+        // Bound-crate holograms are recreated here rather than in registerCrates() itself, since that runs
+        // before registerSpawn()/registerWorlds() - too early for the worlds their blocks live in to be loaded.
+        crateManager.respawnHolograms();
+
         boolean available = getServer().getPluginManager().getPlugin("FancyHolograms") != null;
         if (!available) {
             getLogger().warning("FancyHolograms not found - leaderboard holograms will be disabled. "
