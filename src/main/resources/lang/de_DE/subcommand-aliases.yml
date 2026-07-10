@@ -1,0 +1,45 @@
+# Zusätzliche Unterbefehlsnamen (z. B. "/world tp" für "/world teleport") - keine echten Bukkit-Befehle,
+# werden nur im Code vor der Ausführung geprüft. Der eigentliche Name jedes Unterbefehls funktioniert immer trotzdem.
+world:
+  create: [c]
+  list: [ls]
+  delete: [d, del]
+  teleport: [tp]
+guild:
+  create: []
+  disband: []
+  invite: [inv]
+  accept: [a]
+  kick: []
+  promote: []
+  demote: []
+  sethome: []
+  home: [h]
+  info: [i]
+  list: [ls]
+  chat: [c]
+  leave: []
+  gui: [menü]
+eco:
+  give: []
+  take: []
+  set: []
+statshologram:
+  create: []
+  remove: []
+  list: [ls]
+crate:
+  create: [c]
+  remove: [löschen, del]
+  key: []
+onesmp:
+  reload: []
+maintenance:
+  on: [aktivieren]
+  off: [deaktivieren]
+  status: [info]
+market:
+  sell: []
+  search: [suchen]
+  mine: [meine, angebote]
+  cancel: [entfernen, löschen]

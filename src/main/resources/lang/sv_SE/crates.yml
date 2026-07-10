@@ -1,0 +1,273 @@
+# Each entry under "crates" is a crate type, bound to a block with /crate create <type>.
+# key-material is just the base item; its display name/lore below can make it look like anything.
+# Each reward needs "weight" (higher = more common) and at least one of "items" (Material -> amount),
+# "money", or "commands" (%player% is replaced with the winner's name); "broadcast: true" announces it server-wide.
+# display-item optionally overrides the reel/preview icon (defaults to the first item, or gold/a star for money/command-only rewards).
+crates:
+  common:
+    display-name: "<gray>Vanlig Kista"
+    key-name: "<gray>Vanlig Nyckel"
+    key-material: TRIPWIRE_HOOK
+    key-lore:
+      - "<dark_gray>Högerklicka på en Vanlig Kista för att öppna."
+    rewards:
+      iron:
+        weight: 25
+        display-name: "<white>32 Järntackor"
+        items:
+          IRON_INGOT: 32
+      gold:
+        weight: 20
+        display-name: "<white>16 Guldtackor"
+        items:
+          GOLD_INGOT: 16
+      emerald:
+        weight: 20
+        display-name: "<white>8 Smaragder"
+        items:
+          EMERALD: 8
+      diamond:
+        weight: 15
+        display-name: "<white>6 Diamanter"
+        items:
+          DIAMOND: 6
+      shulker:
+        weight: 2
+        display-name: "<white>1 Shulkerlåda"
+        items:
+          SHULKER_BOX: 1
+      small-xp:
+        weight: 25
+        display-name: "<white>4 Erfarenhetsflaskor"
+        items:
+          EXPERIENCE_BOTTLE: 4
+      big-xp:
+        weight: 15
+        display-name: "<white>8 Erfarenhetsflaskor"
+        items:
+          EXPERIENCE_BOTTLE: 8
+      netherite:
+        weight: 1
+        display-name: "<white>1 Netherittacka"
+        items:
+          NETHERITE_INGOT: 1
+      money-small:
+        weight: 30
+        display-name: "<white>1250 Dollar"
+        money: 1250
+        display-item: BUNDLE
+      money-big:
+        weight: 20
+        display-name: "<white>2500 Dollar"
+        money: 2500
+        display-item: RED_BUNDLE
+      rare-key:
+        weight: 15
+        display-name: "<green>Sällsynt Nyckel"
+        display-item: TRIPWIRE_HOOK
+        commands:
+          - "crate key rare %player% 1"
+      epic-key:
+        weight: 7
+        display-name: "<dark_purple>Episk Nyckel"
+        display-item: TRIPWIRE_HOOK
+        commands:
+          - "crate key epic %player% 1"
+
+  rare:
+    display-name: "<green>Sällsynt Kista"
+    key-name: "<green>Sällsynt Nyckel"
+    key-material: TRIPWIRE_HOOK
+    key-lore:
+      - "<dark_gray>Högerklicka på en Sällsynt Kista för att öppna."
+    rewards:
+      iron:
+        weight: 25
+        display-name: "<white>64 Järntackor"
+        items:
+          IRON_INGOT: 64
+      gold:
+        weight: 20
+        display-name: "<white>32 Guldtackor"
+        items:
+          GOLD_INGOT: 32
+      emerald:
+        weight: 20
+        display-name: "<white>16 Smaragder"
+        items:
+          EMERALD: 16
+      diamond:
+        weight: 15
+        display-name: "<white>12 Diamanter"
+        items:
+          DIAMOND: 12
+      shulker:
+        weight: 4
+        display-name: "<white>1 Shulkerlåda"
+        items:
+          SHULKER_BOX: 1
+      small-xp:
+        weight: 25
+        display-name: "<white>8 Erfarenhetsflaskor"
+        items:
+          EXPERIENCE_BOTTLE: 8
+      big-xp:
+        weight: 15
+        display-name: "<white>16 Erfarenhetsflaskor"
+        items:
+          EXPERIENCE_BOTTLE: 16
+      netherite:
+        weight: 2
+        display-name: "<white>2 Netherittackor"
+        items:
+          NETHERITE_INGOT: 2
+      money-small:
+        weight: 30
+        display-name: "<white>2 500 Dollar"
+        money: 2500
+        display-item: BUNDLE
+      money-big:
+        weight: 20
+        display-name: "<white>5 000 Dollar"
+        money: 5000
+        display-item: RED_BUNDLE
+      epic-key:
+        weight: 15
+        display-name: "<dark_purple>Episk Nyckel"
+        display-item: TRIPWIRE_HOOK
+        commands:
+          - "crate key epic %player% 1"
+      legendary-key:
+        weight: 7
+        display-name: "<gold>Legendarisk Nyckel"
+        display-item: TRIPWIRE_HOOK
+        commands:
+          - "crate key legendary %player% 1"
+
+  epic:
+    display-name: "<dark_purple>Episk Kista"
+    key-name: "<dark_purple>Episk Nyckel"
+    key-material: TRIPWIRE_HOOK
+    key-lore:
+      - "<dark_gray>Högerklicka på en Episk Kista för att öppna."
+    rewards:
+      iron:
+        weight: 25
+        display-name: "<white>16 Järnblock"
+        items:
+          IRON_BLOCK: 16
+      gold:
+        weight: 20
+        display-name: "<white>8 Guldblock"
+        items:
+          GOLD_BLOCK: 8
+      emerald:
+        weight: 20
+        display-name: "<white>4 Smaragdblock"
+        items:
+          EMERALD_BLOCK: 4
+      diamond:
+        weight: 15
+        display-name: "<white>3 Diamantblock"
+        items:
+          DIAMOND_BLOCK: 3
+      shulker:
+        weight: 4
+        display-name: "<white>1 Shulkerlåda"
+        items:
+          SHULKER_BOX: 1
+      small-xp:
+        weight: 25
+        display-name: "<white>16 Erfarenhetsflaskor"
+        items:
+          EXPERIENCE_BOTTLE: 16
+      big-xp:
+        weight: 15
+        display-name: "<white>32 Erfarenhetsflaskor"
+        items:
+          EXPERIENCE_BOTTLE: 32
+      netherite:
+        weight: 2
+        display-name: "<white>4 Netherittackor"
+        items:
+          NETHERITE_INGOT: 4
+      money-small:
+        weight: 30
+        display-name: "<white>5 000 Dollar"
+        money: 5000
+        display-item: BUNDLE
+      money-big:
+        weight: 20
+        display-name: "<white>10 000 Dollar"
+        money: 10000
+        display-item: RED_BUNDLE
+      legendary-key:
+        weight: 15
+        display-name: "<gold>Legendarisk Nyckel"
+        display-item: TRIPWIRE_HOOK
+        commands:
+          - "crate key epic %player% 1"
+
+  legendary:
+    display-name: "<gold>Legendarisk Kista"
+    key-name: "<gold>Legendarisk Nyckel"
+    key-material: TRIPWIRE_HOOK
+    key-lore:
+      - "<dark_gray>Högerklicka på en Legendarisk Kista för att öppna."
+    rewards:
+      iron:
+        weight: 25
+        display-name: "<white>32 Järnblock"
+        items:
+          IRON_BLOCK: 32
+      gold:
+        weight: 20
+        display-name: "<white>16 Guldblock"
+        items:
+          GOLD_BLOCK: 16
+      emerald:
+        weight: 20
+        display-name: "<white>8 Smaragdblock"
+        items:
+          EMERALD_BLOCK: 8
+      diamond:
+        weight: 15
+        display-name: "<white>6 Diamantblock"
+        items:
+          DIAMOND_BLOCK: 6
+      shulker:
+        weight: 8
+        display-name: "<white>1 Shulkerlåda"
+        items:
+          SHULKER_BOX: 1
+      small-xp:
+        weight: 25
+        display-name: "<white>32 Erfarenhetsflaskor"
+        items:
+          EXPERIENCE_BOTTLE: 32
+      big-xp:
+        weight: 15
+        display-name: "<white>64 Erfarenhetsflaskor"
+        items:
+          EXPERIENCE_BOTTLE: 64
+      netherite:
+        weight: 4
+        display-name: "<white>8 Netherittackor"
+        items:
+          NETHERITE_INGOT: 8
+      money-small:
+        weight: 30
+        display-name: "<white>10 000 Dollar"
+        money: 10000
+        display-item: BUNDLE
+      money-big:
+        weight: 20
+        display-name: "<white>20 000 Dollar"
+        money: 20000
+        display-item: RED_BUNDLE
+      legendary-key:
+        weight: 25
+        display-name: "<gold>Legendarisk Nyckel"
+        display-item: TRIPWIRE_HOOK
+        commands:
+          - "crate key epic %player% 1"

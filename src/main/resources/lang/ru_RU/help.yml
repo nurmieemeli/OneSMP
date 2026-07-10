@@ -1,0 +1,99 @@
+# Каждое значение display-name/description/title/body/message поддерживает форматирование MiniMessage, включая <prefix>.
+# body - это список строк, объединяемых переносом строки в диалоге статьи.
+messages:
+  empty: "<prefix><gray>Статьи помощи пока не настроены."
+  category-not-found: "<prefix><fail><red>Категория помощи с именем <white><category></white> не существует."
+  article-not-found: "<prefix><fail><red>Статья помощи с именем <white><article></white> не найдена в этой категории."
+  dialog-title: "<gradient:#38bdf8:#818cf8><bold>Помощь</bold></gradient>"
+  dialog-subtitle: "<gray>Выберите категорию, чтобы просмотреть её статьи."
+  dialog-back: "<gray>« Назад"
+  dialog-back-to-categories: "<gray>Назад к категориям"
+  dialog-back-to-category: "<gray>Назад к <category>"
+  dialog-no-content: "<gray>(нет содержимого)"
+  dialog-click-to-read: "<gray>Нажмите, чтобы прочитать"
+
+categories:
+  getting-started:
+    display-name: "<green>Начало игры"
+    icon: COMPASS
+    description: "Новичок? Начните с основ."
+    articles:
+      rules:
+        title: "<white>Правила сервера"
+        body:
+          - "Будьте уважительны — никаких оскорблений, разжигания ненависти и спама."
+          - "Никакого гриферства, воровства или разрушения чужих построек вне отведённых зон."
+          - "Никаких читов, взломанных клиентов или использования багов/дюпов."
+          - "Решения администрации окончательны; обжаловать их можно через каналы поддержки."
+      spawn:
+        title: "<white>Спавн и передвижение"
+        body:
+          - "<white>/spawn</white> телепортирует вас обратно на спавн."
+          - "<white>/sethome</white> и <white>/home</white> сохраняют и возвращают вас в ваши собственные точки."
+          - "<white>/tpa <player></white> запрашивает телепортацию к другому игроку; <white>/tpaccept</white> или <white>/tpdeny</white>, чтобы ответить."
+          - "<white>/rtp</white> телепортирует вас в случайное неисследованное место."
+  economy:
+    display-name: "<gold>Экономика"
+    icon: GOLD_INGOT
+    description: "Деньги, торговля и рынок игроков."
+    articles:
+      balance:
+        title: "<white>Ваш баланс"
+        body:
+          - "<white>/balance</white> проверяет ваш собственный баланс; <white>/balance <player></white> — баланс другого игрока."
+          - "<white>/pay <player> <amount></white> отправляет деньги напрямую другому игроку."
+          - "<white>/baltop</white> показывает самых богатых игроков на сервере."
+      shop:
+        title: "<white>Продажа серверу"
+        body:
+          - "<white>/sell</white> открывает меню — положите предметы и подтвердите продажу, чтобы мгновенно продать их по фиксированной цене."
+      market:
+        title: "<white>Рынок игроков"
+        body:
+          - "<white>/market sell <price></white> выставляет предмет из вашей руки на продажу другим игрокам."
+          - "<white>/market</white> показывает активные лоты; <white>/market search <query></white> фильтрует их по названию предмета."
+          - "<white>/market mine</white> показывает ваши собственные лоты, которые можно отменить, чтобы забрать предмет обратно."
+  teleport:
+    display-name: "<aqua>Телепортация"
+    icon: ENDER_PEARL
+    description: "Дома, варпы и перемещение к другим игрокам."
+    articles:
+      homes:
+        title: "<white>Дома"
+        body:
+          - "<white>/sethome [name]</white> сохраняет дом в вашем текущем местоположении."
+          - "<white>/home [name]</white> телепортирует вас туда; <white>/delhome <name></white> удаляет его."
+      warps:
+        title: "<white>Варпы"
+        body:
+          - "<white>/warp [name]</white> телепортирует к варпу сервера, а без имени показывает список всех варпов."
+      tpa:
+        title: "<white>Запросы к игрокам"
+        body:
+          - "<white>/tpa <player></white> просит телепортироваться к нему; <white>/tpahere <player></white> просит его телепортироваться к вам."
+          - "<white>/tpaccept</white> и <white>/tpdeny</white> отвечают на ожидающий запрос."
+  guilds:
+    display-name: "<light_purple>Гильдии"
+    icon: SHIELD
+    description: "Объединяйтесь с другими игроками."
+    articles:
+      basics:
+        title: "<white>Создание гильдии"
+        body:
+          - "<white>/guild create <name></white> создаёт гильдию; <white>/guild invite <player></white> приглашает кого-нибудь."
+          - "<white>/guild accept</white> присоединяет вас к гильдии, в которую вас пригласили."
+          - "<white>/guild chat</white> переключает отправку ваших сообщений только участникам гильдии."
+      home:
+        title: "<white>Дом гильдии"
+        body:
+          - "<white>/guild sethome</white> устанавливает общий дом вашей гильдии; <white>/guild home</white> телепортирует туда."
+  crates:
+    display-name: "<yellow>Кейсы"
+    icon: CHEST
+    description: "Открытие кейсов и использование ключей."
+    articles:
+      opening:
+        title: "<white>Открытие кейса"
+        body:
+          - "Нажмите правой кнопкой мыши на привязанный блок кейса, держа подходящий ключ, чтобы открыть его."
+          - "Ключи выглядят как обычные предметы, но помечены для конкретного типа кейса — подделать их нельзя."

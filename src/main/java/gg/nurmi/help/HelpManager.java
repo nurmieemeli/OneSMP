@@ -2,6 +2,7 @@ package gg.nurmi.help;
 
 import gg.nurmi.OneSMPPlugin;
 import gg.nurmi.util.ConfigMigrator;
+import gg.nurmi.util.LanguageManager;
 import org.bukkit.Material;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -26,8 +27,10 @@ public final class HelpManager {
     }
 
     public void load() {
-        ConfigMigrator.migrate(plugin, "help.yml", Set.of("categories"));
-        File file = new File(plugin.getDataFolder(), "help.yml");
+        LanguageManager.migrateLegacyFile(plugin, "help.yml", "lang/en_US/help.yml");
+        String path = LanguageManager.file(plugin, "help");
+        ConfigMigrator.migrate(plugin, path, Set.of("categories"));
+        File file = new File(plugin.getDataFolder(), path);
         YamlConfiguration config = YamlConfiguration.loadConfiguration(file);
         categories.clear();
         messages.clear();

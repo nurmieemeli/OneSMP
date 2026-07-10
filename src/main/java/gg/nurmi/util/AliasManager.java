@@ -18,8 +18,10 @@ public final class AliasManager {
     }
 
     public void applyAliases() {
-        ConfigMigrator.migrate(plugin, "aliases.yml");
-        File file = new File(plugin.getDataFolder(), "aliases.yml");
+        LanguageManager.migrateLegacyFile(plugin, "aliases.yml", "lang/en_US/aliases.yml");
+        String path = LanguageManager.file(plugin, "aliases");
+        ConfigMigrator.migrate(plugin, path);
+        File file = new File(plugin.getDataFolder(), path);
         YamlConfiguration config = YamlConfiguration.loadConfiguration(file);
         ConfigurationSection section = config.getConfigurationSection("aliases");
         if (section == null) {

@@ -1,0 +1,45 @@
+# Дополнительные названия подкоманд (например, "/world tp" для "/world teleport") - это не настоящие команды Bukkit,
+# они просто проверяются в коде перед выполнением. Собственное имя каждой подкоманды всегда работает в любом случае.
+world:
+  create: [c]
+  list: [ls]
+  delete: [d, del]
+  teleport: [tp]
+guild:
+  create: []
+  disband: []
+  invite: [inv]
+  accept: [a]
+  kick: []
+  promote: []
+  demote: []
+  sethome: []
+  home: [h]
+  info: [i]
+  list: [ls]
+  chat: [c]
+  leave: []
+  gui: [меню]
+eco:
+  give: []
+  take: []
+  set: []
+statshologram:
+  create: []
+  remove: []
+  list: [ls]
+crate:
+  create: [c]
+  remove: [удалить, del]
+  key: []
+onesmp:
+  reload: []
+maintenance:
+  on: [включить]
+  off: [выключить]
+  status: [статус]
+market:
+  sell: []
+  search: [искать]
+  mine: [мои, списки]
+  cancel: [удалить, отмена]

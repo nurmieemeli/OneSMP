@@ -1,0 +1,99 @@
+# Todos los valores de display-name/description/title/body/message admiten formato MiniMessage, incluido <prefix>.
+# body es una lista de líneas, unidas con un salto de línea en el diálogo del artículo.
+messages:
+  empty: "<prefix><gray>Todavía no hay artículos de ayuda configurados."
+  category-not-found: "<prefix><fail><red>No existe ninguna categoría de ayuda llamada <white><category></white>."
+  article-not-found: "<prefix><fail><red>No existe ningún artículo de ayuda llamado <white><article></white> en esa categoría."
+  dialog-title: "<gradient:#38bdf8:#818cf8><bold>Ayuda</bold></gradient>"
+  dialog-subtitle: "<gray>Elige una categoría para ver sus artículos."
+  dialog-back: "<gray>« Atrás"
+  dialog-back-to-categories: "<gray>Volver a las categorías"
+  dialog-back-to-category: "<gray>Volver a <category>"
+  dialog-no-content: "<gray>(sin contenido)"
+  dialog-click-to-read: "<gray>Haz clic para leer"
+
+categories:
+  getting-started:
+    display-name: "<green>Primeros Pasos"
+    icon: COMPASS
+    description: "¿Eres nuevo aquí? Empieza por lo básico."
+    articles:
+      rules:
+        title: "<white>Reglas del Servidor"
+        body:
+          - "Sé respetuoso — nada de acoso, discursos de odio o spam."
+          - "Nada de griefing, robos o destrucción de construcciones ajenas fuera de las zonas señaladas."
+          - "Nada de trampas, clientes hackeados o explotación de bugs/fallos de duplicación."
+          - "Las decisiones del staff son definitivas; apela a través de los canales de soporte."
+      spawn:
+        title: "<white>Aparición y Cómo Moverse"
+        body:
+          - "<white>/spawn</white> te teletransporta de vuelta al punto de aparición."
+          - "<white>/sethome</white> y <white>/home</white> guardan y te devuelven a tus propias ubicaciones."
+          - "<white>/tpa <player></white> solicita teletransportarte a otro jugador; <white>/tpaccept</white> o <white>/tpdeny</white> para responder."
+          - "<white>/rtp</white> te teletransporta aleatoriamente a algún lugar inexplorado."
+  economy:
+    display-name: "<gold>Economía"
+    icon: GOLD_INGOT
+    description: "Dinero, comercio y el mercado de jugadores."
+    articles:
+      balance:
+        title: "<white>Tu Saldo"
+        body:
+          - "<white>/balance</white> consulta tu propio saldo; <white>/balance <player></white> consulta el de otra persona."
+          - "<white>/pay <player> <amount></white> envía dinero directamente a otro jugador."
+          - "<white>/baltop</white> muestra a los jugadores más ricos del servidor."
+      shop:
+        title: "<white>Vender al Servidor"
+        body:
+          - "<white>/sell</white> abre un menú — coloca objetos dentro y confirma para venderlos al instante por un precio fijo."
+      market:
+        title: "<white>Mercado de Jugadores"
+        body:
+          - "<white>/market sell <price></white> publica el objeto que tienes en la mano para que otros jugadores lo compren."
+          - "<white>/market</white> muestra los anuncios activos; <white>/market search <query></white> filtra por nombre de objeto."
+          - "<white>/market mine</white> muestra tus propios anuncios, que puedes cancelar para recuperar el objeto."
+  teleport:
+    display-name: "<aqua>Teletransporte"
+    icon: ENDER_PEARL
+    description: "Hogares, teletransportes y cómo llegar hasta otros jugadores."
+    articles:
+      homes:
+        title: "<white>Hogares"
+        body:
+          - "<white>/sethome [name]</white> guarda un hogar en tu ubicación."
+          - "<white>/home [name]</white> te teletransporta allí; <white>/delhome <name></white> lo elimina."
+      warps:
+        title: "<white>Teletransportes"
+        body:
+          - "<white>/warp [name]</white> te teletransporta a un punto del servidor, o los lista si no indicas ningún nombre."
+      tpa:
+        title: "<white>Solicitudes entre Jugadores"
+        body:
+          - "<white>/tpa <player></white> solicita teletransportarte hasta esa persona; <white>/tpahere <player></white> le solicita que venga hasta ti."
+          - "<white>/tpaccept</white> y <white>/tpdeny</white> responden a una solicitud pendiente."
+  guilds:
+    display-name: "<light_purple>Gremios"
+    icon: SHIELD
+    description: "Únete a otros jugadores en equipo."
+    articles:
+      basics:
+        title: "<white>Crear un Gremio"
+        body:
+          - "<white>/guild create <name></white> crea un gremio; <white>/guild invite <player></white> invita a alguien."
+          - "<white>/guild accept</white> te une a un gremio al que te han invitado."
+          - "<white>/guild chat</white> alterna el envío de tus mensajes solo a los miembros del gremio."
+      home:
+        title: "<white>Hogar del Gremio"
+        body:
+          - "<white>/guild sethome</white> establece el hogar compartido de tu gremio; <white>/guild home</white> te teletransporta allí."
+  crates:
+    display-name: "<yellow>Cajas"
+    icon: CHEST
+    description: "Abrir cajas y usar llaves."
+    articles:
+      opening:
+        title: "<white>Abrir una Caja"
+        body:
+          - "Haz clic derecho en un bloque de caja vinculado mientras sostienes una llave compatible para abrirla."
+          - "Las llaves son objetos de apariencia normal marcados para un tipo de caja específico — no se pueden falsificar."

@@ -2,6 +2,7 @@ package gg.nurmi.message;
 
 import gg.nurmi.OneSMPPlugin;
 import gg.nurmi.util.ConfigMigrator;
+import gg.nurmi.util.LanguageManager;
 import io.github.miniplaceholders.api.MiniPlaceholders;
 import io.github.miniplaceholders.api.types.RelationalAudience;
 import net.kyori.adventure.audience.Audience;
@@ -18,6 +19,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.nio.charset.StandardCharsets;
+import java.util.List;
 import java.util.Objects;
 
 public final class MessageService {
@@ -33,14 +35,16 @@ public final class MessageService {
     }
 
     public void reload() {
-        ConfigMigrator.migrate(plugin, "messages.yml");
-        File file = new File(plugin.getDataFolder(), "messages.yml");
+        LanguageManager.migrateLegacyFile(plugin, "messages.yml", "lang/en_US/messages.yml");
+        String path = LanguageManager.file(plugin, "messages");
+        ConfigMigrator.migrate(plugin, path);
+        File file = new File(plugin.getDataFolder(), path);
         this.messages = YamlConfiguration.loadConfiguration(file);
 
-        try (Reader defaultReader = new InputStreamReader(Objects.requireNonNull(plugin.getResource("messages.yml")), StandardCharsets.UTF_8)) {
+        try (Reader defaultReader = new InputStreamReader(Objects.requireNonNull(plugin.getResource(path)), StandardCharsets.UTF_8)) {
             this.messages.setDefaults(YamlConfiguration.loadConfiguration(defaultReader));
         } catch (IOException ex) {
-            plugin.getLogger().warning("Could not load bundled default messages.yml: " + ex.getMessage());
+            plugin.getLogger().warning("Could not load bundled default " + path + ": " + ex.getMessage());
         }
 
         this.prefixComponent = miniMessage.deserialize(messages.getString("prefix", ""));
@@ -52,8 +56,21 @@ public final class MessageService {
         return messages.getString(path, path);
     }
 
+    public List<String> rawList(String path) {
+        return messages.getStringList(path);
+    }
+
     private TagResolver prefixResolver() {
         return TagResolver.resolver("prefix", Tag.inserting(prefixComponent));
+    }
+
+    // Invisible markers, separate from whatever color the message actually uses - playFeedbackSound() below
+    // detects these instead of <green>/<red> so a translated/restyled messages.yml can't break sound feedback.
+    private TagResolver feedbackResolver() {
+        return TagResolver.resolver(
+                TagResolver.resolver("success", Tag.selfClosingInserting(Component.empty())),
+                TagResolver.resolver("fail", Tag.selfClosingInserting(Component.empty()))
+        );
     }
 
     public Component render(Pointered audience, String path, TagResolver... extra) {
@@ -64,6 +81,7 @@ public final class MessageService {
     public Component renderRaw(Pointered audience, String template, TagResolver... extra) {
         TagResolver resolver = TagResolver.resolver(
                 prefixResolver(),
+                feedbackResolver(),
                 MiniPlaceholders.audienceGlobalPlaceholders(),
                 TagResolver.resolver(extra)
         );
@@ -74,6 +92,7 @@ public final class MessageService {
         RelationalAudience<Audience> relational = RelationalAudience.from(viewer, other);
         TagResolver resolver = TagResolver.resolver(
                 prefixResolver(),
+                feedbackResolver(),
                 MiniPlaceholders.relationalGlobalPlaceholders(),
                 TagResolver.resolver(extra)
         );
@@ -99,11 +118,12 @@ public final class MessageService {
         }
     }
 
-    // Relies on the convention that every message starts with <prefix><red> (error) or <prefix><green> (success).
+    // Relies on the convention that every message starts with <prefix><fail> (error) or <prefix><success> (success) -
+    // dedicated markers rather than <red>/<green> so translated messages.yml files can't accidentally break sound feedback.
     private void playFeedbackSound(Player player, String template) {
-        if (template.startsWith("<prefix><red>")) {
+        if (template.startsWith("<prefix><fail>")) {
             plugin.effects().failure(player);
-        } else if (template.startsWith("<prefix><green>")) {
+        } else if (template.startsWith("<prefix><success>")) {
             plugin.effects().success(player);
         }
     }

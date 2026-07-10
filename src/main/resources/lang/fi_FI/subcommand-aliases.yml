@@ -1,0 +1,45 @@
+# Ylimääräiset alikomentojen nimet (esim. "/world tp" komennolle "/world teleport") - eivät ole oikeita Bukkit-komentoja,
+# vaan tarkistetaan koodissa ennen suoritusta. Jokaisen alikomennon oma nimi toimii aina joka tapauksessa.
+world:
+  create: [c]
+  list: [ls]
+  delete: [d, del]
+  teleport: [tp]
+guild:
+  create: []
+  disband: []
+  invite: [inv]
+  accept: [a]
+  kick: []
+  promote: []
+  demote: []
+  sethome: []
+  home: [h]
+  info: [i]
+  list: [ls]
+  chat: [c]
+  leave: []
+  gui: [valikko]
+eco:
+  give: []
+  take: []
+  set: []
+statshologram:
+  create: []
+  remove: []
+  list: [ls]
+crate:
+  create: [c]
+  remove: [poista, del]
+  key: []
+onesmp:
+  reload: []
+maintenance:
+  on: [käynnistä]
+  off: [sammuta]
+  status: [tila]
+market:
+  sell: []
+  search: [etsi]
+  mine: [omat, listaukset]
+  cancel: [poista, peruuta]

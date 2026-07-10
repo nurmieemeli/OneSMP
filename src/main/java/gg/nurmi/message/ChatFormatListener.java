@@ -46,7 +46,7 @@ public final class ChatFormatListener implements Listener {
         if (guild == null) {
             return Component.empty();
         }
-        String segmentFormat = plugin.getConfig().getString("chat.guild-segment-format", "<gray>[<guild_tag>]</gray> ");
+        String segmentFormat = plugin.messages().raw("chat.guild-segment-format");
         return plugin.messages().parse(segmentFormat, sender, Placeholder.unparsed("guild_tag", guild.tag()));
     }
 
@@ -62,7 +62,8 @@ public final class ChatFormatListener implements Listener {
             }
 
             Guild guild = optionalGuild.get();
-            String format = plugin.getConfig().getString("chat.guild-chat-format", "<aqua>[G] <player_name>: <message>");
+            String format = plugin.messages().raw("chat.guild-chat-format");
+            Component guildSegment = buildGuildSegment(sender, guild);
 
             for (GuildMember member : guild.members()) {
                 Player online = Bukkit.getPlayer(member.uuid());
@@ -71,6 +72,7 @@ public final class ChatFormatListener implements Listener {
                 }
                 Component rendered = plugin.messages().renderRelationalRaw(sender, online, format,
                         Placeholder.component("message", messageComponent),
+                        Placeholder.component("guild_segment", guildSegment),
                         Placeholder.unparsed("guild_name", guild.name()),
                         Placeholder.unparsed("guild_tag", guild.tag()));
                 online.sendMessage(rendered);
@@ -86,6 +88,6 @@ public final class ChatFormatListener implements Listener {
     }
 
     private String resolveFormat() {
-        return plugin.getConfig().getString("chat.format", "<white><player_name></white><dark_gray>:</dark_gray> <gray><message>");
+        return plugin.messages().raw("chat.format");
     }
 }

@@ -1,0 +1,45 @@
+# Etiquetas adicionales de subcomando (p. ej. "/world tp" para "/world teleport") - no son comandos reales de Bukkit,
+# solo se comprueban en el código antes de ejecutarse. El propio nombre de cada subcomando siempre funciona igualmente.
+world:
+  create: [c]
+  list: [ls]
+  delete: [d, del]
+  teleport: [tp]
+guild:
+  create: []
+  disband: []
+  invite: [inv]
+  accept: [a]
+  kick: []
+  promote: []
+  demote: []
+  sethome: []
+  home: [h]
+  info: [i]
+  list: [ls]
+  chat: [c]
+  leave: []
+  gui: [menu]
+eco:
+  give: []
+  take: []
+  set: []
+statshologram:
+  create: []
+  remove: []
+  list: [ls]
+crate:
+  create: [c]
+  remove: [eliminar, del]
+  key: []
+onesmp:
+  reload: []
+maintenance:
+  on: [activar]
+  off: [desactivar]
+  status: [info]
+market:
+  sell: []
+  search: [buscar]
+  mine: [mias, listados]
+  cancel: [eliminar, cancelar]

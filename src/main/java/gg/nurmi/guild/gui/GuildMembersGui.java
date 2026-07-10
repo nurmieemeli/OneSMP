@@ -66,11 +66,12 @@ public final class GuildMembersGui extends AbstractGui {
                         return;
                     }
                     GuildRole newRole = member.role() == GuildRole.OFFICER ? GuildRole.MEMBER : GuildRole.OFFICER;
-                    guildManager.setRole(guild.id(), member.uuid(), newRole).thenRun(() -> {
-                        plugin.messages().send(player, newRole == GuildRole.OFFICER ? "guild.promoted" : "guild.demoted",
-                                Placeholder.unparsed("target", name), Placeholder.unparsed("role", newRole.name()));
-                        new GuildMembersGui(plugin, guildManager, guild, viewerUuid).open(player);
-                    });
+                    guildManager.setRole(guild.id(), member.uuid(), newRole).thenRun(() ->
+                            plugin.scheduler().runAtEntity(player, () -> {
+                                plugin.messages().send(player, newRole == GuildRole.OFFICER ? "guild.promoted" : "guild.demoted",
+                                        Placeholder.unparsed("target", name), Placeholder.unparsed("role", newRole.name()));
+                                new GuildMembersGui(plugin, guildManager, guild, viewerUuid).open(player);
+                            }, () -> {}));
                 } else {
                     if (!viewerRole.canManageMembers()) {
                         plugin.messages().send(player, "guild.no-permission-role");

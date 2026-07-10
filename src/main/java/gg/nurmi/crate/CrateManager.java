@@ -7,6 +7,7 @@ import de.oliver.fancyholograms.api.hologram.Hologram;
 import gg.nurmi.OneSMPPlugin;
 import gg.nurmi.util.ConfigMigrator;
 import gg.nurmi.util.Database;
+import gg.nurmi.util.LanguageManager;
 import gg.nurmi.util.ItemBuilder;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
@@ -63,8 +64,10 @@ public final class CrateManager {
     }
 
     private void loadTypes() {
-        ConfigMigrator.migrate(plugin, "crates.yml", Set.of("crates"));
-        File file = new File(plugin.getDataFolder(), "crates.yml");
+        LanguageManager.migrateLegacyFile(plugin, "crates.yml", "lang/en_US/crates.yml");
+        String path = LanguageManager.file(plugin, "crates");
+        ConfigMigrator.migrate(plugin, path, Set.of("crates"));
+        File file = new File(plugin.getDataFolder(), path);
         YamlConfiguration config = YamlConfiguration.loadConfiguration(file);
         types.clear();
 

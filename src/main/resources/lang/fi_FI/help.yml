@@ -1,0 +1,99 @@
+# Jokainen display-name/description/title/body/message-arvo tukee MiniMessage-muotoilua, mukaan lukien <prefix>.
+# body on lista riveistä, jotka yhdistetään rivinvaihdolla artikkelin dialogissa.
+messages:
+  empty: "<prefix><gray>Ei vielä määritettyjä ohjeartikkeleita."
+  category-not-found: "<prefix><fail><red>Ohjekategoriaa nimeltä <white><category></white> ei ole olemassa."
+  article-not-found: "<prefix><fail><red>Ohjeartikkelia nimeltä <white><article></white> ei löydy tuosta kategoriasta."
+  dialog-title: "<gradient:#38bdf8:#818cf8><bold>Ohje</bold></gradient>"
+  dialog-subtitle: "<gray>Valitse kategoria selataksesi sen artikkeleita."
+  dialog-back: "<gray>« Takaisin"
+  dialog-back-to-categories: "<gray>Takaisin kategorioihin"
+  dialog-back-to-category: "<gray>Takaisin kategoriaan <category>"
+  dialog-no-content: "<gray>(ei sisältöä)"
+  dialog-click-to-read: "<gray>Klikkaa lukeaksesi"
+
+categories:
+  getting-started:
+    display-name: "<green>Aloitus"
+    icon: COMPASS
+    description: "Uusi täällä? Aloita perusteista."
+    articles:
+      rules:
+        title: "<white>Palvelimen Säännöt"
+        body:
+          - "Ole kunnioittava — ei häirintää, vihapuhetta tai spämmiä."
+          - "Ei griefausta, varastamista tai muiden rakennelmien tuhoamista merkittyjen alueiden ulkopuolella."
+          - "Ei huijauksia, hakkeroituja clienttejä tai bugien/dupliointivirheiden hyväksikäyttöä."
+          - "Henkilökunnan päätökset ovat lopullisia; valita voi tukikanavien kautta."
+      spawn:
+        title: "<white>Spawn ja Liikkuminen"
+        body:
+          - "<white>/spawn</white> siirtää sinut takaisin spawniin."
+          - "<white>/sethome</white> ja <white>/home</white> tallentavat ja palauttavat sinut omiin sijainteihisi."
+          - "<white>/tpa <player></white> pyytää siirtymistä toisen pelaajan luo; <white>/tpaccept</white> tai <white>/tpdeny</white> vastaa pyyntöön."
+          - "<white>/rtp</white> siirtää sinut satunnaisesti johonkin tutkimattomaan paikkaan."
+  economy:
+    display-name: "<gold>Talous"
+    icon: GOLD_INGOT
+    description: "Raha, kauppa ja pelaajien markkina."
+    articles:
+      balance:
+        title: "<white>Saldosi"
+        body:
+          - "<white>/balance</white> tarkistaa oman saldosi; <white>/balance <player></white> tarkistaa jonkun muun saldon."
+          - "<white>/pay <player> <amount></white> lähettää rahaa suoraan toiselle pelaajalle."
+          - "<white>/baltop</white> näyttää palvelimen rikkaimmat pelaajat."
+      shop:
+        title: "<white>Myynti Palvelimelle"
+        body:
+          - "<white>/sell</white> avaa valikon — pudota tavarat sisään ja vahvista myydäksesi ne heti kiinteään hintaan."
+      market:
+        title: "<white>Pelaajien Markkina"
+        body:
+          - "<white>/market sell <price></white> listaa kädessäsi olevan tavaran muiden pelaajien ostettavaksi."
+          - "<white>/market</white> selaa aktiivisia ilmoituksia; <white>/market search <query></white> suodattaa tuotteen nimen mukaan."
+          - "<white>/market mine</white> näyttää omat ilmoituksesi, jotka voit peruuttaa saadaksesi tavaran takaisin."
+  teleport:
+    display-name: "<aqua>Siirtyminen"
+    icon: ENDER_PEARL
+    description: "Kodit, warpit ja muiden pelaajien luo siirtyminen."
+    articles:
+      homes:
+        title: "<white>Kodit"
+        body:
+          - "<white>/sethome [name]</white> tallentaa kodin sijaintiisi."
+          - "<white>/home [name]</white> siirtää sinut sinne; <white>/delhome <name></white> poistaa sen."
+      warps:
+        title: "<white>Warpit"
+        body:
+          - "<white>/warp [name]</white> siirtää palvelimen warppiin, tai listaa ne jos nimeä ei anneta."
+      tpa:
+        title: "<white>Pelaajapyynnöt"
+        body:
+          - "<white>/tpa <player></white> pyytää siirtymistä hänen luokseen; <white>/tpahere <player></white> pyytää häntä tulemaan luoksesi."
+          - "<white>/tpaccept</white> ja <white>/tpdeny</white> vastaavat odottavaan pyyntöön."
+  guilds:
+    display-name: "<light_purple>Killat"
+    icon: SHIELD
+    description: "Liity yhteen muiden pelaajien kanssa."
+    articles:
+      basics:
+        title: "<white>Killan Perustaminen"
+        body:
+          - "<white>/guild create <name></white> luo killan; <white>/guild invite <player></white> kutsuu jonkun."
+          - "<white>/guild accept</white> liittää sinut kiltaan, johon sinut on kutsuttu."
+          - "<white>/guild chat</white> vaihtaa viestiesi lähetyksen vain kiltasi jäsenille."
+      home:
+        title: "<white>Killan Koti"
+        body:
+          - "<white>/guild sethome</white> asettaa killan yhteisen kodin; <white>/guild home</white> siirtää sinne."
+  crates:
+    display-name: "<yellow>Arkut"
+    icon: CHEST
+    description: "Arkkujen avaaminen ja avainten käyttö."
+    articles:
+      opening:
+        title: "<white>Arkun Avaaminen"
+        body:
+          - "Klikkaa hiiren oikealla painikkeella sidottua arkkulohkoa pitäen sopivaa avainta kädessäsi avataksesi sen."
+          - "Avaimet näyttävät tavallisilta esineiltä, mutta ne on merkitty tietylle arkkutyypille — niitä ei voi väärentää."

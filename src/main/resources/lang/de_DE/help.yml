@@ -1,0 +1,99 @@
+# Every display-name/description/title/body/message value supports MiniMessage formatting, including <prefix>.
+# body is a list of lines, joined with a line break in the article dialog.
+messages:
+  empty: "<prefix><gray>Es sind noch keine Hilfeartikel konfiguriert."
+  category-not-found: "<prefix><fail><red>Es existiert keine Hilfekategorie namens <white><category></white>."
+  article-not-found: "<prefix><fail><red>In dieser Kategorie existiert kein Hilfeartikel namens <white><article></white>."
+  dialog-title: "<gradient:#38bdf8:#818cf8><bold>Hilfe</bold></gradient>"
+  dialog-subtitle: "<gray>Wähle eine Kategorie, um ihre Artikel zu durchsuchen."
+  dialog-back: "<gray>« Zurück"
+  dialog-back-to-categories: "<gray>Zurück zu den Kategorien"
+  dialog-back-to-category: "<gray>Zurück zu <category>"
+  dialog-no-content: "<gray>(kein Inhalt)"
+  dialog-click-to-read: "<gray>Klicken zum Lesen"
+
+categories:
+  getting-started:
+    display-name: "<green>Erste Schritte"
+    icon: COMPASS
+    description: "Neu hier? Fang mit den Grundlagen an."
+    articles:
+      rules:
+        title: "<white>Serverregeln"
+        body:
+          - "Sei respektvoll — keine Belästigung, Hassrede oder Spam."
+          - "Kein Griefing, Stehlen oder Zerstören der Bauwerke anderer außerhalb markierter Bereiche."
+          - "Keine Cheats, gehackten Clients oder das Ausnutzen von Bugs/Duplikationsfehlern."
+          - "Entscheidungen des Teams sind endgültig; Einsprüche über die Support-Kanäle."
+      spawn:
+        title: "<white>Spawn & Fortbewegung"
+        body:
+          - "<white>/spawn</white> teleportiert dich zurück zum Spawn."
+          - "<white>/sethome</white> und <white>/home</white> speichern und bringen dich zu deinen eigenen Orten zurück."
+          - "<white>/tpa <player></white> fragt an, zu einem anderen Spieler zu teleportieren; <white>/tpaccept</white> oder <white>/tpdeny</white>, um zu antworten."
+          - "<white>/rtp</white> teleportiert dich zufällig an einen unerforschten Ort."
+  economy:
+    display-name: "<gold>Wirtschaft"
+    icon: GOLD_INGOT
+    description: "Geld, Handel und der Spielermarkt."
+    articles:
+      balance:
+        title: "<white>Dein Kontostand"
+        body:
+          - "<white>/balance</white> prüft deinen eigenen Kontostand; <white>/balance <player></white> prüft den eines anderen Spielers."
+          - "<white>/pay <player> <amount></white> sendet Geld direkt an einen anderen Spieler."
+          - "<white>/baltop</white> zeigt die reichsten Spieler auf dem Server."
+      shop:
+        title: "<white>An den Server verkaufen"
+        body:
+          - "<white>/sell</white> öffnet ein Menü — lege Gegenstände hinein und bestätige, um sie sofort zu einem festen Preis zu verkaufen."
+      market:
+        title: "<white>Spielermarkt"
+        body:
+          - "<white>/market sell <price></white> bietet den Gegenstand in deiner Hand anderen Spielern zum Kauf an."
+          - "<white>/market</white> durchsucht aktive Angebote; <white>/market search <query></white> filtert nach Gegenstandsnamen."
+          - "<white>/market mine</white> zeigt deine eigenen Angebote, die du stornieren kannst, um den Gegenstand zurückzuholen."
+  teleport:
+    display-name: "<aqua>Teleportation"
+    icon: ENDER_PEARL
+    description: "Zuhause, Warps und wie du zu anderen Spielern kommst."
+    articles:
+      homes:
+        title: "<white>Zuhause"
+        body:
+          - "<white>/sethome [name]</white> speichert ein Zuhause an deinem Standort."
+          - "<white>/home [name]</white> teleportiert dich dorthin; <white>/delhome <name></white> entfernt es."
+      warps:
+        title: "<white>Warps"
+        body:
+          - "<white>/warp [name]</white> teleportiert zu einem Server-Warp, oder listet sie auf, wenn kein Name angegeben wird."
+      tpa:
+        title: "<white>Spieleranfragen"
+        body:
+          - "<white>/tpa <player></white> bittet darum, zu ihm/ihr zu teleportieren; <white>/tpahere <player></white> bittet ihn/sie, zu dir zu kommen."
+          - "<white>/tpaccept</white> und <white>/tpdeny</white> beantworten eine ausstehende Anfrage."
+  guilds:
+    display-name: "<light_purple>Gilden"
+    icon: SHIELD
+    description: "Schließ dich mit anderen Spielern zusammen."
+    articles:
+      basics:
+        title: "<white>Eine Gilde erstellen"
+        body:
+          - "<white>/guild create <name></white> erstellt eine Gilde; <white>/guild invite <player></white> lädt jemanden ein."
+          - "<white>/guild accept</white> tritt einer Gilde bei, zu der du eingeladen wurdest."
+          - "<white>/guild chat</white> schaltet um, ob deine Nachrichten nur an Gildenmitglieder gesendet werden."
+      home:
+        title: "<white>Gildenzuhause"
+        body:
+          - "<white>/guild sethome</white> legt das gemeinsame Zuhause deiner Gilde fest; <white>/guild home</white> teleportiert dorthin."
+  crates:
+    display-name: "<yellow>Kisten"
+    icon: CHEST
+    description: "Kisten öffnen und Schlüssel benutzen."
+    articles:
+      opening:
+        title: "<white>Eine Kiste öffnen"
+        body:
+          - "Rechtsklicke einen gebundenen Kistenblock, während du einen passenden Schlüssel hältst, um ihn zu öffnen."
+          - "Schlüssel sind gewöhnlich aussehende Gegenstände, die für einen bestimmten Kistentyp markiert sind — sie können nicht gefälscht werden."

@@ -22,8 +22,10 @@ public final class SubcommandAliases {
     }
 
     public void load() {
-        ConfigMigrator.migrate(plugin, "subcommand-aliases.yml");
-        File file = new File(plugin.getDataFolder(), "subcommand-aliases.yml");
+        LanguageManager.migrateLegacyFile(plugin, "subcommand-aliases.yml", "lang/en_US/subcommand-aliases.yml");
+        String path = LanguageManager.file(plugin, "subcommand-aliases");
+        ConfigMigrator.migrate(plugin, path);
+        File file = new File(plugin.getDataFolder(), path);
         YamlConfiguration config = YamlConfiguration.loadConfiguration(file);
 
         for (String commandName : config.getKeys(false)) {

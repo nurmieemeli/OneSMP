@@ -1,0 +1,273 @@
+# Каждая запись под "crates" - это тип кейса, привязываемый к блоку через /crate create <type>.
+# key-material - это просто базовый предмет; его имя/лор ниже могут сделать его похожим на что угодно.
+# Каждой награде нужен "weight" (выше = чаще выпадает) и хотя бы одно из "items" (Material -> количество),
+# "money" или "commands" (%player% заменяется именем победителя); "broadcast: true" объявляет об этом на весь сервер.
+# display-item опционально переопределяет иконку в барабане/превью (по умолчанию - первый предмет, либо золото/звезда для наград только с деньгами/командами).
+crates:
+  common:
+    display-name: "<gray>Обычный кейс"
+    key-name: "<gray>Обычный ключ"
+    key-material: TRIPWIRE_HOOK
+    key-lore:
+      - "<dark_gray>Нажмите правой кнопкой на Обычный кейс, чтобы открыть."
+    rewards:
+      iron:
+        weight: 25
+        display-name: "<white>32 железных слитка"
+        items:
+          IRON_INGOT: 32
+      gold:
+        weight: 20
+        display-name: "<white>16 золотых слитков"
+        items:
+          GOLD_INGOT: 16
+      emerald:
+        weight: 20
+        display-name: "<white>8 изумрудов"
+        items:
+          EMERALD: 8
+      diamond:
+        weight: 15
+        display-name: "<white>6 алмазов"
+        items:
+          DIAMOND: 6
+      shulker:
+        weight: 2
+        display-name: "<white>1 шалкеровский ящик"
+        items:
+          SHULKER_BOX: 1
+      small-xp:
+        weight: 25
+        display-name: "<white>4 бутылки опыта"
+        items:
+          EXPERIENCE_BOTTLE: 4
+      big-xp:
+        weight: 15
+        display-name: "<white>8 бутылок опыта"
+        items:
+          EXPERIENCE_BOTTLE: 8
+      netherite:
+        weight: 1
+        display-name: "<white>1 слиток незерита"
+        items:
+          NETHERITE_INGOT: 1
+      money-small:
+        weight: 30
+        display-name: "<white>1250 долларов"
+        money: 1250
+        display-item: BUNDLE
+      money-big:
+        weight: 20
+        display-name: "<white>2500 долларов"
+        money: 2500
+        display-item: RED_BUNDLE
+      rare-key:
+        weight: 15
+        display-name: "<green>Редкий ключ"
+        display-item: TRIPWIRE_HOOK
+        commands:
+          - "crate key rare %player% 1"
+      epic-key:
+        weight: 7
+        display-name: "<dark_purple>Эпический ключ"
+        display-item: TRIPWIRE_HOOK
+        commands:
+          - "crate key epic %player% 1"
+
+  rare:
+    display-name: "<green>Редкий кейс"
+    key-name: "<green>Редкий ключ"
+    key-material: TRIPWIRE_HOOK
+    key-lore:
+      - "<dark_gray>Нажмите правой кнопкой на Редкий кейс, чтобы открыть."
+    rewards:
+      iron:
+        weight: 25
+        display-name: "<white>64 железных слитка"
+        items:
+          IRON_INGOT: 64
+      gold:
+        weight: 20
+        display-name: "<white>32 золотых слитка"
+        items:
+          GOLD_INGOT: 32
+      emerald:
+        weight: 20
+        display-name: "<white>16 изумрудов"
+        items:
+          EMERALD: 16
+      diamond:
+        weight: 15
+        display-name: "<white>12 алмазов"
+        items:
+          DIAMOND: 12
+      shulker:
+        weight: 4
+        display-name: "<white>1 шалкеровский ящик"
+        items:
+          SHULKER_BOX: 1
+      small-xp:
+        weight: 25
+        display-name: "<white>8 бутылок опыта"
+        items:
+          EXPERIENCE_BOTTLE: 8
+      big-xp:
+        weight: 15
+        display-name: "<white>16 бутылок опыта"
+        items:
+          EXPERIENCE_BOTTLE: 16
+      netherite:
+        weight: 2
+        display-name: "<white>2 слитка незерита"
+        items:
+          NETHERITE_INGOT: 2
+      money-small:
+        weight: 30
+        display-name: "<white>2 500 долларов"
+        money: 2500
+        display-item: BUNDLE
+      money-big:
+        weight: 20
+        display-name: "<white>5 000 долларов"
+        money: 5000
+        display-item: RED_BUNDLE
+      epic-key:
+        weight: 15
+        display-name: "<dark_purple>Эпический ключ"
+        display-item: TRIPWIRE_HOOK
+        commands:
+          - "crate key epic %player% 1"
+      legendary-key:
+        weight: 7
+        display-name: "<gold>Легендарный ключ"
+        display-item: TRIPWIRE_HOOK
+        commands:
+          - "crate key legendary %player% 1"
+
+  epic:
+    display-name: "<dark_purple>Эпический кейс"
+    key-name: "<dark_purple>Эпический ключ"
+    key-material: TRIPWIRE_HOOK
+    key-lore:
+      - "<dark_gray>Нажмите правой кнопкой на Эпический кейс, чтобы открыть."
+    rewards:
+      iron:
+        weight: 25
+        display-name: "<white>16 железных блоков"
+        items:
+          IRON_BLOCK: 16
+      gold:
+        weight: 20
+        display-name: "<white>8 золотых блоков"
+        items:
+          GOLD_BLOCK: 8
+      emerald:
+        weight: 20
+        display-name: "<white>4 изумрудных блока"
+        items:
+          EMERALD_BLOCK: 4
+      diamond:
+        weight: 15
+        display-name: "<white>3 алмазных блока"
+        items:
+          DIAMOND_BLOCK: 3
+      shulker:
+        weight: 4
+        display-name: "<white>1 шалкеровский ящик"
+        items:
+          SHULKER_BOX: 1
+      small-xp:
+        weight: 25
+        display-name: "<white>16 бутылок опыта"
+        items:
+          EXPERIENCE_BOTTLE: 16
+      big-xp:
+        weight: 15
+        display-name: "<white>32 бутылки опыта"
+        items:
+          EXPERIENCE_BOTTLE: 32
+      netherite:
+        weight: 2
+        display-name: "<white>4 слитка незерита"
+        items:
+          NETHERITE_INGOT: 4
+      money-small:
+        weight: 30
+        display-name: "<white>5 000 долларов"
+        money: 5000
+        display-item: BUNDLE
+      money-big:
+        weight: 20
+        display-name: "<white>10 000 долларов"
+        money: 10000
+        display-item: RED_BUNDLE
+      legendary-key:
+        weight: 15
+        display-name: "<gold>Легендарный ключ"
+        display-item: TRIPWIRE_HOOK
+        commands:
+          - "crate key epic %player% 1"
+
+  legendary:
+    display-name: "<gold>Легендарный кейс"
+    key-name: "<gold>Легендарный ключ"
+    key-material: TRIPWIRE_HOOK
+    key-lore:
+      - "<dark_gray>Нажмите правой кнопкой на Легендарный кейс, чтобы открыть."
+    rewards:
+      iron:
+        weight: 25
+        display-name: "<white>32 железных блока"
+        items:
+          IRON_BLOCK: 32
+      gold:
+        weight: 20
+        display-name: "<white>16 золотых блоков"
+        items:
+          GOLD_BLOCK: 16
+      emerald:
+        weight: 20
+        display-name: "<white>8 изумрудных блоков"
+        items:
+          EMERALD_BLOCK: 8
+      diamond:
+        weight: 15
+        display-name: "<white>6 алмазных блоков"
+        items:
+          DIAMOND_BLOCK: 6
+      shulker:
+        weight: 8
+        display-name: "<white>1 шалкеровский ящик"
+        items:
+          SHULKER_BOX: 1
+      small-xp:
+        weight: 25
+        display-name: "<white>32 бутылки опыта"
+        items:
+          EXPERIENCE_BOTTLE: 32
+      big-xp:
+        weight: 15
+        display-name: "<white>64 бутылки опыта"
+        items:
+          EXPERIENCE_BOTTLE: 64
+      netherite:
+        weight: 4
+        display-name: "<white>8 слитков незерита"
+        items:
+          NETHERITE_INGOT: 8
+      money-small:
+        weight: 30
+        display-name: "<white>10 000 долларов"
+        money: 10000
+        display-item: BUNDLE
+      money-big:
+        weight: 20
+        display-name: "<white>20 000 долларов"
+        money: 20000
+        display-item: RED_BUNDLE
+      legendary-key:
+        weight: 25
+        display-name: "<gold>Легендарный ключ"
+        display-item: TRIPWIRE_HOOK
+        commands:
+          - "crate key epic %player% 1"

@@ -1,4 +1,4 @@
-# Backs /sell only. sell-price is what /sell pays per single item; omit an item entirely to make it unsellable.
+# Backs /sell only. sell-price is what /sell pays per single item; remove an item from this list to make it unsellable.
 items:
   STONE: 0.5
   COBBLESTONE: 0.25

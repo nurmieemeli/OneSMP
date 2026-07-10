@@ -1,0 +1,99 @@
+# Every display-name/description/title/body/message value supports MiniMessage formatting, including <prefix>.
+# body is a list of lines, joined with a line break in the article dialog.
+messages:
+  empty: "<prefix><gray>Inga hjälpartiklar är konfigurerade än."
+  category-not-found: "<prefix><fail><red>Ingen hjälpkategori som heter <white><category></white> finns."
+  article-not-found: "<prefix><fail><red>Ingen hjälpartikel som heter <white><article></white> finns i den kategorin."
+  dialog-title: "<gradient:#38bdf8:#818cf8><bold>Hjälp</bold></gradient>"
+  dialog-subtitle: "<gray>Välj en kategori för att bläddra bland dess artiklar."
+  dialog-back: "<gray>« Tillbaka"
+  dialog-back-to-categories: "<gray>Tillbaka till kategorier"
+  dialog-back-to-category: "<gray>Tillbaka till <category>"
+  dialog-no-content: "<gray>(inget innehåll)"
+  dialog-click-to-read: "<gray>Klicka för att läsa"
+
+categories:
+  getting-started:
+    display-name: "<green>Kom Igång"
+    icon: COMPASS
+    description: "Ny här? Börja med grunderna."
+    articles:
+      rules:
+        title: "<white>Serverregler"
+        body:
+          - "Var respektfull — inga trakasserier, hatretorik eller spam."
+          - "Ingen griefing, stöld eller förstörelse av andras byggen utanför markerade områden."
+          - "Inga fusk, hackade klienter eller utnyttjande av buggar/dupliceringsfel."
+          - "Personalens beslut är slutgiltiga; överklaga via supportkanalerna."
+      spawn:
+        title: "<white>Spawn & Att Ta Sig Runt"
+        body:
+          - "<white>/spawn</white> teleporterar dig tillbaka till spawn."
+          - "<white>/sethome</white> och <white>/home</white> sparar och tar dig tillbaka till dina egna platser."
+          - "<white>/tpa <player></white> begär att teleportera till en annan spelare; <white>/tpaccept</white> eller <white>/tpdeny</white> för att svara."
+          - "<white>/rtp</white> teleporterar dig slumpmässigt till en outforskad plats."
+  economy:
+    display-name: "<gold>Ekonomi"
+    icon: GOLD_INGOT
+    description: "Pengar, handel och spelarmarknaden."
+    articles:
+      balance:
+        title: "<white>Ditt Saldo"
+        body:
+          - "<white>/balance</white> kontrollerar ditt eget saldo; <white>/balance <player></white> kontrollerar någon annans."
+          - "<white>/pay <player> <amount></white> skickar pengar direkt till en annan spelare."
+          - "<white>/baltop</white> visar de rikaste spelarna på servern."
+      shop:
+        title: "<white>Sälja till Servern"
+        body:
+          - "<white>/sell</white> öppnar en meny — släpp i föremål och bekräfta för att sälja dem direkt för ett fast pris."
+      market:
+        title: "<white>Spelarmarknaden"
+        body:
+          - "<white>/market sell <price></white> listar föremålet i din hand för andra spelare att köpa."
+          - "<white>/market</white> bläddrar bland aktiva annonser; <white>/market search <query></white> filtrerar efter föremålsnamn."
+          - "<white>/market mine</white> visar dina egna annonser, som du kan avbryta för att återta föremålet."
+  teleport:
+    display-name: "<aqua>Teleportering"
+    icon: ENDER_PEARL
+    description: "Hem, warps och att ta sig till andra spelare."
+    articles:
+      homes:
+        title: "<white>Hem"
+        body:
+          - "<white>/sethome [name]</white> sparar ett hem på din plats."
+          - "<white>/home [name]</white> teleporterar dig dit; <white>/delhome <name></white> tar bort det."
+      warps:
+        title: "<white>Warps"
+        body:
+          - "<white>/warp [name]</white> teleporterar till en serverwarp, eller listar dem om inget namn anges."
+      tpa:
+        title: "<white>Spelarförfrågningar"
+        body:
+          - "<white>/tpa <player></white> ber om att teleportera till dem; <white>/tpahere <player></white> ber dem komma till dig."
+          - "<white>/tpaccept</white> och <white>/tpdeny</white> svarar på en väntande förfrågan."
+  guilds:
+    display-name: "<light_purple>Gillen"
+    icon: SHIELD
+    description: "Gå samman med andra spelare."
+    articles:
+      basics:
+        title: "<white>Skapa ett Gille"
+        body:
+          - "<white>/guild create <name></white> skapar ett gille; <white>/guild invite <player></white> bjuder in någon."
+          - "<white>/guild accept</white> går med i ett gille du har blivit inbjuden till."
+          - "<white>/guild chat</white> växlar så att dina meddelanden bara skickas till gildemedlemmar."
+      home:
+        title: "<white>Gildehem"
+        body:
+          - "<white>/guild sethome</white> sätter ditt gilles gemensamma hem; <white>/guild home</white> teleporterar dit."
+  crates:
+    display-name: "<yellow>Kistor"
+    icon: CHEST
+    description: "Öppna kistor och använda nycklar."
+    articles:
+      opening:
+        title: "<white>Öppna en Kista"
+        body:
+          - "Högerklicka på ett bundet kistblock medan du håller en matchande nyckel för att öppna det."
+          - "Nycklar är föremål som ser vanliga ut men är märkta för en specifik kisttyp — de kan inte förfalskas."

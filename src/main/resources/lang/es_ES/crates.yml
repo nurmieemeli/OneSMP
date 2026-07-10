@@ -1,0 +1,273 @@
+# Cada entrada bajo "crates" es un tipo de caja, vinculada a un bloque con /crate create <type>.
+# key-material es solo el objeto base; su nombre de visualización/lore de abajo puede hacer que parezca cualquier cosa.
+# Cada recompensa necesita "weight" (más alto = más común) y al menos uno de "items" (Material -> cantidad),
+# "money", o "commands" (%player% se sustituye por el nombre del ganador); "broadcast: true" lo anuncia a todo el servidor.
+# display-item sobrescribe opcionalmente el icono de la ruleta/vista previa (por defecto es el primer objeto, u oro/una estrella para recompensas solo de dinero/comandos).
+crates:
+  common:
+    display-name: "<gray>Caja Común"
+    key-name: "<gray>Llave Común"
+    key-material: TRIPWIRE_HOOK
+    key-lore:
+      - "<dark_gray>Haz clic derecho en una Caja Común para abrirla."
+    rewards:
+      iron:
+        weight: 25
+        display-name: "<white>32 Lingotes de Hierro"
+        items:
+          IRON_INGOT: 32
+      gold:
+        weight: 20
+        display-name: "<white>16 Lingotes de Oro"
+        items:
+          GOLD_INGOT: 16
+      emerald:
+        weight: 20
+        display-name: "<white>8 Esmeraldas"
+        items:
+          EMERALD: 8
+      diamond:
+        weight: 15
+        display-name: "<white>6 Diamantes"
+        items:
+          DIAMOND: 6
+      shulker:
+        weight: 2
+        display-name: "<white>1 Caja Shulker"
+        items:
+          SHULKER_BOX: 1
+      small-xp:
+        weight: 25
+        display-name: "<white>4 Botellas de Experiencia"
+        items:
+          EXPERIENCE_BOTTLE: 4
+      big-xp:
+        weight: 15
+        display-name: "<white>8 Botellas de Experiencia"
+        items:
+          EXPERIENCE_BOTTLE: 8
+      netherite:
+        weight: 1
+        display-name: "<white>1 Lingote de Netherita"
+        items:
+          NETHERITE_INGOT: 1
+      money-small:
+        weight: 30
+        display-name: "<white>1250 Dólares"
+        money: 1250
+        display-item: BUNDLE
+      money-big:
+        weight: 20
+        display-name: "<white>2500 Dólares"
+        money: 2500
+        display-item: RED_BUNDLE
+      rare-key:
+        weight: 15
+        display-name: "<green>Llave Rara"
+        display-item: TRIPWIRE_HOOK
+        commands:
+          - "crate key rare %player% 1"
+      epic-key:
+        weight: 7
+        display-name: "<dark_purple>Llave Épica"
+        display-item: TRIPWIRE_HOOK
+        commands:
+          - "crate key epic %player% 1"
+
+  rare:
+    display-name: "<green>Caja Rara"
+    key-name: "<green>Llave Rara"
+    key-material: TRIPWIRE_HOOK
+    key-lore:
+      - "<dark_gray>Haz clic derecho en una Caja Rara para abrirla."
+    rewards:
+      iron:
+        weight: 25
+        display-name: "<white>64 Lingotes de Hierro"
+        items:
+          IRON_INGOT: 64
+      gold:
+        weight: 20
+        display-name: "<white>32 Lingotes de Oro"
+        items:
+          GOLD_INGOT: 32
+      emerald:
+        weight: 20
+        display-name: "<white>16 Esmeraldas"
+        items:
+          EMERALD: 16
+      diamond:
+        weight: 15
+        display-name: "<white>12 Diamantes"
+        items:
+          DIAMOND: 12
+      shulker:
+        weight: 4
+        display-name: "<white>1 Caja Shulker"
+        items:
+          SHULKER_BOX: 1
+      small-xp:
+        weight: 25
+        display-name: "<white>8 Botellas de Experiencia"
+        items:
+          EXPERIENCE_BOTTLE: 8
+      big-xp:
+        weight: 15
+        display-name: "<white>16 Botellas de Experiencia"
+        items:
+          EXPERIENCE_BOTTLE: 16
+      netherite:
+        weight: 2
+        display-name: "<white>2 Lingotes de Netherita"
+        items:
+          NETHERITE_INGOT: 2
+      money-small:
+        weight: 30
+        display-name: "<white>2 500 Dólares"
+        money: 2500
+        display-item: BUNDLE
+      money-big:
+        weight: 20
+        display-name: "<white>5 000 Dólares"
+        money: 5000
+        display-item: RED_BUNDLE
+      epic-key:
+        weight: 15
+        display-name: "<dark_purple>Llave Épica"
+        display-item: TRIPWIRE_HOOK
+        commands:
+          - "crate key epic %player% 1"
+      legendary-key:
+        weight: 7
+        display-name: "<gold>Llave Legendaria"
+        display-item: TRIPWIRE_HOOK
+        commands:
+          - "crate key legendary %player% 1"
+
+  epic:
+    display-name: "<dark_purple>Caja Épica"
+    key-name: "<dark_purple>Llave Épica"
+    key-material: TRIPWIRE_HOOK
+    key-lore:
+      - "<dark_gray>Haz clic derecho en una Caja Épica para abrirla."
+    rewards:
+      iron:
+        weight: 25
+        display-name: "<white>16 Bloques de Hierro"
+        items:
+          IRON_BLOCK: 16
+      gold:
+        weight: 20
+        display-name: "<white>8 Bloques de Oro"
+        items:
+          GOLD_BLOCK: 8
+      emerald:
+        weight: 20
+        display-name: "<white>4 Bloques de Esmeralda"
+        items:
+          EMERALD_BLOCK: 4
+      diamond:
+        weight: 15
+        display-name: "<white>3 Bloques de Diamante"
+        items:
+          DIAMOND_BLOCK: 3
+      shulker:
+        weight: 4
+        display-name: "<white>1 Caja Shulker"
+        items:
+          SHULKER_BOX: 1
+      small-xp:
+        weight: 25
+        display-name: "<white>16 Botellas de Experiencia"
+        items:
+          EXPERIENCE_BOTTLE: 16
+      big-xp:
+        weight: 15
+        display-name: "<white>32 Botellas de Experiencia"
+        items:
+          EXPERIENCE_BOTTLE: 32
+      netherite:
+        weight: 2
+        display-name: "<white>4 Lingotes de Netherita"
+        items:
+          NETHERITE_INGOT: 4
+      money-small:
+        weight: 30
+        display-name: "<white>5 000 Dólares"
+        money: 5000
+        display-item: BUNDLE
+      money-big:
+        weight: 20
+        display-name: "<white>10 000 Dólares"
+        money: 10000
+        display-item: RED_BUNDLE
+      legendary-key:
+        weight: 15
+        display-name: "<gold>Llave Legendaria"
+        display-item: TRIPWIRE_HOOK
+        commands:
+          - "crate key epic %player% 1"
+
+  legendary:
+    display-name: "<gold>Caja Legendaria"
+    key-name: "<gold>Llave Legendaria"
+    key-material: TRIPWIRE_HOOK
+    key-lore:
+      - "<dark_gray>Haz clic derecho en una Caja Legendaria para abrirla."
+    rewards:
+      iron:
+        weight: 25
+        display-name: "<white>32 Bloques de Hierro"
+        items:
+          IRON_BLOCK: 32
+      gold:
+        weight: 20
+        display-name: "<white>16 Bloques de Oro"
+        items:
+          GOLD_BLOCK: 16
+      emerald:
+        weight: 20
+        display-name: "<white>8 Bloques de Esmeralda"
+        items:
+          EMERALD_BLOCK: 8
+      diamond:
+        weight: 15
+        display-name: "<white>6 Bloques de Diamante"
+        items:
+          DIAMOND_BLOCK: 6
+      shulker:
+        weight: 8
+        display-name: "<white>1 Caja Shulker"
+        items:
+          SHULKER_BOX: 1
+      small-xp:
+        weight: 25
+        display-name: "<white>32 Botellas de Experiencia"
+        items:
+          EXPERIENCE_BOTTLE: 32
+      big-xp:
+        weight: 15
+        display-name: "<white>64 Botellas de Experiencia"
+        items:
+          EXPERIENCE_BOTTLE: 64
+      netherite:
+        weight: 4
+        display-name: "<white>8 Lingotes de Netherita"
+        items:
+          NETHERITE_INGOT: 8
+      money-small:
+        weight: 30
+        display-name: "<white>10 000 Dólares"
+        money: 10000
+        display-item: BUNDLE
+      money-big:
+        weight: 20
+        display-name: "<white>20 000 Dólares"
+        money: 20000
+        display-item: RED_BUNDLE
+      legendary-key:
+        weight: 25
+        display-name: "<gold>Llave Legendaria"
+        display-item: TRIPWIRE_HOOK
+        commands:
+          - "crate key epic %player% 1"

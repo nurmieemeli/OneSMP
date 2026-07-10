@@ -110,12 +110,12 @@ public final class ScoreboardManager {
     }
 
     private Component renderTitle(Player player) {
-        String titleFormat = plugin.getConfig().getString("scoreboard.title", "<white>Server");
+        String titleFormat = plugin.messages().raw("scoreboard.title");
         return plugin.messages().parse(titleFormat, player);
     }
 
     private List<Component> renderLines(Player player) {
-        List<String> lines = plugin.getConfig().getStringList("scoreboard.lines");
+        List<String> lines = plugin.messages().rawList("scoreboard.lines");
         List<Component> rendered = new ArrayList<>(lines.size());
         for (String line : lines) {
             rendered.add(plugin.messages().renderRelationalRaw(player, player, line));

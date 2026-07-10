@@ -1,3 +1,7 @@
+# Which set of lang/<code>/*.yml files to load for messages.yml/help.yml/crates.yml content. Supported out of box:
+# en_US, fi_FI, sv_SE, de_DE, ru_RU, es_ES. Falls back to en_US (with a warning) if unrecognized.
+language: en_US
+
 links:
   discord-url: "https://discord.gg/your-invite"
   store-url: "https://store.example.com"
@@ -34,7 +38,7 @@ market:
 # Cosmetic sound/particle feedback only - never affects whether an action succeeds.
 effects:
   enabled: true
-  # Success chime or denial grunt, picked from whether the command's message starts with <green> or <red> in messages.yml.
+  # Success chime or denial grunt, picked from whether the command's message starts with <success> or <fail> in messages.yml.
   command-feedback: true
   gui-open: true
   teleport: true
@@ -83,17 +87,6 @@ guild:
   default-member-limit: 12
   creation-cost: 500.0
   allow-guild-bank: true
-  # Fed into the <guild_own_name>/<guild_own_tag> placeholders for players not in a guild.
-  no-guild-placeholder: "No Guild"
-
-chat:
-  # <guild_segment> renders to nothing without a guild - don't hardcode brackets around <guild_tag>, use guild-segment-format below instead.
-  # Remove <luckperms_prefix>/<luckperms_suffix> if the MiniPlaceholders-LuckPerms expansion isn't installed, or parsing will fail on every message.
-  # <player_name> inherits <luckperms_prefix>'s color if that prefix doesn't close its own tag - add your own <reset> here if that's unwanted.
-  format: "<guild_segment><luckperms_prefix><player_name><gray>:</gray> <white><message>"
-  guild-chat-format: "<dark_aqua>[G]</dark_aqua> <gray>[<guild_tag>]</gray> <white><player_name></white><gray>:</gray><aqua><message>"
-  # Include your own trailing space - the no-guild case omits both the brackets and the space.
-  guild-segment-format: "<gray>[<guild_tag>]</gray> "
 
 # Backed by the server's real whitelist (whitelist.json) - /maintenance on/off flips server.getWhitelist()
 # directly, so turning maintenance off also turns the real whitelist off.
@@ -122,7 +115,7 @@ nametag:
   refresh-interval-seconds: 30
   guild-tag:
     # Second nametag line for guild members, rendered via a fake TEXT_DISPLAY entity since there's no vanilla way to stack a second line.
-    format: "<gray>[<tag>]</gray>"
+    format: "<dark_aqua>[<aqua><guild_tag></aqua>]</dark_aqua>"
     # How far above the mount point the line floats - a generic passenger has no defined seat height like a horse/boat.
     y-offset: 0.55
     # Re-sent periodically since it's a cheap packet, guarding against the passenger mount desyncing client-side.
@@ -168,19 +161,7 @@ world-creation:
 scoreboard:
   enabled: true
   refresh-interval-seconds: 5
-  title: "<gradient:#38bdf8:#818cf8><bold>OneSMP</bold></gradient>"
-  # Rendered per viewer; besides MiniPlaceholders tags, also supports <stats_*>, <economy_balance>, and <guild_own_name>/<guild_own_tag>.
-  lines:
-    - "<gradient:#818cf8:#38bdf8><strikethrough>                         </strikethrough>"
-    - " "
-    - " <green><bold>$</bold><gray> Money: </gray><economy_balance></green>"
-    - " <dark_red><bold>🗡</bold><gray> Kills: </gray><stats_kills></dark_red>"
-    - " <#F54927>☠<gray> Deaths: </gray><stats_deaths></#F54927>"
-    - " <yellow><bold>🕓</bold><gray> Playtime: </gray><stats_playtime></yellow>"
-    - " <#818cf8>⚑<gray> Guild: </gray><guild_own_name></#818cf8>"
-    - " "
-    - "<gradient:#818cf8:#38bdf8><strikethrough>                         </strikethrough>"
-    - "<white>   play.example.com"
+  # title/lines moved to lang/<language>/messages.yml (scoreboard.title / scoreboard.lines) so they're translatable.
 
 stats:
   # Broadcasts stats.killstreak-broadcast (messages.yml) whenever a killstreak hits one of these numbers.

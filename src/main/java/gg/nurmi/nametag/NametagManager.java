@@ -184,8 +184,8 @@ public final class NametagManager {
             return;
         }
 
-        String format = plugin.getConfig().getString("nametag.guild-tag.format", "<gray>[<tag>]");
-        Component rendered = plugin.messages().parse(format, player, Placeholder.unparsed("tag", tag));
+        String format = plugin.getConfig().getString("nametag.guild-tag.format", "<gray>[<guild_tag>]");
+        Component rendered = plugin.messages().parse(format, player, Placeholder.unparsed("guild_tag", tag));
         String currentWorld = player.getWorld().getName();
 
         GuildTagState existing = guildTagState.get(uuid);

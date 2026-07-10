@@ -2,8 +2,8 @@
 # body is a list of lines, joined with a line break in the article dialog.
 messages:
   empty: "<prefix><gray>No help articles are configured yet."
-  category-not-found: "<prefix><red>No help category named <white><category></white> exists."
-  article-not-found: "<prefix><red>No help article named <white><article></white> exists in that category."
+  category-not-found: "<prefix><fail><red>No help category named <white><category></white> exists."
+  article-not-found: "<prefix><fail><red>No help article named <white><article></white> exists in that category."
   dialog-title: "<gradient:#38bdf8:#818cf8><bold>Help</bold></gradient>"
   dialog-subtitle: "<gray>Pick a category to browse its articles."
   dialog-back: "<gray>« Back"

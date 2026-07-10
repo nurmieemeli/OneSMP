@@ -17,7 +17,7 @@ public final class GuildPlaceholderExpansion {
     }
 
     public static Expansion register(OneSMPPlugin plugin, GuildManager guildManager) {
-        Component noGuild = plugin.messages().parse(plugin.getConfig().getString("guild.no-guild-placeholder", "No Guild"));
+        Component noGuild = plugin.messages().parse(plugin.messages().raw("guild.no-guild-placeholder"));
 
         Expansion expansion = Expansion.builder("guild")
                 .audiencePlaceholder(Player.class, "own_name", (player, queue, ctx) ->

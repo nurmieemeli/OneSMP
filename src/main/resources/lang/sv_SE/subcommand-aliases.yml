@@ -1,0 +1,45 @@
+# Extra underkommandonamn (t.ex. "/world tp" för "/world teleport") - inte riktiga Bukkit-kommandon,
+# kontrolleras bara i koden innan de körs. Varje underkommandos eget namn fungerar alltid ändå.
+world:
+  create: [c]
+  list: [ls]
+  delete: [d, del]
+  teleport: [tp]
+guild:
+  create: []
+  disband: []
+  invite: [inv]
+  accept: [a]
+  kick: []
+  promote: []
+  demote: []
+  sethome: []
+  home: [h]
+  info: [i]
+  list: [ls]
+  chat: [c]
+  leave: []
+  gui: [meny]
+eco:
+  give: []
+  take: []
+  set: []
+statshologram:
+  create: []
+  remove: []
+  list: [ls]
+crate:
+  create: [c]
+  remove: [radera, del]
+  key: []
+onesmp:
+  reload: []
+maintenance:
+  on: [aktivera]
+  off: [inaktivera]
+  status: [info]
+market:
+  sell: []
+  search: [sök]
+  mine: [mina, listor]
+  cancel: [radera, avbryt]
